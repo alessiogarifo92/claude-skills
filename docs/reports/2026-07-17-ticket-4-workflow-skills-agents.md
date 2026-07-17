@@ -1,5 +1,10 @@
 # Workflow end-to-end skills + agents (ticket #4)
 
+> **Storico della decisione** — questo report è un decision record immutabile.
+> La fonte di verità operativa è `product-ownership` § "End-to-end workflow
+> and handoffs" (implementata nel ticket #7); questo file non viene più
+> aggiornato.
+
 Report di ricerca per l'issue [#4](https://github.com/alessiogarifo92/claude-skills/issues/4):
 mappatura del ciclo di vita di un task sulle skill del repo, sulle skill del
 plugin superpowers e sui custom agents, con analisi di gap/sovrapposizioni e

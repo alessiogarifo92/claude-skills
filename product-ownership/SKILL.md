@@ -1,12 +1,34 @@
 ---
 name: product-ownership
 description: Use when drafting or creating a GitHub issue/ticket, researching external sources needed to write one, deciding whether something is a bug/research/implementation ticket, starting or finishing implementation work on a ticket, about to push or merge a completed change, or cleaning up branches after a PR merges or a commit supersedes it
-version: 1.0.0
+version: 1.1.0
 ---
 
 # Product Ownership
 
 Own the lifecycle of a work item end to end: from a raw problem report to a grounded ticket, through to the branch cleanup once the work has actually shipped. Grounding tickets in the real code/data is expected baseline behavior, not this skill's job — this skill is about the parts that get skipped without a deliberate habit: separating ticket types, confirming before publishing, reusing repo conventions, and closing the loop on branches.
+
+## End-to-end workflow and handoffs
+This skill is the entry and exit point of the task lifecycle; the superpowers chain (brainstorming → plans → execution → review → finishing) covers the middle. Who does what, per phase:
+
+| Phase | Process skill | Agent |
+|---|---|---|
+| 0. Operating principles | `principal-engineering-core` for non-trivial tasks | — |
+| 1. Ideation | `superpowers:brainstorming` | `researcher` for external feasibility facts; `Explore` to see what already exists in the code |
+| 2. Grounding / ticket | this skill (ticket type, draft + user confirmation, existing labels) | `researcher` for the ticket's external sources; `Explore` to verify in the code that the problem is where you think |
+| 3. Pickup | this skill (`in progress` label) → `superpowers:using-git-worktrees` → `superpowers:writing-plans` for multi-step work | `Explore` to locate the critical files before planning |
+| 4. Implementation | `superpowers:subagent-driven-development` (or `superpowers:executing-plans`) + `superpowers:test-driven-development`, plus the relevant domain skill; a research ticket delivers a report instead (see Ticket types) | implementer subagents; `researcher` writes the report on research tickets |
+| 5. Verification | `test-verification` picks the checks → `superpowers:verification-before-completion` enforces evidence before "done" | `test-runner` runs suites/lint/typecheck and reports only the outcome |
+| 6. Review | `superpowers:requesting-code-review`; add the `architecture-review` / `security-review` lens when the change touches structure or trust boundaries | reviewer subagent |
+| 7. Closing | manual user gate (below) → `superpowers:finishing-a-development-branch` (merge/PR options) → this skill: close issue, remove label, branch cleanup, skill version bumps | — |
+
+The table stays at phase level on purpose: domain skills are a category ("the relevant domain skill"), not an exhaustive list. Rationale and diagram live in the decision record `docs/reports/2026-07-17-ticket-4-workflow-skills-agents.md` (#4).
+
+**Closing order is fixed.** The manual user gate comes first; only after the user confirms does `finishing-a-development-branch` present its merge/PR options, and only after the work lands do issue closing and cleanup happen. Never let finishing-a-development-branch's menu jump ahead of the gate.
+
+**Anti-friction rules:**
+- When multiple user confirmations are foreseeable (ticket draft, manual gate, follow-up ticket), prepare all the material first — report, drafts, closing text — and present the requests at a single stop point, so one reply unblocks the whole queue. The gate's content is unchanged; only the batching is.
+- The handoff message at the gate must be self-contained: what to check, where (URL/command), the expected result, and what will happen after confirmation — the user should not need to reconstruct context from the conversation.
 
 ## Ticket types — don't blend them
 - **Bug**: root cause identified in code. Deliverable is the fix.
@@ -66,6 +88,7 @@ Every skill in this repo carries a semver `version` in its `SKILL.md` frontmatte
 - Closing an issue → was the `in progress` label removed?
 - Just merged/superseded a branch → does `git branch -a` show only the default branch, locally and remotely, when you're done?
 - Modified a skill → did you bump its frontmatter `version` and add the `CHANGELOG.md` line in the same commit?
+- Added or renamed a repo skill or agent → is the "End-to-end workflow and handoffs" section still correct? Update it in the same commit.
 
 ## Boundary
 This is about grounding and lifecycle hygiene for issues/branches, not about deciding product priority or roadmap — it doesn't replace the user's judgment on what to build next or in what order.
