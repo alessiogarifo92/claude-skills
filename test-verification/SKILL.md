@@ -1,7 +1,7 @@
 ---
 name: test-verification
 description: Use when deciding what to run to verify a code change - choosing the narrowest meaningful set of tests, lint, type checks, or manual smoke checks for backend, frontend, database, or API changes
-version: 1.0.0
+version: 1.0.1
 ---
 
 # Test Verification
@@ -9,6 +9,8 @@ version: 1.0.0
 Select the narrowest meaningful verification set first, then expand if justified.
 
 **Pairs with:** superpowers:verification-before-completion, which enforces actually running verification before claiming done; this skill helps pick which checks to run.
+
+**Execution:** this skill decides *what* to run; delegate the actual runs to the `test-runner` agent, which executes suites/lint/typechecks and reports only the outcome, keeping verbose logs out of the conversation.
 
 ## Verification order
 1. targeted unit or feature tests

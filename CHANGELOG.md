@@ -14,6 +14,13 @@ modifica alla skill.
 
 ## 2026-07-17
 
+Ticket #7 — workflow end-to-end skills+agents (decisione del report #4):
+
+- product-ownership 1.1.0 — nuova sezione "End-to-end workflow and handoffs" (tabella fasi → skill → agent, ordine del gate di chiusura, regole anti-attrito, agents `researcher`/`Explore`/`test-runner`) e riga di checklist sul sync della sezione
+- debugging-workflow 1.0.1 — chiarito che `superpowers:systematic-debugging` governa il processo e viene prima; questa skill aggiunge il livello repo-specifico
+- test-verification 1.0.1 — esplicitata la delega dell'esecuzione all'agent `test-runner`
+- (senza versione) `agents/researcher.md` — rimando alla regola di chiusura research; report del #4 marcato come decision record
+
 Baseline: tutte le skill partono da 1.0.0.
 
 - api-design 1.0.0

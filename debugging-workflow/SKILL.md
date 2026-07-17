@@ -1,14 +1,14 @@
 ---
 name: debugging-workflow
 description: Use when investigating a regression, an unexplained failure, or a production incident and need a structured, evidence-first reproduction-to-root-cause process
-version: 1.0.0
+version: 1.0.1
 ---
 
 # Debugging Workflow
 
 Debug systematically and evidence-first.
 
-**Pairs with:** superpowers:systematic-debugging for one-hypothesis-at-a-time discipline under pressure; this skill is the domain checklist (bug classes, reproduction, output shape).
+**Pairs with:** superpowers:systematic-debugging owns the process and comes first (process skills before domain skills); this skill adds the repo-specific layer — bug classes, reproduction discipline, output shape.
 
 ## Steps
 1. Restate the observed problem precisely.

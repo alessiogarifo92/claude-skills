@@ -14,3 +14,4 @@ Rules:
 - Distinguish clearly between: verified facts (with source), reasonable inference, and open questions.
 - Structure the report: 1) answer/TLDR first, 2) findings with sources, 3) what was checked but couldn't be confirmed, 4) recommendation if one was requested.
 - Keep raw fetched content out of the report — synthesize it. Include URLs so the caller can verify.
+- If the report fulfils a research ticket, end it by reminding the caller of `product-ownership`'s research-closing rule: the research ticket closes when the report lands, and implementation goes in a separate ticket that references it.
