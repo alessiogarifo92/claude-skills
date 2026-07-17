@@ -1,6 +1,7 @@
 ---
 name: python-backend
 description: Use when writing or reviewing Python backend code - services, scripts, or API handlers - for typing, error handling, async correctness, resource or subprocess safety, or input validation
+version: 1.0.0
 ---
 
 # Python Backend

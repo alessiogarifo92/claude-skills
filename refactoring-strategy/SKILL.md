@@ -1,6 +1,7 @@
 ---
 name: refactoring-strategy
 description: Use when planning a refactor - sequencing safe steps, isolating mechanical changes from behavior changes, or deciding how to de-risk a large structural change
+version: 1.0.0
 ---
 
 # Refactoring Strategy

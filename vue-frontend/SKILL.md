@@ -1,6 +1,7 @@
 ---
 name: vue-frontend
 description: Use when writing or reviewing Vue components - composables, state ownership, props/emits design, accessibility, or loading/empty/error UI states
+version: 1.0.0
 ---
 
 # Vue Frontend

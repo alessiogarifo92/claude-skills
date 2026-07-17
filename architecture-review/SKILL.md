@@ -1,6 +1,7 @@
 ---
 name: architecture-review
 description: Use when reviewing a non-trivial code change or design for structural boundaries, layering, coupling, testability, or long-term maintainability - not for small, self-contained fixes
+version: 1.0.0
 ---
 
 # Architecture Review
