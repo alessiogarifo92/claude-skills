@@ -14,6 +14,11 @@ modifica alla skill.
 
 ## 2026-07-17
 
+Ticket #8 — skill market-analyst e integrazione nel workflow decisionale:
+
+- market-analyst 1.0.0 — nuova skill: due diligence su costi (pricing verificato, free tier, stima a volume attuale e 10x, lock-in) e licenze/legale (SPDX, copyleft vs permissive, ToS delle API, copyright e attribuzione degli asset) di tool, API, SaaS, librerie e asset esterni
+- product-ownership 1.2.0 — `market-analyst` nelle fasi 1–2 della tabella end-to-end (prima di fissare l'adozione di dipendenze esterne; il ticket ne cita il verdetto) e come lente in fase 6 quando il change introduce nuove dipendenze o servizi a pagamento
+
 Ticket #7 — workflow end-to-end skills+agents (decisione del report #4):
 
 - product-ownership 1.1.0 — nuova sezione "End-to-end workflow and handoffs" (tabella fasi → skill → agent, ordine del gate di chiusura, regole anti-attrito, agents `researcher`/`Explore`/`test-runner`) e riga di checklist sul sync della sezione
