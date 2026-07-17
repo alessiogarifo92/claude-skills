@@ -1,6 +1,7 @@
 ---
 name: handling-sudo-and-missing-tools
 description: Use when a command needs sudo/root, fails with "permission denied", or a required tool is missing from the environment or a container (command not found — e.g. wget, curl, an apt/apk package) — BEFORE attempting installation or privilege escalation.
+version: 1.0.0
 ---
 
 # Sudo and Missing Tools: Ask First

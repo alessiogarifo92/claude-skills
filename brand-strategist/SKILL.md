@@ -1,6 +1,7 @@
 ---
 name: brand-strategist
 description: Use when naming a product, feature, or repo, briefing or reviewing a logo or visual identity, defining voice and tone for UI copy, docs, or error messages, or auditing brand consistency across pages, meta tags, social cards, store listings, and locales
+version: 1.0.0
 ---
 
 # Brand Strategist

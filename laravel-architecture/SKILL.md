@@ -1,6 +1,7 @@
 ---
 name: laravel-architecture
 description: Use when writing or reviewing Laravel code - controllers, Form Requests, policies/gates, actions or services, jobs, events, Eloquent models, or API resources
+version: 1.0.0
 ---
 
 # Laravel Architecture

@@ -1,6 +1,7 @@
 ---
 name: go-backend
 description: Use when writing or reviewing Go service code - goroutine lifecycle, context propagation and cancellation, channel ownership, error handling, or interface boundaries
+version: 1.0.0
 ---
 
 # Go Backend

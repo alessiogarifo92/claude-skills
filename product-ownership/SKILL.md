@@ -1,6 +1,7 @@
 ---
 name: product-ownership
 description: Use when drafting or creating a GitHub issue/ticket, researching external sources needed to write one, deciding whether something is a bug/research/implementation ticket, starting or finishing implementation work on a ticket, about to push or merge a completed change, or cleaning up branches after a PR merges or a commit supersedes it
+version: 1.0.0
 ---
 
 # Product Ownership
@@ -53,6 +54,9 @@ Once a branch's work has landed on the default branch, delete **both** copies �
 
 **Red flag:** if you notice `git branch -a` listing branches other than the default one whose work is already on it, that's stale cleanup you should do now, not just note for later.
 
+## Skill versioning
+Every skill in this repo carries a semver `version` in its `SKILL.md` frontmatter. When you modify a skill, bump its version (MAJOR = behavior/approach change, MINOR = new section/rule/capability, PATCH = fixes/clarifications) and add a line to the root `CHANGELOG.md` under today's date — in the same commit as the change.
+
 ## Check
 - Research ticket done → is there a follow-up implementation ticket, or does one need opening?
 - About to run `gh issue create` → did the user see and confirm this exact text?
@@ -61,6 +65,7 @@ Once a branch's work has landed on the default branch, delete **both** copies �
 - Fix pushed to the default branch → did you close the issue right away, without waiting to be asked?
 - Closing an issue → was the `in progress` label removed?
 - Just merged/superseded a branch → does `git branch -a` show only the default branch, locally and remotely, when you're done?
+- Modified a skill → did you bump its frontmatter `version` and add the `CHANGELOG.md` line in the same commit?
 
 ## Boundary
 This is about grounding and lifecycle hygiene for issues/branches, not about deciding product priority or roadmap — it doesn't replace the user's judgment on what to build next or in what order.

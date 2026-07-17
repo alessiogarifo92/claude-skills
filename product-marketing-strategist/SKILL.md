@@ -1,6 +1,7 @@
 ---
 name: product-marketing-strategist
 description: Use when writing or reviewing landing/home copy, positioning a product or feature for an audience, planning a launch or announcement (Product Hunt, Reddit, communities, blog, email), writing user-facing release notes or changelogs, improving SEO titles and meta descriptions, or turning a README into something that converts visitors into users
+version: 1.0.0
 ---
 
 # Product Marketing Strategist

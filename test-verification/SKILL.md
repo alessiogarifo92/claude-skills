@@ -1,6 +1,7 @@
 ---
 name: test-verification
 description: Use when deciding what to run to verify a code change - choosing the narrowest meaningful set of tests, lint, type checks, or manual smoke checks for backend, frontend, database, or API changes
+version: 1.0.0
 ---
 
 # Test Verification

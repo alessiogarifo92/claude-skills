@@ -1,6 +1,7 @@
 ---
 name: api-design
 description: Use when designing or reviewing a REST-style API contract - new endpoints, request/response shapes, validation and error formats, pagination, filtering, idempotency, or breaking-change risk
+version: 1.0.0
 ---
 
 # API Design

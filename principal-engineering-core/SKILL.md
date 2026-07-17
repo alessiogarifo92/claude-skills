@@ -1,6 +1,7 @@
 ---
 name: principal-engineering-core
 description: Use at the start of a non-trivial engineering task, or when weighing architecture, quality, or delivery tradeoffs, to set explore-then-plan, evidence-over-guesswork operating principles before reaching for a more specific skill
+version: 1.0.0
 ---
 
 # Principal Engineering Core
