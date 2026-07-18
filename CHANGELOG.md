@@ -19,6 +19,11 @@ Nuovo agent globale `github-ops` (model: haiku) per operazioni git/GitHub meccan
 - (senza versione) `agents/github-ops.md` — nuovo agent
 - product-ownership 1.3.0 — `github-ops` in fase 3 (creazione worktree/branch del ticket) e fase 7 (merge/push, chiusura issue, cleanup branch/worktree) della tabella end-to-end
 
+`CLAUDE.md` globale (regole per tutti i progetti) ora versionato in questa repo, stesso pattern di `agents/`:
+
+- `CLAUDE.md` spostato qui da `~/.claude/CLAUDE.md`, che ora è un symlink a `~/.claude/skills/CLAUDE.md`
+- Aggiunte due regole: "Manual verification: real data, standard ports, one environment at a time" e "Manual verification: mock data when the real dataset can't cover the case"
+
 ## 2026-07-17
 
 Ticket #8 — skill market-analyst e integrazione nel workflow decisionale:
