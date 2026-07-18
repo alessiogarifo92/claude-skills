@@ -12,6 +12,13 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-07-18
+
+Nuovo agent globale `github-ops` (model: haiku) per operazioni git/GitHub meccaniche e convention-following (worktree/branch, PR, issue) senza giudizio editoriale:
+
+- (senza versione) `agents/github-ops.md` — nuovo agent
+- product-ownership 1.3.0 — `github-ops` in fase 3 (creazione worktree/branch del ticket) e fase 7 (merge/push, chiusura issue, cleanup branch/worktree) della tabella end-to-end
+
 ## 2026-07-17
 
 Ticket #8 — skill market-analyst e integrazione nel workflow decisionale:
