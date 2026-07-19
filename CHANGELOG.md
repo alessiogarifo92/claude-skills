@@ -24,6 +24,14 @@ Sistema di orchestrazione custom (sostituisce l'orchestrazione superpowers per i
 - product-ownership 1.4.0 — fase 4 della tabella end-to-end passa a esecuzione diretta di default (subagent solo per workstream paralleli indipendenti); ogni dispatch segue orchestrating-agents
 - product-ownership 1.5.0 — sezione "Work-in-progress label": la label non era mai stata applicata all'issue #34 (creata worktree, lavoro consegnato, nessun evento "labeled") perché il passo esisteva solo come frase nella skill, scollegato dall'azione di pickup. Aggiunta indicazione di automatizzare il passo nel tooling di pickup del repo quando possibile (vedi ps-plus-catalog `.claude/skills/worktree-manager`, repo-local, non versionata qui), invece di lasciarlo alla memoria
 
+## 2026-07-19 (bis)
+
+Il worktree manager, prima duplicato per-repo, diventa una skill globale — stessa convenzione (naming branch/path, label "in progress") su tutti i progetti presenti e futuri, cambia solo lo stack/linguaggio del singolo repo:
+
+- worktree-manager 1.0.0 — nuova skill globale, sposta lo script da `ps-plus-catalog/.claude/scripts/worktree.sh` a `~/.claude/skills/worktree-manager/scripts/worktree.sh` (già repo-agnostico: risolve la root via `git rev-parse --git-common-dir`, nessun percorso hardcoded); rimossa la copia locale in ps-plus-catalog
+- `CLAUDE.md` — sezione "One git worktree per ticket" ora punta sempre alla skill globale invece di "usa quella del repo se esiste, altrimenti fai a mano"
+- product-ownership 1.5.0 (fix di seguito) — riferimento a `worktree-manager` corretto da "implementazione di questo repo" a skill globale condivisa
+
 ## 2026-07-18
 
 Nuovo agent globale `github-ops` (model: haiku) per operazioni git/GitHub meccaniche e convention-following (worktree/branch, PR, issue) senza giudizio editoriale:

@@ -32,9 +32,9 @@ If the real dataset doesn't contain a case the user needs to see with their own 
 - Clean it up promptly once approved, so it doesn't linger and get mistaken for real data in later tests.
 
 ## One git worktree per ticket
-When starting implementation work on a ticket/issue in any git repo, never work directly on the default branch of the primary checkout — use an isolated worktree:
+When starting implementation work on a ticket/issue in any git repo, never work directly on the default branch of the primary checkout — use an isolated worktree, via the global `worktree-manager` skill (`~/.claude/skills/worktree-manager/scripts/worktree.sh`). This is the same convention and the same script in every project — present and future — not something to reinvent or copy per-repo:
 
-- If the repo has its own worktree helper or convention (e.g. `.claude/scripts/worktree.sh` or a `worktree-manager` skill), use that.
-- Otherwise apply this convention manually: branch `worktree-<issue>-<slug>`, worktree at `.claude/worktrees/<slug>` (ensure that directory is git-ignored in the committed `.gitignore`), locked via `git worktree lock --reason "issue #<n>"` so other sessions can see who owns it.
+- `worktree.sh start <issue> [slug]` creates + locks `.claude/worktrees/<slug>` on branch `worktree-<issue>-<slug>` (ensuring that directory is git-ignored) and applies the `in progress` label to the issue.
 - Two sessions must never write to the same branch. A locked worktree belongs to another session — do not touch it; unlocking is the owner's explicit handoff step.
-- After the branch merges: unlock and remove the worktree, delete the branch (local and remote), and clean up any orphaned worktree directories.
+- After the branch merges: `worktree.sh cleanup` unlocks/removes the merged worktree and branch, and clears orphaned worktree directories; the remote branch still needs `git push origin --delete` separately.
+- If a repo genuinely can't use the script (no `gh` auth, unusual branch layout), fall back to the convention manually — same naming, same lock discipline — but that's the exception, not the default.
