@@ -22,6 +22,7 @@ Sistema di orchestrazione custom (sostituisce l'orchestrazione superpowers per i
 - (senza versione) `agents/quick-debugger.md`, `agents/implementer.md`, `agents/refactor-optimizer.md` — nuovi agent (model: sonnet), report nel contratto strutturato, git vietato
 - (senza versione) `agents/researcher.md`, `agents/Explore.md`, `agents/test-runner.md`, `agents/github-ops.md` — report allineato al contratto (riga STATUS, evidenze ri-verificabili)
 - product-ownership 1.4.0 — fase 4 della tabella end-to-end passa a esecuzione diretta di default (subagent solo per workstream paralleli indipendenti); ogni dispatch segue orchestrating-agents
+- product-ownership 1.5.0 — sezione "Work-in-progress label": la label non era mai stata applicata all'issue #34 (creata worktree, lavoro consegnato, nessun evento "labeled") perché il passo esisteva solo come frase nella skill, scollegato dall'azione di pickup. Aggiunta indicazione di automatizzare il passo nel tooling di pickup del repo quando possibile (vedi ps-plus-catalog `.claude/skills/worktree-manager`, repo-local, non versionata qui), invece di lasciarlo alla memoria
 
 ## 2026-07-18
 

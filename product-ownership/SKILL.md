@@ -1,7 +1,7 @@
 ---
 name: product-ownership
 description: Use when drafting or creating a GitHub issue/ticket, researching external sources needed to write one, deciding whether something is a bug/research/implementation ticket, starting or finishing implementation work on a ticket, about to push or merge a completed change, or cleaning up branches after a PR merges or a commit supersedes it
-version: 1.4.0
+version: 1.5.0
 ---
 
 # Product Ownership
@@ -44,6 +44,8 @@ The table stays at phase level on purpose: domain skills are a category ("the re
 
 ## Work-in-progress label
 The moment actual implementation work starts on an issue (not just drafting/grounding it) — add an `in progress` label to it. If the repo doesn't have that label yet (`gh label list`), create it first: `gh label create "in progress" --color fbca04 --description "Actively being worked on"`. Remove the label when the issue closes — GitHub does not strip labels on close automatically, so this is a manual step to do alongside `gh issue close`/the closing comment, not something to leave dangling.
+
+A step that only exists as a phrase in a skill, disconnected from the action that triggers it, gets skipped under load — it happened on issue #34: the worktree was created and work landed without the label ever being applied. Don't rely on remembering to do this as a separate action each time. If the repo's pickup tooling (e.g. a `worktree.sh start`/`github-ops` create-worktree step) can apply the label as part of creating the worktree/branch, wire it there so labeling and pickup happen atomically — see `worktree-manager` for this repo's implementation. Where no such tooling exists, treat "did I label it?" as a mandatory checkpoint immediately after `git worktree add`/branch creation, before writing any code — not a step to "get to."
 
 ## Manual user check — the gate before any merge or push
 Automated tests passing is necessary but NOT sufficient to merge or push. After implementation and tests, and before any `git push`, branch merge, or PR merge:
