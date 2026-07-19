@@ -12,6 +12,17 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-07-19
+
+Sistema di orchestrazione custom (sostituisce l'orchestrazione superpowers per i task lineari) — regola globale + skill + agent:
+
+- `CLAUDE.md` — nuova sezione "Orchestration: direct execution by default" (esecuzione diretta per task lineari, subagent solo per lavoro davvero parallelo) + politica modelli, contratto di report e verification gate
+- direct-execution 1.1.0 — nuova skill (albero decisionale anti-over-orchestration), poi estesa con lista agent completa (con modelli) e rimando a orchestrating-agents
+- orchestrating-agents 1.0.0 — nuova skill: fasi del workflow (brainstorming → ricerca → piano → implementazione → verifica → deploy) con owner e modello per fase; politica modelli (haiku meccanico, sonnet codice/ricerca, main session per decisioni e git); dispatch brief; contratto di report STATUS/CHANGES/EVIDENCE/FINDINGS/OPEN; verification gate dell'orchestratore prima di ogni fase successiva
+- (senza versione) `agents/quick-debugger.md`, `agents/implementer.md`, `agents/refactor-optimizer.md` — nuovi agent (model: sonnet), report nel contratto strutturato, git vietato
+- (senza versione) `agents/researcher.md`, `agents/Explore.md`, `agents/test-runner.md`, `agents/github-ops.md` — report allineato al contratto (riga STATUS, evidenze ri-verificabili)
+- product-ownership 1.4.0 — fase 4 della tabella end-to-end passa a esecuzione diretta di default (subagent solo per workstream paralleli indipendenti); ogni dispatch segue orchestrating-agents
+
 ## 2026-07-18
 
 Nuovo agent globale `github-ops` (model: haiku) per operazioni git/GitHub meccaniche e convention-following (worktree/branch, PR, issue) senza giudizio editoriale:

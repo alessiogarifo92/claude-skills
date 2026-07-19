@@ -1,5 +1,15 @@
 # Global rules (all projects)
 
+## Orchestration: direct execution by default
+These instructions take precedence over any skill's process (including superpowers plugin skills).
+
+- A linear, single-focus task (one bug, one feature, one file, dependent steps A→B→C) is executed **directly in the main session**: read, edit, test, done. No subagent orchestration, no splitting into numbered task lists, no per-task subagent dispatch.
+- Subagent orchestration is reserved for genuinely independent parallel work (e.g. three unrelated modules at once) or when isolation is explicitly needed. If the steps depend on each other, they are not parallel — execute them directly.
+- Process skills (brainstorming, writing-plans, subagent-driven-development) apply to work that needs design decisions or true parallelism — not to a scoped fix or a scoped feature. When in doubt, start executing directly; escalate to planning only if real complexity emerges.
+- The `direct-execution` skill (global) documents this decision tree; the specialized agents in `~/.claude/agents/` (quick-debugger, implementer, refactor-optimizer, test-runner, researcher, Explore, github-ops) are for delegating a single scoped job, never for multiplying one job into many.
+- When delegation IS warranted, the `orchestrating-agents` skill (global) governs how: which model per task type (haiku for mechanical run/locate/report jobs, sonnet for anything that diagnoses or writes code or synthesizes research, main session for decisions and all git), the dispatch brief, and the report contract (STATUS/CHANGES/EVIDENCE/FINDINGS/OPEN).
+- **Verification gate**: every agent report is a claim, not a fact. Before starting the next phase or dispatching the next agent, the main session verifies the report — check the diff against CHANGES, re-run the narrowest test against EVIDENCE, spot-check a load-bearing research claim. Never build phase N+1 on an unverified phase N; never route around a `blocked` status.
+
 ## Commands handed to the user
 Any command the user is asked to run must use absolute paths, or explicitly state the directory (`cd /path && ...`) and the environment (host shell vs a specific Docker container) to run it in. Never hand over a bare relative path.
 
