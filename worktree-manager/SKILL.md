@@ -1,10 +1,12 @@
 ---
 name: worktree-manager
-description: Use when starting implementation work on a GitHub issue in any repo, when checking which worktrees/sessions are active, or after a branch merges — creates/lists/cleans per-ticket git worktrees so parallel Claude Code sessions never write to the same branch. Same convention across every project.
-version: 1.0.0
+description: Use when actual code work (not research/drafting) is about to start on a GitHub issue in any repo, when checking which worktrees/sessions are active, or after a branch merges — creates/lists/cleans per-ticket git worktrees so parallel Claude Code sessions never write to the same branch. Same convention across every project.
+version: 1.1.0
 ---
 
-Every Claude Code session working on a ticket gets its own worktree and branch. Never commit ticket work directly on the default branch in the primary checkout, and never reuse another session's worktree.
+Every Claude Code session that's about to write or modify code for a ticket gets its own worktree and branch. Never commit ticket work directly on the default branch in the primary checkout, and never reuse another session's worktree.
+
+`start` is a code-work trigger, not a ticket-pickup trigger. Don't call it the moment you pick up an issue — call it right before the first file edit. Research/investigation tickets (report lands as an issue comment, nothing committed) never need a worktree at all; see "Research tickets" below.
 
 This is a **global** skill: the naming convention, branch/path scheme, and label handling are identical across every project — only the stack/language inside each repo differs, and the underlying script doesn't need to know that. Don't create a per-project copy of this script or its docs; if a repo needs something this doesn't cover, extend this skill, not a project-local fork.
 
@@ -22,9 +24,19 @@ This is a **global** skill: the naming convention, branch/path scheme, and label
 
 ## Lifecycle
 
-1. **Pickup**: `start <issue>` → work only inside the printed path.
+1. **Pickup**: reading the issue, grounding it, drafting a plan or a research report — none of that needs `start`. Call `start <issue>` only at the point the first file is actually about to be edited, then work only inside the printed path.
 2. **During**: `list` shows what other sessions hold, across whichever repo you're standing in. If `start` says the slug or branch already exists, another session owns that ticket — coordinate with the user instead of forcing a second worktree.
-3. **After merge to the default branch**: `git worktree unlock .claude/worktrees/<slug>`, then run `cleanup`. It removes your (now unlocked, merged) worktree and branch, plus any orphan directories and leftover merged `worktree-*` branches. This is the worktree-side half of the branch-cleanup rule in the product-ownership skill — the remote branch still needs `git push origin --delete`.
+3. **After merge to the default branch**: `git worktree unlock .claude/worktrees/<slug>`, then run `cleanup`. It removes your (now unlocked, merged) worktree and branch, plus any orphan directories and leftover merged `worktree-*` branches. This is the worktree-side half of the branch-cleanup rule in the product-ownership skill — the remote branch still needs `git push origin --delete`. `cleanup` only touches worktrees/branches, not the GitHub issue itself — closing the issue and stripping its `in progress` label (`gh issue close`/`gh issue edit --remove-label`) is a separate step, done regardless of whether the ticket ever got a worktree at all.
+
+## Research tickets: no worktree, label it directly
+
+A ticket whose deliverable is a report posted as an issue comment (no repo commit) never needs `start` — creating a worktree "just because a ticket was picked up" is exactly the false trigger this skill avoids. Mark it in progress without a worktree:
+
+```bash
+gh issue edit <issue> --add-label "in progress"
+```
+
+If the research later turns into (or produces) something that gets committed — a `docs/` file, a code change — that's the point code work begins, and `start` applies from there, same as any other ticket.
 
 ## Safety model
 

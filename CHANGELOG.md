@@ -12,6 +12,14 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-07-23
+
+Due nuove regole globali su worktree/label, richieste esplicitamente dall'utente:
+
+- `CLAUDE.md` — "One git worktree per ticket" ora condizionata al momento in cui il codice viene effettivamente scritto/modificato (non al pickup del ticket, non per i research ticket che restano un commento); nuova sezione "Remove the in progress label when a ticket closes" — rimozione della label incondizionata su qualunque percorso di chiusura (fix, report di ricerca, duplicate/wontfix, commit che supera una PR)
+- worktree-manager 1.1.0 — description e lifecycle chiariscono che `start` è un trigger di code-work, non di pickup; nuova sezione "Research tickets: no worktree, label it directly" (`gh issue edit --add-label` senza worktree per i ticket che restano commento)
+- product-ownership 1.6.0 — fase 3 della tabella end-to-end: label sempre al pickup, worktree solo al code-work; sezione "Ticket types" (Research) e "When work lands via a different path" rimandano esplicitamente alla rimozione della label; "Work-in-progress label" riscritta come regola incondizionata per ogni percorso di chiusura, non solo il flusso fix-shippato
+
 ## 2026-07-19
 
 Sistema di orchestrazione custom (sostituisce l'orchestrazione superpowers per i task lineari) — regola globale + skill + agent:

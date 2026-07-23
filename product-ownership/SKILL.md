@@ -1,7 +1,7 @@
 ---
 name: product-ownership
 description: Use when drafting or creating a GitHub issue/ticket, researching external sources needed to write one, deciding whether something is a bug/research/implementation ticket, starting or finishing implementation work on a ticket, about to push or merge a completed change, or cleaning up branches after a PR merges or a commit supersedes it
-version: 1.5.0
+version: 1.6.0
 ---
 
 # Product Ownership
@@ -16,7 +16,7 @@ This skill is the entry and exit point of the task lifecycle; the superpowers ch
 | 0. Operating principles | `principal-engineering-core` for non-trivial tasks | — |
 | 1. Ideation | `superpowers:brainstorming`; `market-analyst` before locking in any external tool/API/SaaS/asset (cost + license due diligence) | `researcher` for external feasibility facts and current pricing/ToS pages; `Explore` to see what already exists in the code |
 | 2. Grounding / ticket | this skill (ticket type, draft + user confirmation, existing labels); a ticket that adopts an external dependency cites the `market-analyst` verdict | `researcher` for the ticket's external sources; `Explore` to verify in the code that the problem is where you think |
-| 3. Pickup | this skill (`in progress` label) → `superpowers:using-git-worktrees` → `superpowers:writing-plans` for multi-step work | `Explore` to locate the critical files before planning; `github-ops` to create/list the ticket's worktree and branch via the repo's own convention |
+| 3. Pickup | this skill (`in progress` label, always) → `superpowers:using-git-worktrees` **only once code work is about to start** (not for research/drafting) → `superpowers:writing-plans` for multi-step work | `Explore` to locate the critical files before planning; `github-ops` to create/list the ticket's worktree and branch via the repo's own convention, called at the code-work point, not at pickup |
 | 4. Implementation | **Direct execution in the main session by default** (`direct-execution`) + `superpowers:test-driven-development`, plus the relevant domain skill; subagent orchestration only for genuinely independent parallel workstreams; a research ticket delivers a report instead (see Ticket types) | `implementer` / `quick-debugger` / `refactor-optimizer` for one whole scoped piece, per `orchestrating-agents`; `researcher` writes the report on research tickets |
 | 5. Verification | `test-verification` picks the checks → `superpowers:verification-before-completion` enforces evidence before "done" | `test-runner` runs suites/lint/typecheck and reports only the outcome |
 | 6. Review | `superpowers:requesting-code-review`; add the `architecture-review` / `security-review` lens when the change touches structure or trust boundaries, and the `market-analyst` lens when it introduces new external dependencies or paid services | reviewer subagent |
@@ -34,7 +34,7 @@ The table stays at phase level on purpose: domain skills are a category ("the re
 
 ## Ticket types — don't blend them
 - **Bug**: root cause identified in code. Deliverable is the fix.
-- **Research**: deliverable is a written report (issue comment or `docs/` file), *not* code. Close the research ticket when the report lands and open a **separate** implementation ticket that references it — don't let research quietly turn into unplanned implementation, and don't let an open research ticket sit unresolved once the report is done.
+- **Research**: deliverable is a written report (issue comment or `docs/` file), *not* code. Close the research ticket when the report lands (remove the `in progress` label as part of that same close, exactly as any other closing path) and open a **separate** implementation ticket that references it — don't let research quietly turn into unplanned implementation, and don't let an open research ticket sit unresolved once the report is done. If the report is just an issue comment (nothing committed), the ticket never needed a worktree in the first place — see `worktree-manager`'s "Research tickets" section.
 - **Implementation**: references the research/decision it's grounded in instead of re-deriving it.
 
 ## Before creating on GitHub
@@ -43,7 +43,9 @@ The table stays at phase level on purpose: domain skills are a category ("the re
 - Match the repo's existing issue tone/language/section structure if prior issues establish one (check `gh issue list`/`gh issue view` on a couple of examples).
 
 ## Work-in-progress label
-The moment actual implementation work starts on an issue (not just drafting/grounding it) — add an `in progress` label to it. If the repo doesn't have that label yet (`gh label list`), create it first: `gh label create "in progress" --color fbca04 --description "Actively being worked on"`. Remove the label when the issue closes — GitHub does not strip labels on close automatically, so this is a manual step to do alongside `gh issue close`/the closing comment, not something to leave dangling.
+Add an `in progress` label the moment a ticket is actually being worked (this includes research/drafting, not just code — see the pickup row in the table above for when a *worktree* also gets created, which is a narrower, later trigger). If the repo doesn't have that label yet (`gh label list`), create it first: `gh label create "in progress" --color fbca04 --description "Actively being worked on"`.
+
+Remove the label the moment the issue closes — GitHub does not strip labels on close automatically, so this is a manual step to do alongside `gh issue close`/the closing comment, never left dangling. This is unconditional: it applies to **every** closing path, not just the shipped-fix flow — a research ticket closed once its report lands, an issue closed as duplicate/wontfix/not-planned, and a superseded ticket (see "When work lands via a different path" below) all remove the label at close time exactly the same way a shipped fix does.
 
 A step that only exists as a phrase in a skill, disconnected from the action that triggers it, gets skipped under load — it happened on issue #34: the worktree was created and work landed without the label ever being applied. Don't rely on remembering to do this as a separate action each time: pickup tooling should apply the label as part of creating the worktree/branch, so labeling and pickup happen atomically. The global `worktree-manager` skill does exactly this — its `start <issue>` labels the issue automatically, and it's the same script across every repo, not something to reimplement per project. Where a repo's pickup instead goes through `github-ops` or something else that doesn't label automatically, treat "did I label it?" as a mandatory checkpoint immediately after `git worktree add`/branch creation, before writing any code — not a step to "get to."
 
@@ -70,7 +72,7 @@ Once the fix is committed and pushed to the default branch (after tests pass **a
 This is pre-authorized as standard practice for the ticket-implementation workflow described in this skill — it doesn't extend to other GitHub actions (merging PRs, force-pushing, etc.), which still default to asking first.
 
 ## When work lands via a different path than expected
-If a PR gets superseded (e.g. you push a direct commit instead of merging its branch), close **both** the issue and the PR, and reference what actually shipped it (commit SHA or PR number) in the closing comment — don't leave either dangling as if nothing happened.
+If a PR gets superseded (e.g. you push a direct commit instead of merging its branch), close **both** the issue and the PR, and reference what actually shipped it (commit SHA or PR number) in the closing comment — don't leave either dangling as if nothing happened. Remove the `in progress` label from the issue as part of closing it here too, same as any other close.
 
 ## Branch cleanup — after any merge or superseding commit
 Once a branch's work has landed on the default branch, delete **both** copies — local and remote. Only the default branch persists long-term. This is standing cleanup, not something to wait to be asked for each time; do it as part of finishing that piece of work, right after confirming the change actually landed.
@@ -86,7 +88,7 @@ Every skill in this repo carries a semver `version` in its `SKILL.md` frontmatte
 ## Check
 - Research ticket done → is there a follow-up implementation ticket, or does one need opening?
 - About to run `gh issue create` → did the user see and confirm this exact text?
-- Starting work on an issue → is the `in progress` label on it?
+- Starting work on an issue → is the `in progress` label on it? (Label yes, always — worktree only once code is actually about to be written.)
 - About to `git push` or merge anything → did the user manually confirm in the browser that the change works? If not, stop and ask now.
 - Fix pushed to the default branch → did you close the issue right away, without waiting to be asked?
 - Closing an issue → was the `in progress` label removed?
