@@ -120,6 +120,7 @@ cmd_cleanup() {
         continue
       fi
       echo "removing merged worktree $(basename "$path") ($branch)"
+      echo "  reminder: if a running stack was swapped to serve this worktree, point it back at $DEFAULT_BRANCH first — the path is about to disappear" >&2
       run git -C "$ROOT" worktree remove "$path" || { echo "skip: could not remove $path" >&2; continue; }
       run git -C "$ROOT" branch -d "$branch" || echo "skip: could not delete branch $branch" >&2
     fi
