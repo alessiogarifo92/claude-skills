@@ -1,10 +1,12 @@
 ---
 name: direct-execution
 description: Use when a task is linear and single-focus (one bug, one feature, one file, dependent steps) and you are tempted to orchestrate it — split it into a task list, dispatch subagents per step, or enter a planning workflow — instead of just doing it.
-version: 1.1.0
+version: 1.2.0
 ---
 
 # Direct Execution
+
+**Pairs with:** `orchestrating-agents` governs HOW to delegate once this skill's tree says delegation buys something. The escalation targets below (`brainstorming`, `writing-plans`, `executing-plans`, `subagent-driven-development`) all defer to this tree first — they are what "escalate" means, not alternatives to it.
 
 ## Overview
 
@@ -44,7 +46,12 @@ Every dispatch follows the `orchestrating-agents` skill: model per task, dispatc
 
 ## Escalating to planning
 
-Move to brainstorming/planning only when the task genuinely needs decisions: architecture choices, unclear requirements, cross-module redesign, or multiple truly independent workstreams. Escalate when complexity *emerges* — not preemptively "to be safe".
+Escalate only when the task genuinely needs decisions: architecture choices, unclear requirements, cross-module redesign, or multiple truly independent workstreams. Escalate when complexity *emerges* — not preemptively "to be safe". Where it goes, in order:
+
+- unclear *what* to build → `brainstorming` (or `multi-agent-brainstorm` when the idea spans UI/UX + architecture + cost at once)
+- intent confirmed, many dependent steps → `writing-plans`, then `executing-plans` to run it
+- genuinely independent workstreams → `subagent-driven-development`, per `orchestrating-agents`
+- whole project, not one task → `project-lifecycle`
 
 ## Red flags — you are about to over-orchestrate
 

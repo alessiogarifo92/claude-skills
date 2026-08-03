@@ -12,6 +12,35 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-08-03
+
+Copertura completa 1:1 delle 14 skill del plugin `superpowers`, per poterlo disattivare (costo token per turno dell'hook SessionStart) senza perdere nessuna area. Analisi iniziale: 5 skill superpowers avevano già un equivalente più forte con nome proprio (orchestrating-agents ~ dispatching-parallel-agents, worktree-manager ~ using-git-worktrees, debugging-workflow ~ systematic-debugging, test-verification ~ verification-before-completion, product-ownership copre gran parte del lifecycle); per le restanti 9 sono state create skill nuove, usando il nome superpowers dove calzava 1:1 e un nome più chiaro altrove. `using-superpowers` non ha equivalente: è il bootstrap del plugin stesso (l'hook forzato ad ogni turno), non una tecnica da replicare — è esattamente il meccanismo di costo che la disattivazione elimina.
+
+- brainstorming 1.0.0 — nuova skill (nome invariato da superpowers), esplorazione di requisiti fuzzy prima di codice/piano
+- test-driven-development 1.0.0 — nuova skill (nome invariato da superpowers), ciclo red-green-refactor; distinta da test-verification che sceglie cosa far girare, non quando scrivere il test. Verificata con test di pressione (scenario time/sunk-cost su un agente sonnet): ha rifiutato la scorciatoia e seguito il ciclo correttamente
+- writing-plans 1.0.0 — nuova skill (nome invariato), sequenziamento di un piano multi-step prima di toccare codice; distinta da docs-and-specs (formato del documento) ed executing-plans (esecuzione)
+- executing-plans 1.0.0 — nuova skill (nome invariato), esecuzione sequenziale di un piano già scritto con checkpoint per step, anche tra sessioni/context reset
+- subagent-driven-development 1.0.0 — nuova skill (nome invariato), variante a dispatch parallelo di executing-plans per step del piano genuinamente indipendenti, sopra le convenzioni di orchestrating-agents
+- finishing-a-development-branch 1.0.0 — nuova skill (nome invariato), scelta del meccanismo di integrazione (push diretto/PR squash/merge/rebase) dopo il gate manuale di product-ownership
+- requesting-code-review 1.0.0 — nuova skill (nome invariato), disciplina del chiedere review prima del merge, distinta dal plugin `code-review` che la esegue
+- receiving-code-review 1.0.0 — nuova skill (nome invariato), rigore tecnico nel processare i commenti di review invece di accordo performativo
+- writing-skills 1.0.0 — nuova skill (nome invariato), come/quando creare o modificare skill in questa repo, con verifica scalata al tipo di skill (disciplinare/tecnica/orchestratore)
+- project-lifecycle 1.0.0 — nuova skill orchestratore custom (nessun equivalente superpowers): incatena brainstorming → market-analyst → architecture-review/principal-engineering-core → product-ownership (per-ticket) → deploy per un intero progetto/applicazione, non un singolo ticket
+- multi-agent-brainstorm 1.0.0 — nuova skill custom (nessun equivalente superpowers): dispatch parallelo di agenti general-purpose con lenti diverse (UI/UX, architettura, costi/tooling, fattibilità codice) sulla stessa idea, sintesi in main session; resta nella fase 2 (raccolta dati) di orchestrating-agents, la decisione non viene mai delegata
+- test-verification 1.1.0 — assorbe la disciplina "evidenza prima di dichiarare fatto" di superpowers:verification-before-completion (tabella scuse/realtà, mai claim senza aver rieseguito il check nella sessione corrente)
+- product-ownership 1.8.0 — tabella end-to-end aggiornata su tutte le 7 fasi con i nomi finali: brainstorming/multi-agent-brainstorm, worktree-manager, writing-plans, test-driven-development, subagent-driven-development/executing-plans, requesting/receiving-code-review, finishing-a-development-branch
+- debugging-workflow 1.0.2 — rimando a superpowers:systematic-debugging sostituito con test-driven-development (la riproduzione diventa il RED test)
+- Plugin `superpowers@claude-plugins-official` disattivato in `~/.claude/settings.json` (`enabledPlugins`)
+
+Passata di revisione sulle skill preesistenti che *instradano* verso le altre: erano rimaste indietro rispetto ai nuovi nomi, con riferimenti a senso unico (tutti puntavano a `direct-execution`, che non rimandava a nessuno).
+
+- orchestrating-agents 1.1.0 — tabella delle fasi allineata ai nomi finali: fase 1 `brainstorming`/`multi-agent-brainstorm`, fase 4 `test-driven-development` + `executing-plans`/`subagent-driven-development`, fase 6 `requesting-code-review`/`receiving-code-review` attorno al plugin `code-review`
+- direct-execution 1.2.0 — riga `**Pairs with:**` e sezione "Escalating to planning" con le destinazioni esplicite dell'escalation (brainstorming → writing-plans → executing-plans/subagent-driven-development → project-lifecycle) invece di "brainstorming/planning" generico
+- test-verification 1.2.0 — riga `**Pairs with:**` (confine con `test-driven-development` sull'ordine test/codice, e col gate manuale di `product-ownership`: i check verdi sono evidenza, mai autorizzazione al merge) e sezione `Boundary`
+- multi-agent-brainstorm 1.1.0 — modello per lente invece di quattro agenti `general-purpose` che ereditano opus: UI/UX e architettura `general-purpose` (sonnet), costi `researcher` (sonnet, pagine di pricing come fonti), fattibilità codice `Explore` (haiku) su repo esistente; nuovo check "ogni lente è davvero decisiva?" per non dispatchare tutte e quattro di default
+- project-lifecycle 1.1.0 — fase 5 esplicita l'intera catena per-ticket (writing-plans → test-driven-development → test-verification → requesting-code-review → gate → finishing-a-development-branch); fase 6 aggiunge `security-review` prima di rendere qualcosa pubblicamente raggiungibile e la riconferma del costo ricorrente al deploy
+- writing-skills 1.1.0 — due regole nuove: aggiungere/rinominare una skill impone di ricontrollare le tre tabelle di instradamento (product-ownership, orchestrating-agents, project-lifecycle) nello stesso commit; i riferimenti incrociati devono essere bidirezionali
+
 ## 2026-07-23
 
 Due nuove regole globali su worktree/label, richieste esplicitamente dall'utente:

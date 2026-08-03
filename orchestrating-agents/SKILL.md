@@ -1,7 +1,7 @@
 ---
 name: orchestrating-agents
 description: Use when dispatching any subagent or coordinating multi-phase work (research → plan → implement → verify → deploy) — covers picking the model for the task, writing the dispatch brief, and verifying each agent's report before the next phase.
-version: 1.0.0
+version: 1.1.0
 ---
 
 # Orchestrating Agents
@@ -16,12 +16,12 @@ This skill governs HOW to orchestrate once `direct-execution`'s decision tree sa
 
 | Phase | Who | Model |
 |---|---|---|
-| 1. Brainstorming / design decisions | Main session, with the user. Never delegated — decisions need the user. | main session |
+| 1. Brainstorming / design decisions | Main session, with the user (`brainstorming`). Never delegated — decisions need the user. `multi-agent-brainstorm` may gather parallel lenses as phase-2 input, but the call still happens here. | main session |
 | 2. Data gathering | `researcher` (external facts, docs, feasibility); `Explore` (locating things in the codebase) | sonnet / haiku |
 | 3. Planning | Main session (`writing-plans` only for real multi-step work); user approves the plan | main session |
-| 4. Implementation | Direct by default. Delegate one whole scoped piece: `implementer` (feature+tests), `quick-debugger` (localized bug), `refactor-optimizer` (behavior-preserving cleanup) | sonnet |
+| 4. Implementation | Direct by default (`test-driven-development` for the test/code order). Delegate one whole scoped piece: `implementer` (feature+tests), `quick-debugger` (localized bug), `refactor-optimizer` (behavior-preserving cleanup); `executing-plans` / `subagent-driven-development` when a written plan drives it | sonnet |
 | 5. Verification | `test-runner` for suites/lint (keeps logs out of context); orchestrator re-checks (gate below); manual browser check with the user per global rules | haiku + main session |
-| 6. Review | `/code-review` (user-triggered) or main session reading the full diff | — |
+| 6. Review | `requesting-code-review` decides whether a pass is warranted; the `code-review` plugin (user-triggered) or main session reads the full diff; `receiving-code-review` governs the feedback that comes back | — |
 | 7. Deploy / closing | Main session only: commit, push, merge, release — after tests + manual gate + user confirmation. `github-ops` only for mechanical follow-through once every decision is made | main session + haiku |
 
 ## Model policy

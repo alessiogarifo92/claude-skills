@@ -1,14 +1,22 @@
 ---
 name: test-verification
-description: Use when deciding what to run to verify a code change - choosing the narrowest meaningful set of tests, lint, type checks, or manual smoke checks for backend, frontend, database, or API changes
-version: 1.0.1
+description: Use when deciding what to run to verify a code change - choosing the narrowest meaningful set of tests, lint, type checks, or manual smoke checks for backend, frontend, database, or API changes - and before claiming any change is done, fixed, or passing
+version: 1.2.0
 ---
 
 # Test Verification
 
 Select the narrowest meaningful verification set first, then expand if justified.
 
-**Pairs with:** superpowers:verification-before-completion, which enforces actually running verification before claiming done; this skill helps pick which checks to run.
+**Pairs with:** `test-driven-development` governs *when* a test gets written (before the code); this skill governs *what* gets run once code exists. `product-ownership`'s manual user gate comes after this — green checks are evidence, never merge authorization.
+
+**Evidence before assertion.** Never claim a change is done, fixed, or passing without having actually run the check in this session first. "It should work," a manual test from an earlier conversation, or confidence in the diff are not evidence — the command output is.
+
+| Excuse | Reality |
+|--------|---------|
+| "The change is small/obvious, no need to run it" | Small changes break imports and types too; the run takes seconds |
+| "I already verified this earlier in the session" | Re-verify after every subsequent edit — a later change can silently undo it |
+| "Reading the diff is enough to know it's correct" | Reading confirms intent, not behavior; run it |
 
 **Execution:** this skill decides *what* to run; delegate the actual runs to the `test-runner` agent, which executes suites/lint/typechecks and reports only the outcome, keeping verbose logs out of the conversation.
 
@@ -38,3 +46,6 @@ Select the narrowest meaningful verification set first, then expand if justified
 - What passed
 - What remains unverified
 - Why the chosen verification is sufficient
+
+## Boundary
+This picks the checks and enforces evidence before "done". It does not authorize a merge or push — that's `product-ownership`'s manual user gate — and it does not decide the test/code authoring order, which is `test-driven-development`'s.

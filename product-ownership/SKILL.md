@@ -1,7 +1,7 @@
 ---
 name: product-ownership
 description: Use when drafting or creating a GitHub issue/ticket, researching external sources needed to write one, deciding whether something is a bug/research/implementation ticket, starting or finishing implementation work on a ticket, about to push or merge a completed change, or cleaning up branches after a PR merges or a commit supersedes it
-version: 1.6.0
+version: 1.8.0
 ---
 
 # Product Ownership
@@ -9,18 +9,18 @@ version: 1.6.0
 Own the lifecycle of a work item end to end: from a raw problem report to a grounded ticket, through to the branch cleanup once the work has actually shipped. Grounding tickets in the real code/data is expected baseline behavior, not this skill's job — this skill is about the parts that get skipped without a deliberate habit: separating ticket types, confirming before publishing, reusing repo conventions, and closing the loop on branches.
 
 ## End-to-end workflow and handoffs
-This skill is the entry and exit point of the task lifecycle; the superpowers chain (brainstorming → plans → execution → review → finishing) covers the middle. Who does what, per phase:
+This skill is the entry and exit point of the task lifecycle; the custom chain (brainstorming → writing-plans → test-driven-development → requesting/receiving-code-review → finishing-a-development-branch) covers the middle — see `project-lifecycle` for the whole-project version of this table when the work spans multiple tickets, not just one. Who does what, per phase:
 
 | Phase | Process skill | Agent |
 |---|---|---|
 | 0. Operating principles | `principal-engineering-core` for non-trivial tasks | — |
-| 1. Ideation | `superpowers:brainstorming`; `market-analyst` before locking in any external tool/API/SaaS/asset (cost + license due diligence) | `researcher` for external feasibility facts and current pricing/ToS pages; `Explore` to see what already exists in the code |
+| 1. Ideation | `brainstorming` (or `multi-agent-brainstorm` when the idea spans UI/UX + architecture + cost at once); `market-analyst` before locking in any external tool/API/SaaS/asset (cost + license due diligence) | `researcher` for external feasibility facts and current pricing/ToS pages; `Explore` to see what already exists in the code |
 | 2. Grounding / ticket | this skill (ticket type, draft + user confirmation, existing labels); a ticket that adopts an external dependency cites the `market-analyst` verdict | `researcher` for the ticket's external sources; `Explore` to verify in the code that the problem is where you think |
-| 3. Pickup | this skill (`in progress` label, always) → `superpowers:using-git-worktrees` **only once code work is about to start** (not for research/drafting) → `superpowers:writing-plans` for multi-step work | `Explore` to locate the critical files before planning; `github-ops` to create/list the ticket's worktree and branch via the repo's own convention, called at the code-work point, not at pickup |
-| 4. Implementation | **Direct execution in the main session by default** (`direct-execution`) + `superpowers:test-driven-development`, plus the relevant domain skill; subagent orchestration only for genuinely independent parallel workstreams; a research ticket delivers a report instead (see Ticket types) | `implementer` / `quick-debugger` / `refactor-optimizer` for one whole scoped piece, per `orchestrating-agents`; `researcher` writes the report on research tickets |
-| 5. Verification | `test-verification` picks the checks → `superpowers:verification-before-completion` enforces evidence before "done" | `test-runner` runs suites/lint/typecheck and reports only the outcome |
-| 6. Review | `superpowers:requesting-code-review`; add the `architecture-review` / `security-review` lens when the change touches structure or trust boundaries, and the `market-analyst` lens when it introduces new external dependencies or paid services | reviewer subagent |
-| 7. Closing | manual user gate (below) → `superpowers:finishing-a-development-branch` (merge/PR options) → this skill: close issue, remove label, branch cleanup, skill version bumps | `github-ops` for the mechanical follow-through once you've decided what to run: merge/push, `gh issue close`/label removal, local+remote branch and worktree cleanup |
+| 3. Pickup | this skill (`in progress` label, always) → `worktree-manager` **only once code work is about to start** (not for research/drafting) → `writing-plans` for multi-step work | `Explore` to locate the critical files before planning; `github-ops` to create/list the ticket's worktree and branch via the repo's own convention, called at the code-work point, not at pickup |
+| 4. Implementation | **Direct execution in the main session by default** (`direct-execution`) + `test-driven-development`, plus the relevant domain skill; `subagent-driven-development`/`executing-plans` only for genuinely independent parallel workstreams or plans spanning sessions; a research ticket delivers a report instead (see Ticket types) | `implementer` / `quick-debugger` / `refactor-optimizer` for one whole scoped piece, per `orchestrating-agents`; `researcher` writes the report on research tickets |
+| 5. Verification | `test-verification` picks the checks and enforces evidence before "done" | `test-runner` runs suites/lint/typecheck and reports only the outcome |
+| 6. Review | `requesting-code-review` (the discipline of asking before merging) drives the `code-review` plugin for the diff itself; add the `architecture-review` / `security-review` lens when the change touches structure or trust boundaries, the `market-analyst` lens for new external dependencies, and `receiving-code-review` when feedback comes back | reviewer subagent |
+| 7. Closing | manual user gate (below) → `finishing-a-development-branch` (merge/PR/rebase options) → this skill: close issue, remove label, branch cleanup, skill version bumps | `github-ops` for the mechanical follow-through once you've decided what to run: merge/push, `gh issue close`/label removal, local+remote branch and worktree cleanup |
 
 Every agent dispatch in any phase follows `orchestrating-agents`: the model matches the task (haiku mechanical, sonnet code/research), the agent reports in the STATUS/CHANGES/EVIDENCE/FINDINGS/OPEN structure, and the orchestrator verifies the report before the next phase starts.
 
