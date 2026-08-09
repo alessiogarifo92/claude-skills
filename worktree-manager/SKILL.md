@@ -1,7 +1,7 @@
 ---
 name: worktree-manager
 description: Use when actual code work (not research/drafting) is about to start on a GitHub issue in any repo, when checking which worktrees/sessions are active, or after a branch merges — creates/lists/cleans per-ticket git worktrees so parallel Claude Code sessions never write to the same branch. Same convention across every project.
-version: 1.2.0
+version: 1.3.0
 ---
 
 Every Claude Code session that's about to write or modify code for a ticket gets its own worktree and branch. Never commit ticket work directly on the default branch in the primary checkout, and never reuse another session's worktree.
@@ -41,7 +41,9 @@ If the research later turns into (or produces) something that gets committed —
 ## Safety model
 
 - `cleanup` never touches a **locked** worktree, even if its branch looks merged — a fresh branch with no commits of its own also counts as "merged", and yanking it would destroy another session's workspace. Unlocking is the explicit handoff step.
-- Unmerged branches are never deleted (`git branch -d`, never `-D`); dirty worktrees are skipped with a warning.
+- A branch only counts as "merged" if it's a literal git ancestor of `main`, **or** `gh` reports a merged PR with that branch as head — the second check exists because a squash or rebase merge (GitHub's default for this project's repos) produces a brand-new commit on `main`, so the original branch is never an ancestor even though its content is fully there. Without this fallback, `cleanup` silently does nothing on every squash-merged ticket — it reports no error, so the gap is easy to miss (this happened for real on DamianoGuideSite ticket #7: `cleanup` claimed success while the worktree and branch were still sitting there, locked, until it was noticed and fixed by hand).
+- Deletion still favors the safe path: `git branch -d` (never `-D`) whenever the branch is a real ancestor. Only when it isn't — and a merged GitHub PR independently confirmed the merge — does `cleanup` force-delete with `-D`; a bare local heuristic never triggers `-D` on its own.
+- Unmerged branches (no ancestor relationship and no merged PR found) are never deleted; dirty worktrees are skipped with a warning.
 - `--dry-run` prints what would happen without changing anything.
 
 ## Per-repo requirements

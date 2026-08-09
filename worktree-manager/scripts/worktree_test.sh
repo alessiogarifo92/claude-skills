@@ -91,5 +91,42 @@ chmod -R u+w .claude/worktrees/stuck && rm -rf .claude/worktrees/stuck
 mkdir -p .claude/worktrees/orphan2 && echo "gitdir: /nowhere" > .claude/worktrees/orphan2/.git
 "$SCRIPT" cleanup --dry-run >/dev/null
 check "dry-run leaves orphan in place" test -d .claude/worktrees/orphan2
+rm -rf .claude/worktrees/orphan2
+
+# --- cleanup: squash-merged branch (not a git ancestor) is still detected via gh ---
+# Simulates GitHub's squash-and-merge: the branch's content lands on main as a
+# brand-new commit, so `merge-base --is-ancestor` can never see it — this is the
+# gap `is_branch_merged()`'s gh-pr fallback exists to close.
+SQUASH_BRANCH="worktree-55-squash"
+"$SCRIPT" start 55 squash >/dev/null
+( cd .claude/worktrees/squash && echo squash-content > s.txt && git add s.txt && git commit -qm squash-work )
+echo squash-content > s.txt && git add s.txt && git commit -qm "squash merge simulate (not an ancestor)"
+git worktree unlock .claude/worktrees/squash
+
+REAL_GH="$(command -v gh || true)"
+FAKE_GH_DIR="$TMP/fakebin"
+mkdir -p "$FAKE_GH_DIR"
+cat > "$FAKE_GH_DIR/gh" <<EOF
+#!/usr/bin/env bash
+if [[ "\$1" == "pr" && "\$2" == "list" ]]; then
+  branch=""
+  for ((i=1; i<=\$#; i++)); do
+    if [[ "\${!i}" == "--head" ]]; then j=\$((i+1)); branch="\${!j}"; fi
+  done
+  if [[ "\$branch" == "$SQUASH_BRANCH" ]]; then echo 999; exit 0; fi
+  exit 1
+fi
+exec "$REAL_GH" "\$@"
+EOF
+chmod +x "$FAKE_GH_DIR/gh"
+
+# Without gh confirming the PR, the branch isn't a literal ancestor — it must survive.
+"$SCRIPT" cleanup >/dev/null 2>&1
+check "squash-merged worktree survives cleanup without gh PR confirmation" test -d .claude/worktrees/squash
+
+# With the fake gh reporting a merged PR for this branch, cleanup must now remove it.
+PATH="$FAKE_GH_DIR:$PATH" "$SCRIPT" cleanup >/dev/null
+check "squash-merged worktree removed once gh confirms a merged PR" test ! -d .claude/worktrees/squash
+check "squash-merged branch force-deleted" bash -c "! git show-ref -q refs/heads/$SQUASH_BRANCH"
 
 exit $FAIL
