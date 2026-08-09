@@ -25,11 +25,33 @@ When a ticket needs a manual browser/functional check before merge/push, verify 
 - To point the already-running stack at the worktree's code instead: swap only the code-serving layer (e.g. bind-mount paths, `docker compose` service source, symlink) over to the worktree while reusing the same database/volume/network/service the primary checkout normally uses, so real data stays intact and the app stays reachable on its usual host/port. Swap it back to the primary checkout when the check is done.
 - If two tickets are in progress at once, don't run two parallel environments — verify one, get confirmation, then swap the same environment over to the other ticket and verify that one. Same port, same real data, one at a time.
 
+## Manual verification: walk it in the browser first, then hand the user a checklist
+Before asking for the manual check, walk the flow yourself against that running stack with the `playwright` MCP server — navigate, perform the action, read the accessibility snapshot and the console. Never hand over a check you haven't opened; a broken page discovered by the user is a wasted round trip.
+
+This never replaces the user's check, it prepares it. The handoff is always three explicit parts (`test-verification` holds the detail):
+1. what was already verified in the browser, one line each, so it isn't repeated;
+2. what needs the user's eyes — absolute URL with host and port, the exact action, and an expected result concrete enough to be contradicted ("the row reads 3 articoli — €45,00", not "the totals look right");
+3. what could not be verified and why.
+
+Playwright proves the page loads, the action fires and nothing errored. Whether the result is *right* — visually, editorially, in the data — is the user's judgment, and that is the whole point of the gate.
+
 ## Manual verification: mock data when the real dataset can't cover the case
 If the real dataset doesn't contain a case the user needs to see with their own eyes (a specific edge case, empty state, boundary condition, error state), don't skip the check, don't fake having verified it, and don't just describe what "should" happen — insert temporary mock/seed data into the running environment so the scenario is actually reproducible and clickable for the user's manual check.
 - Make clear to the user that what they're looking at is temporary mock data inserted for this check, not real catalog data.
 - Only delete the mock data after the user has given explicit approval of the check — deleting data is a hard-to-reverse action, so it follows the same confirm-first default as any other destructive operation, it doesn't get a standing exception just because the data is fake.
 - Clean it up promptly once approved, so it doesn't linger and get mistaken for real data in later tests.
+
+## Laravel Boost is standard equipment in every Laravel project
+Every Laravel project gets Laravel Boost — one just scaffolded, or an existing one being touched for the first time. It's the difference between reasoning about the app from its source files and interrogating the app that is actually running: registered routes, real schema, installed package versions, logs, tinker, plus documentation matched to those versions instead of the most common answer on the internet.
+
+- **Check, then install.** On the first substantive work in a Laravel repo, check whether `laravel/boost` is in `composer.json`. If it isn't: `composer require laravel/boost --dev`, then `php artisan boost:install`. It's a dev dependency and never ships to production.
+- **Announce it, keep it separate.** Adding a dependency to someone's repo is a change in its own right — say you're doing it, and give it its own commit rather than folding it silently into a ticket's diff.
+- **`boost:install` is interactive** — it asks which agents and features to set up. If it can't be driven from here, hand it to the user to run with the `!` prefix instead of guessing at undocumented `--no-interaction` behavior. Claude Code registration is normally automatic; the documented fallback is `claude mcp add -s local -t stdio laravel-boost php artisan boost:mcp`.
+- **It generates a project-root `CLAUDE.md`.** Boost writes guideline files (`CLAUDE.md`, `AGENTS.md`, …) and regenerates them on every later `boost:install`/`boost:update`. If the project already has its own `CLAUDE.md`, read and preserve it first — losing a project's own instructions to a regenerated file is a real regression. This is the project root file, not `~/.claude/CLAUDE.md`.
+- **What's committed differs by file.** `.mcp.json`, the generated guideline files, and `boost.json` are regenerated on demand and may be gitignored. `.ai/rules/` is the opposite — it's the team's shared project rules and belongs in version control.
+- **Record project rules through the tool, never by hand.** Use Boost's `record-rule` MCP tool: it files the rule under the right glob and regenerates `.ai/rules/index.md`, which is how agents discover it. A rule file written by hand stays invisible until that index is next rebuilt.
+- **Existing codebase:** after installing, offer the `infer-conventions` skill to bootstrap `.ai/rules` from what the code already does. It presents each convention with its evidence for approval before writing anything — don't let it record unreviewed.
+- **Keep it from drifting:** add `@php artisan boost:update --ansi` to the project's Composer `post-update-cmd` scripts, so guidelines and skills track the installed package versions instead of aging in place.
 
 ## One git worktree per ticket
 Create the worktree only when code in the repo is actually about to be written or modified — not as a reflexive first step on every ticket, and not for tickets that never touch the repo (a research ticket whose deliverable is an issue comment, for example). When that moment arrives, never work directly on the default branch of the primary checkout — use an isolated worktree, via the global `worktree-manager` skill (`~/.claude/skills/worktree-manager/scripts/worktree.sh`). This is the same convention and the same script in every project — present and future — not something to reinvent or copy per-repo:

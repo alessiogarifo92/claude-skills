@@ -1,7 +1,7 @@
 ---
 name: product-ownership
 description: Use when drafting or creating a GitHub issue/ticket, researching external sources needed to write one, deciding whether something is a bug/research/implementation ticket, starting or finishing implementation work on a ticket, about to push or merge a completed change, or cleaning up branches after a PR merges or a commit supersedes it
-version: 1.8.0
+version: 1.9.0
 ---
 
 # Product Ownership
@@ -52,8 +52,8 @@ A step that only exists as a phrase in a skill, disconnected from the action tha
 ## Manual user check — the gate before any merge or push
 Automated tests passing is necessary but NOT sufficient to merge or push. After implementation and tests, and before any `git push`, branch merge, or PR merge:
 
-1. Make the change live and reachable in the browser: dev stack running (`docker compose up -d` in this repo — frontend at http://localhost:3000, API docs at http://localhost:8010/docs) with the change active. Open/curl the relevant page yourself first to confirm the handoff isn't broken.
-2. Tell the user exactly what to check manually: which URL/page, what action to perform, and what they should see.
+1. Make the change live and reachable in the browser: dev stack running (`docker compose up -d` in this repo — frontend at http://localhost:3000, API docs at http://localhost:8010/docs) with the change active. Walk the page yourself first with the `playwright` MCP server — navigate, perform the action, read the console — to confirm the handoff isn't broken before you hand it over.
+2. Tell the user exactly what to check manually, in the three-part split `test-verification` defines: what you already verified in the browser (so they don't repeat it), what needs their eyes (absolute URL, the action, a falsifiable expected result), and what you could not verify and why.
 3. Stop and wait for their explicit confirmation that it works. If they report a problem, fix it and repeat this gate from step 1.
 
 If the change has no browser-observable surface (pure tooling, CI config, docs), say so explicitly and tell the user how to verify it instead — the stop-and-wait for their confirmation still applies before merge/push.
@@ -64,6 +64,7 @@ If the change has no browser-observable surface (pure tooling, CI config, docs),
 | "It's a trivial/one-line change" | Trivial changes ship broken UIs too. Same gate. |
 | "Pushing after tests is pre-authorized" | That pre-authorization operates *after* this gate, never instead of it. |
 | "I already verified it in the browser myself" | Your own check prepares the handoff; it doesn't replace the user's. |
+| "Playwright drove the whole flow green, that's stronger than a human click" | Playwright proves it runs. It can't tell you the result is *right* — that judgment is what the gate is for. |
 | "The user seems away, I'll push and they can review later" | The push can wait. Waiting is the whole point of the gate. |
 
 ## Closing when the fix ships
