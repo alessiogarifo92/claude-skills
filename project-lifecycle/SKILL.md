@@ -1,7 +1,7 @@
 ---
 name: project-lifecycle
 description: Use when starting a new application or project from scratch, or evaluating one end to end — from initial idea through tool/stack and cost decisions, architecture, breaking the work into tickets, implementation, and deploy — not for a single scoped ticket already in flight
-version: 1.2.0
+version: 1.3.0
 ---
 
 # Project Lifecycle
@@ -17,7 +17,8 @@ Owns the whole-project arc that sits above a single ticket: an idea becomes a va
 | 1. Idea | `brainstorming` (or `multi-agent-brainstorm` for multi-specialty ideas) — goal, users, constraints, 2-3 shapes | User picks a direction |
 | 2. Tools & cost | `market-analyst` per external tool/API/SaaS/library candidate; state the free-tier and cheapest-viable path explicitly, not just the "best" option | User confirms the stack and its cost profile |
 | 3. Architecture | `principal-engineering-core` for operating principles, `architecture-review` for structural shape (plus `database-design` if persistence is involved) | User confirms the shape before any ticket is drafted |
-| 4. Tickets | `product-ownership` — one ticket per independently shippable slice, referencing the phase 2/3 decisions instead of re-deriving them | Each ticket drafted and confirmed per `product-ownership`'s own gate |
+| 3.5. Design UI/UX (only if the project has a user-facing UI) | Propose it explicitly here, don't wait to be asked: palette, typography, a component library choice, and at least low-fidelity wireframes/reference for the screens the tickets will cover — see the global CLAUDE.md rule "Never skip a Design UI/UX phase before development" for the failure mode this prevents | User confirms the design direction (or explicitly defers it, e.g. "ship default styling for now") before any UI-bearing ticket is drafted |
+| 4. Tickets | `product-ownership` — one ticket per independently shippable slice, referencing the phase 2/3/3.5 decisions instead of re-deriving them | Each ticket drafted and confirmed per `product-ownership`'s own gate |
 | 5. Implementation | `product-ownership`'s per-ticket loop (worktree → `writing-plans` if multi-step → direct execution / `test-driven-development` → `test-verification` → `requesting-code-review` → manual gate → `finishing-a-development-branch`) | Same ticket-level gates, unchanged |
 | 6. Deploy | Cheapest viable hosting path first (see cost rule); `security-review` before anything becomes publicly reachable (secrets, auth, exposed endpoints); manual verification on the real deploy target, not just locally | User confirms the live deploy |
 
@@ -26,6 +27,7 @@ Every phase that adds a tool, service, or hosting target restates: what it costs
 
 ## Check
 - Idea phase skipped straight to code? Back up — requirements were never confirmed.
+- Project has any user-facing screen and phase 3.5 was never proposed? Back up before drafting UI-bearing tickets — this was the exact gap that let subsplit's tickets #3/#4/#6/#8/#9 get drafted with zero design direction, caught only because the user asked, not because this skill flagged it.
 - A tool/service adopted without a `market-analyst` verdict? Get one before it lands in a ticket.
 - More than one ticket drafted before phase 3's architecture is confirmed? Architecture decisions ripple into every ticket — confirm shape first.
 - Tickets don't reference the phase 2/3 decisions? They'll re-derive and drift from what was actually decided.
