@@ -12,6 +12,11 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-08-16 (4)
+
+- CLAUDE.md — sezioni "Manual verification: real data, standard ports, one environment at a time" e "Restore the stack to main when a ticket closes" generalizzate a stack senza layer di serving swappabile (es. Expo/React Native via Expo Go): lo "swap" diventa fermare/riavviare il dev server dalla directory del worktree sulla stessa porta, riusando le stesse env var di backend/DB, invece del bind-mount/`docker compose` usato per stack containerizzati. Chiude #10.
+- worktree-manager 1.3.1 — nota nel passo "After merge" del Lifecycle: il meccanismo di swap include ora anche il riavvio di un dev server diretto (es. `expo start`), non solo bind mount/`docker compose`/symlink.
+
 ## 2026-08-16 (3)
 
 - product-ownership 1.11.1 — nota nella sezione Milestones: `gh issue create/edit --milestone <title>` risolve il titolo solo tra i milestone **aperti**, quindi assegnare un ticket a un milestone creato già `closed` fallisce con "not found" anche se esiste. Riscontrato davvero creando "Setup"/"Design UI/UX" su subsplit già chiusi (tutti i ticket coperti erano già fatti) — fix: riaprire via API, assegnare, richiudere.
