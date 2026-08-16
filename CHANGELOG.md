@@ -12,6 +12,10 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-08-16 (3)
+
+- product-ownership 1.11.1 — nota nella sezione Milestones: `gh issue create/edit --milestone <title>` risolve il titolo solo tra i milestone **aperti**, quindi assegnare un ticket a un milestone creato già `closed` fallisce con "not found" anche se esiste. Riscontrato davvero creando "Setup"/"Design UI/UX" su subsplit già chiusi (tutti i ticket coperti erano già fatti) — fix: riaprire via API, assegnare, richiudere.
+
 ## 2026-08-16 (2)
 
 - product-ownership 1.11.0 — nuova sezione "Milestones — grouping tickets by phase or goal": creare un milestone GitHub per ogni batch di ticket di fase/obiettivo (es. "MVP") e assegnarci i ticket, invece di nominare solo l'intervallo ("ticket #2-#11") come testo libero nel body — non interrogabile e fragile nel tempo. `gh` non ha un subcommand `milestone` dedicato, quindi si passa da `gh api repos/<owner>/<repo>/milestones` per crearlo e da `gh issue create/edit --milestone` per assegnarlo (verificato l'endpoint in lettura su subsplit, nessun milestone esistente). Esplicitamente ortogonale alle relazioni di dipendenza/epic appena introdotte (1.10.x): milestone = "appartiene a questo obiettivo", blocked-by/blocking = "può partire adesso". Stesso principio anti-burocrazia delle sezioni precedenti: niente milestone su un obiettivo già chiuso al 100%, nessun beneficio in avanti.

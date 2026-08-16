@@ -1,7 +1,7 @@
 ---
 name: product-ownership
 description: Use when drafting or creating a GitHub issue/ticket, researching external sources needed to write one, deciding whether something is a bug/research/implementation ticket, starting or finishing implementation work on a ticket, about to push or merge a completed change, or cleaning up branches after a PR merges or a commit supersedes it
-version: 1.11.0
+version: 1.11.1
 ---
 
 # Product Ownership
@@ -71,6 +71,7 @@ When a batch of tickets is drafted for a defined phase or goal (a `project-lifec
 `gh` has no dedicated `milestone` subcommand — go through the REST API:
 - Create once, if it doesn't already exist (`gh api repos/<owner>/<repo>/milestones --jq '.[].title'` to check first): `gh api repos/<owner>/<repo>/milestones -f title="MVP" -f state="open" -f description="..."`.
 - Assign at creation: `gh issue create --milestone "MVP" ...`; on an existing issue: `gh issue edit <N> --milestone "MVP"`.
+- `gh issue create/edit --milestone <title>` only resolves the title against **open** milestones — if a milestone was created already `closed` (e.g. one covering a phase whose tickets are all done, like "Setup"), assignment fails with `'<title>' not found` even though the milestone exists. Reopen it first (`gh api -X PATCH repos/<owner>/<repo>/milestones/<number> -f state="open"`), assign the issues, then close it again the same way — confirmed hitting this on subsplit's "Setup"/"Design UI/UX" milestones.
 
 Milestones and the dependency/epic relationships above are orthogonal, not substitutes: a milestone answers "does this ticket belong to this goal", `blockedBy`/`blocking` answers "can this ticket start yet". Don't create a milestone for a phase/goal that's already 100% closed — no forward value, same administrative-churn trap as retroactively wiring epics onto finished work (see above). Only create one for a phase/goal that still has open tickets, or that's about to receive its first one.
 
