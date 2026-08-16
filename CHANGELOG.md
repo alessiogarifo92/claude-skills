@@ -12,6 +12,11 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-08-16 (2)
+
+- product-ownership 1.11.0 — nuova sezione "Milestones — grouping tickets by phase or goal": creare un milestone GitHub per ogni batch di ticket di fase/obiettivo (es. "MVP") e assegnarci i ticket, invece di nominare solo l'intervallo ("ticket #2-#11") come testo libero nel body — non interrogabile e fragile nel tempo. `gh` non ha un subcommand `milestone` dedicato, quindi si passa da `gh api repos/<owner>/<repo>/milestones` per crearlo e da `gh issue create/edit --milestone` per assegnarlo (verificato l'endpoint in lettura su subsplit, nessun milestone esistente). Esplicitamente ortogonale alle relazioni di dipendenza/epic appena introdotte (1.10.x): milestone = "appartiene a questo obiettivo", blocked-by/blocking = "può partire adesso". Stesso principio anti-burocrazia delle sezioni precedenti: niente milestone su un obiettivo già chiuso al 100%, nessun beneficio in avanti.
+- project-lifecycle 1.4.0 — riga della fase 4 "Tickets" aggiornata per rimandare alla nuova convenzione milestone di product-ownership: il batch di ticket di una fase riceve il proprio milestone, non solo un intervallo nominato nel testo.
+
 ## 2026-08-16
 
 - product-ownership 1.10.0 — nuova sezione "Ticket relationships — dependencies and epics": usare i campi nativi di `gh` (`--blocked-by`/`--blocking` per dipendenze sequenziali, `--parent`/`--add-sub-issue` per epic) invece di convenzioni ad-hoc (frase "Blocked by #N" nel body, checklist scritta a mano per gli epic) — sono nativamente renderizzati in UI, restano sincronizzati da soli e sono interrogabili via `--json`. Include il one-liner per trovare, su tutto il backlog aperto, quali ticket sono bloccati adesso (hanno un blocker ancora aperto) e quali sono liberi e quindi assegnabili in parallelo. Richiesta esplicita dell'utente durante il lavoro sul progetto subsplit, a livello globale (non solo per quel repo): verificato che `gh` 2.96.0 espone questi campi/flag nativamente (`blockedBy`, `blocking`, `parent`, `subIssues`, `subIssuesSummary`), niente `issueType`/Issue Types nativi però su repo personali (campo risultato `null` via GraphQL) quindi gli epic restano un label `epic` + sub-issue, non un issue type dedicato.

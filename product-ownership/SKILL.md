@@ -1,7 +1,7 @@
 ---
 name: product-ownership
 description: Use when drafting or creating a GitHub issue/ticket, researching external sources needed to write one, deciding whether something is a bug/research/implementation ticket, starting or finishing implementation work on a ticket, about to push or merge a completed change, or cleaning up branches after a PR merges or a commit supersedes it
-version: 1.10.1
+version: 1.11.0
 ---
 
 # Product Ownership
@@ -65,6 +65,15 @@ GitHub has native issue-relationship fields — `blockedBy`/`blocking` (sequenti
   Re-check the shape on a future `gh` version before trusting this blind (`gh issue list --json blockedBy --jq '.[0]'` on one issue with a known relationship) — GitHub's dependency feature is recent and the JSON shape could still change.
 - Every open ticket that doesn't show up in that list has no live blocker — those are the ones safe to hand out for parallel work (parallel worktrees/sessions, or just parallel priority) at the same time.
 
+## Milestones — grouping tickets by phase or goal
+When a batch of tickets is drafted for a defined phase or goal (a `project-lifecycle` phase-4 ticket batch — e.g. "MVP" for the initial slice, or a later named batch like "v2"/"Deploy"), create a GitHub milestone for it and assign every ticket in the batch to it, instead of only cross-referencing "ticket #X-#Y" as free text in a ticket body — free text drifts as the backlog grows and isn't queryable (this is exactly what happened on subsplit: `#12` says "derogabile a dopo l'MVP, ticket #2-#11", something only discoverable by reading that one ticket's body, not by asking GitHub).
+
+`gh` has no dedicated `milestone` subcommand — go through the REST API:
+- Create once, if it doesn't already exist (`gh api repos/<owner>/<repo>/milestones --jq '.[].title'` to check first): `gh api repos/<owner>/<repo>/milestones -f title="MVP" -f state="open" -f description="..."`.
+- Assign at creation: `gh issue create --milestone "MVP" ...`; on an existing issue: `gh issue edit <N> --milestone "MVP"`.
+
+Milestones and the dependency/epic relationships above are orthogonal, not substitutes: a milestone answers "does this ticket belong to this goal", `blockedBy`/`blocking` answers "can this ticket start yet". Don't create a milestone for a phase/goal that's already 100% closed — no forward value, same administrative-churn trap as retroactively wiring epics onto finished work (see above). Only create one for a phase/goal that still has open tickets, or that's about to receive its first one.
+
 ## Work-in-progress label
 Add an `in progress` label the moment a ticket is actually being worked (this includes research/drafting, not just code — see the pickup row in the table above for when a *worktree* also gets created, which is a narrower, later trigger). If the repo doesn't have that label yet (`gh label list`), create it first: `gh label create "in progress" --color fbca04 --description "Actively being worked on"`.
 
@@ -113,6 +122,7 @@ Every skill in this repo carries a semver `version` in its `SKILL.md` frontmatte
 - Research ticket done → is there a follow-up implementation ticket, or does one need opening?
 - About to run `gh issue create` → did the user see and confirm this exact text?
 - Drafting a ticket that depends on/blocks another, or belongs under an epic → did you wire `--blocked-by`/`--blocking`/`--parent` before showing the draft, not after?
+- Drafting a batch of tickets for a phase/goal (MVP or otherwise) → does a milestone exist for it, and is each ticket in the batch assigned to it?
 - Starting work on an issue → is the `in progress` label on it? (Label yes, always — worktree only once code is actually about to be written.)
 - About to `git push` or merge anything → did the user manually confirm in the browser that the change works? If not, stop and ask now.
 - Fix pushed to the default branch → did you close the issue right away, without waiting to be asked?
