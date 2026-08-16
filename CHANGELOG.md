@@ -15,8 +15,9 @@ modifica alla skill.
 ## 2026-08-16 (4)
 
 - CLAUDE.md — nuova regola globale "Never wipe shared DB data while another ticket is in progress": operazioni distruttive su un DB condiviso (reset/seed fixture, `migrate:fresh`, wipe tabelle, cancellazione mock data) possono avvenire solo se nessun altro ticket ha la label `in progress`, altrimenti va usata una soluzione non distruttiva (dati scoped, transazione con rollback, schema/DB separato per i test automatici). Estende "one environment at a time" oltre il solo check manuale, coprendo anche i run di test automatici. Chiude #9.
-- worktree-manager 1.3.1 — rimando alla nuova regola CLAUDE.md nella sezione "Lifecycle": i worktree isolano il codice, non i servizi condivisi (DB) dietro di esso.
-- test-verification 1.3.1 — stesso rimando nella voce "migrations" di "By change type".
+- CLAUDE.md — sezioni "Manual verification: real data, standard ports, one environment at a time" e "Restore the stack to main when a ticket closes" generalizzate a stack senza layer di serving swappabile (es. Expo/React Native via Expo Go): lo "swap" diventa fermare/riavviare il dev server dalla directory del worktree sulla stessa porta, riusando le stesse env var di backend/DB, invece del bind-mount/`docker compose` usato per stack containerizzati. Chiude #10.
+- worktree-manager 1.3.1 — rimando alla nuova regola no-wipe DB nella sezione "Lifecycle" (bullet 2, "During"), e nota nel bullet 3 ("After merge") che il meccanismo di swap include ora anche il riavvio di un dev server diretto (es. `expo start`), non solo bind mount/`docker compose`/symlink.
+- test-verification 1.3.1 — rimando alla regola no-wipe DB nella voce "migrations" di "By change type".
 
 ## 2026-08-16 (3)
 
