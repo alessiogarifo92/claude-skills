@@ -12,6 +12,10 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-08-16 (6)
+
+- product-ownership 1.13.1 — rinominato il label di tipo ticket `enhancement` in `feature` nella sezione "Labels" (nome preferito dall'utente, che non gradisce "enhancement"); nessun cambio di comportamento.
+
 ## 2026-08-16 (5)
 
 - product-ownership 1.12.0 — nuova sottosezione "Recording the check: 'Test info' section on the ticket" dentro "Manual user check": screenshot Playwright per ogni step del walkthrough (o per gli step fondamentali sui walkthrough lunghi/ripetitivi), committati sotto `docs/test-evidence/<issue>-<slug>/`, referenziati in un commento `## Test info` via URL `raw.githubusercontent.com` sul commit SHA (non sul branch, che viene cancellato al merge). Chiude #11.
