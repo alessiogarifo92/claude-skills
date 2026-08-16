@@ -15,6 +15,7 @@ modifica alla skill.
 ## 2026-08-16
 
 - product-ownership 1.10.0 — nuova sezione "Ticket relationships — dependencies and epics": usare i campi nativi di `gh` (`--blocked-by`/`--blocking` per dipendenze sequenziali, `--parent`/`--add-sub-issue` per epic) invece di convenzioni ad-hoc (frase "Blocked by #N" nel body, checklist scritta a mano per gli epic) — sono nativamente renderizzati in UI, restano sincronizzati da soli e sono interrogabili via `--json`. Include il one-liner per trovare, su tutto il backlog aperto, quali ticket sono bloccati adesso (hanno un blocker ancora aperto) e quali sono liberi e quindi assegnabili in parallelo. Richiesta esplicita dell'utente durante il lavoro sul progetto subsplit, a livello globale (non solo per quel repo): verificato che `gh` 2.96.0 espone questi campi/flag nativamente (`blockedBy`, `blocking`, `parent`, `subIssues`, `subIssuesSummary`), niente `issueType`/Issue Types nativi però su repo personali (campo risultato `null` via GraphQL) quindi gli epic restano un label `epic` + sub-issue, non un issue type dedicato.
+- product-ownership 1.10.1 — fix nel one-liner della sezione appena aggiunta: `blockedBy`/`blocking` tornano come `{nodes: [...], totalCount: N}`, non come array piatto — verificato creando davvero la relazione (subsplit #29 blocked-by #22) e ispezionando l'output reale di `gh issue view`/`gh issue list`, non assunto a memoria.
 
 ## 2026-08-09
 

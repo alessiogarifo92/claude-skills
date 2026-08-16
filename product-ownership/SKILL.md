@@ -1,7 +1,7 @@
 ---
 name: product-ownership
 description: Use when drafting or creating a GitHub issue/ticket, researching external sources needed to write one, deciding whether something is a bug/research/implementation ticket, starting or finishing implementation work on a ticket, about to push or merge a completed change, or cleaning up branches after a PR merges or a commit supersedes it
-version: 1.10.0
+version: 1.10.1
 ---
 
 # Product Ownership
@@ -56,13 +56,13 @@ GitHub has native issue-relationship fields — `blockedBy`/`blocking` (sequenti
 
 **Finding what's blocked vs. what can run in parallel:**
 - Per ticket: `gh issue view <N> --json blockedBy,blocking,parent,subIssues,subIssuesSummary`.
-- Across the open backlog, list every issue that has at least one *still-open* blocker (truly blocked right now, not just historically linked to something already closed):
+- Across the open backlog, list every issue that has at least one *still-open* blocker (truly blocked right now, not just historically linked to something already closed). `blockedBy`/`blocking` come back as `{nodes: [...], totalCount: N}`, not a flat array — verified against `gh` 2.96.0 on 2026-08-16:
   ```
   gh issue list --state open --json number,title,blockedBy \
-    --jq '.[] | select([.blockedBy[]? | select(.state=="OPEN")] | length > 0)
-              | "#\(.number) \(.title) — blocked by " + ([.blockedBy[]? | select(.state=="OPEN") | "#\(.number)"] | join(", "))'
+    --jq '.[] | select([.blockedBy.nodes[]? | select(.state=="OPEN")] | length > 0)
+              | "#\(.number) \(.title) — blocked by " + ([.blockedBy.nodes[]? | select(.state=="OPEN") | "#\(.number)"] | join(", "))'
   ```
-  Sanity-check the jq field names against your `gh` version's actual output shape first (`gh issue list --json blockedBy --jq '.[0]'` on one issue) rather than trusting the snippet blind on a repo you haven't checked yet.
+  Re-check the shape on a future `gh` version before trusting this blind (`gh issue list --json blockedBy --jq '.[0]'` on one issue with a known relationship) — GitHub's dependency feature is recent and the JSON shape could still change.
 - Every open ticket that doesn't show up in that list has no live blocker — those are the ones safe to hand out for parallel work (parallel worktrees/sessions, or just parallel priority) at the same time.
 
 ## Work-in-progress label
