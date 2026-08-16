@@ -1,7 +1,7 @@
 ---
 name: test-verification
 description: Use when deciding what to run to verify a code change - choosing the narrowest meaningful set of tests, lint, type checks, or manual smoke checks for backend, frontend, database, or API changes - and before claiming any change is done, fixed, or passing
-version: 1.3.0
+version: 1.3.1
 ---
 
 # Test Verification
@@ -37,7 +37,7 @@ Select the narrowest meaningful verification set first, then expand if justified
 ## By change type
 - backend logic: focused tests around changed behavior
 - frontend UI: render, interaction, loading/error states, responsive behavior
-- migrations: migrate up/down plus affected data paths
+- migrations: migrate up/down plus affected data paths — a destructive reset/seed against a shared DB checks no other ticket is `in progress` first (global CLAUDE.md, "Never wipe shared DB data while another ticket is in progress")
 - APIs: contract shape, status codes, validation errors
 - performance-sensitive code: targeted benchmarks or query plans when relevant
 

@@ -56,6 +56,11 @@ If the real dataset doesn't contain a case the user needs to see with their own 
 - Only delete the mock data after the user has given explicit approval of the check — deleting data is a hard-to-reverse action, so it follows the same confirm-first default as any other destructive operation, it doesn't get a standing exception just because the data is fake.
 - Clean it up promptly once approved, so it doesn't linger and get mistaken for real data in later tests.
 
+## Never wipe shared DB data while another ticket is in progress
+Destructive operations on a shared database — resetting/seeding fixtures, `migrate:fresh`, wiping tables, deleting the mock data described above — may run only when no *other* ticket carries the `in progress` label: check `gh issue list --label "in progress"` first, excluding your own ticket. This applies exactly as much to automated test runs (the `test-runner` agent, CI-style suites) as it does to the manual-verification stack — it generalizes "one environment at a time" above from "don't run two manual checks at once" to "don't destroy data another ticket might still be reading, even from an unattended run".
+- If another ticket is in progress, don't destroy shared data — either wait for it to close, or use a solution that doesn't require destruction: data scoped/namespaced to your own ticket, a transaction that rolls back instead of committing, or a separate schema/database reserved for automated tests.
+- **Why:** without this check, one agent's fixture reset or table wipe can corrupt another agent's test that's mid-flight on the same shared DB, even though neither session touched the other's code.
+
 ## Laravel Boost is standard equipment in every Laravel project
 Every Laravel project gets Laravel Boost — one just scaffolded, or an existing one being touched for the first time. It's the difference between reasoning about the app from its source files and interrogating the app that is actually running: registered routes, real schema, installed package versions, logs, tinker, plus documentation matched to those versions instead of the most common answer on the internet.
 

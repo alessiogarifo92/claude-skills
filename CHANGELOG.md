@@ -12,6 +12,12 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-08-16 (4)
+
+- CLAUDE.md — nuova regola globale "Never wipe shared DB data while another ticket is in progress": operazioni distruttive su un DB condiviso (reset/seed fixture, `migrate:fresh`, wipe tabelle, cancellazione mock data) possono avvenire solo se nessun altro ticket ha la label `in progress`, altrimenti va usata una soluzione non distruttiva (dati scoped, transazione con rollback, schema/DB separato per i test automatici). Estende "one environment at a time" oltre il solo check manuale, coprendo anche i run di test automatici. Chiude #9.
+- worktree-manager 1.3.1 — rimando alla nuova regola CLAUDE.md nella sezione "Lifecycle": i worktree isolano il codice, non i servizi condivisi (DB) dietro di esso.
+- test-verification 1.3.1 — stesso rimando nella voce "migrations" di "By change type".
+
 ## 2026-08-16 (3)
 
 - product-ownership 1.11.1 — nota nella sezione Milestones: `gh issue create/edit --milestone <title>` risolve il titolo solo tra i milestone **aperti**, quindi assegnare un ticket a un milestone creato già `closed` fallisce con "not found" anche se esiste. Riscontrato davvero creando "Setup"/"Design UI/UX" su subsplit già chiusi (tutti i ticket coperti erano già fatti) — fix: riaprire via API, assegnare, richiudere.
