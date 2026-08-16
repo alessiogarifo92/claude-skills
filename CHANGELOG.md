@@ -12,6 +12,10 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-08-16 (5)
+
+- product-ownership 1.13.0 — nuovo tipo di ticket "Spike" (esplorazione a tempo limitato, deliverable throwaway invece di un report) e nuova sezione "Labels": convenzione bug→`bug`, feature/implementation→`enhancement`, research→`question`, spike→`spike` (label creata: `gh label create "spike" ...`); regola di priorità bug > enhancement quando l'utente non specifica altrimenti. Chiude #12.
+
 ## 2026-08-16 (4)
 
 - CLAUDE.md — nuova regola globale "Never wipe shared DB data while another ticket is in progress": operazioni distruttive su un DB condiviso (reset/seed fixture, `migrate:fresh`, wipe tabelle, cancellazione mock data) possono avvenire solo se nessun altro ticket ha la label `in progress`, altrimenti va usata una soluzione non distruttiva (dati scoped, transazione con rollback, schema/DB separato per i test automatici). Estende "one environment at a time" oltre il solo check manuale, coprendo anche i run di test automatici. Chiude #9.

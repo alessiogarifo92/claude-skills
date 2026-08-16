@@ -1,7 +1,7 @@
 ---
 name: product-ownership
 description: Use when drafting or creating a GitHub issue/ticket, researching external sources needed to write one, deciding whether something is a bug/research/implementation ticket, starting or finishing implementation work on a ticket, about to push or merge a completed change, or cleaning up branches after a PR merges or a commit supersedes it
-version: 1.11.1
+version: 1.13.0
 ---
 
 # Product Ownership
@@ -36,6 +36,12 @@ The table stays at phase level on purpose: domain skills are a category ("the re
 - **Bug**: root cause identified in code. Deliverable is the fix.
 - **Research**: deliverable is a written report (issue comment or `docs/` file), *not* code. Close the research ticket when the report lands (remove the `in progress` label as part of that same close, exactly as any other closing path) and open a **separate** implementation ticket that references it — don't let research quietly turn into unplanned implementation, and don't let an open research ticket sit unresolved once the report is done. If the report is just an issue comment (nothing committed), the ticket never needed a worktree in the first place — see `worktree-manager`'s "Research tickets" section.
 - **Implementation**: references the research/decision it's grounded in instead of re-deriving it.
+- **Spike**: a time-boxed technical exploration or prototype to reduce uncertainty *before* committing to an implementation approach — "will this library actually work for X", "can we make this integration talk to that API". Unlike research, the deliverable can be throwaway code (a branch/worktree that's never meant to merge), not a written report; unlike implementation, nothing here ships. Close it with a short comment on what was learned and, if it points to a real approach, open a **separate** implementation ticket that references it — same non-blending rule as research.
+
+## Labels — bug outranks feature, spike is exploration not delivery
+Reuse the repo's existing GitHub labels for ticket type instead of inventing new ones per project: `bug` for bug tickets, `enhancement` for feature/implementation tickets, `question` for research tickets, `spike` for spikes (create it once per repo if missing: `gh label create "spike" --color 1d76db --description "Time-boxed technical exploration/prototype to reduce uncertainty"`). `in progress` (see below) stacks on top of whichever type label applies — it is not itself a type.
+
+When choosing what to pick up next and priorities aren't otherwise specified by the user, an open `bug` outranks an open `enhancement`: a broken existing behavior costs more the longer it sits than a not-yet-built feature does. This is a default, not an override of explicit user direction — if the user names what to work on next, that stands regardless of label.
 
 ## Before creating on GitHub
 - Draft the full title + body and show it to the user; wait for confirmation before `gh issue create`, unless they've explicitly said to just create it directly.
