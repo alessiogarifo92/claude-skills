@@ -1,6 +1,7 @@
 {
   "permissions": {
-    "defaultMode": "auto"
+    "defaultMode": "auto",
+    "allow": ["Bash(gh pr merge:*)"]
   },
   "enabledPlugins": {
     "frontend-design@claude-plugins-official": true,
