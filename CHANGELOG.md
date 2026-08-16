@@ -15,6 +15,7 @@ modifica alla skill.
 ## 2026-08-16 (5)
 
 - product-ownership 1.12.0 — nuova sottosezione "Recording the check: 'Test info' section on the ticket" dentro "Manual user check": screenshot Playwright per ogni step del walkthrough (o per gli step fondamentali sui walkthrough lunghi/ripetitivi), committati sotto `docs/test-evidence/<issue>-<slug>/`, referenziati in un commento `## Test info` via URL `raw.githubusercontent.com` sul commit SHA (non sul branch, che viene cancellato al merge). Chiude #11.
+- product-ownership 1.13.0 — nuovo tipo di ticket "Spike" (esplorazione a tempo limitato, deliverable throwaway invece di un report) e nuova sezione "Labels": convenzione bug→`bug`, feature/implementation→`enhancement`, research→`question`, spike→`spike` (label creata: `gh label create "spike" ...`); regola di priorità bug > enhancement quando l'utente non specifica altrimenti. Chiude #12.
 
 ## 2026-08-16 (4)
 
