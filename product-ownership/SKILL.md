@@ -1,7 +1,7 @@
 ---
 name: product-ownership
 description: Use when drafting or creating a GitHub issue/ticket, researching external sources needed to write one, deciding whether something is a bug/research/implementation ticket, starting or finishing implementation work on a ticket, about to push or merge a completed change, or cleaning up branches after a PR merges or a commit supersedes it
-version: 1.9.0
+version: 1.10.0
 ---
 
 # Product Ownership
@@ -41,6 +41,29 @@ The table stays at phase level on purpose: domain skills are a category ("the re
 - Draft the full title + body and show it to the user; wait for confirmation before `gh issue create`, unless they've explicitly said to just create it directly.
 - Run `gh label list` and reuse what exists instead of inventing new labels.
 - Match the repo's existing issue tone/language/section structure if prior issues establish one (check `gh issue list`/`gh issue view` on a couple of examples).
+- Check whether the new ticket depends on, blocks, or belongs under an existing one — wire the relationship in with the flags below *before* showing the draft to the user, not as a follow-up once work starts.
+
+## Ticket relationships — dependencies and epics
+GitHub has native issue-relationship fields — `blockedBy`/`blocking` (sequential dependencies) and `parent`/`subIssues` (epics) — exposed by `gh issue create`/`gh issue edit` as real flags, not just body text. Use these instead of ad-hoc conventions (a "Blocked by #N" sentence buried in the body, a hand-written epic checklist): they render as badges/progress bars in the GitHub UI, stay in sync automatically, and are queryable with `--json`. Confirm your `gh` version still has them (`gh issue create --help` / `gh issue edit --help`) before falling back to a body-text convention on an older CLI or host that lacks the feature.
+
+**Dependencies (ticket B can't start until ticket A is done):**
+- At creation: `gh issue create --blocked-by <A>` or `--blocking <B>`.
+- On an existing issue: `gh issue edit <B> --add-blocked-by <A>` / `--remove-blocked-by <A>` (symmetric `--add-blocking`/`--remove-blocking` from the other side).
+
+**Epics (one tracking issue grouping several sub-issues):**
+- Create the epic as a normal issue; add an `epic` label for easy filtering (create it once if the repo doesn't have it: `gh label create "epic" --color 5319e7 --description "Tracking issue grouping several sub-issues"`).
+- Create each sub-issue against it — `gh issue create --parent <epic>` — or link an existing issue with `gh issue edit <child> --parent <epic>` (or from the epic side: `gh issue edit <epic> --add-sub-issue <child>`). Don't hand-write a `- [ ] #N` checklist for this: the native sub-issue link already gives the epic a progress bar that updates itself as children close.
+
+**Finding what's blocked vs. what can run in parallel:**
+- Per ticket: `gh issue view <N> --json blockedBy,blocking,parent,subIssues,subIssuesSummary`.
+- Across the open backlog, list every issue that has at least one *still-open* blocker (truly blocked right now, not just historically linked to something already closed):
+  ```
+  gh issue list --state open --json number,title,blockedBy \
+    --jq '.[] | select([.blockedBy[]? | select(.state=="OPEN")] | length > 0)
+              | "#\(.number) \(.title) — blocked by " + ([.blockedBy[]? | select(.state=="OPEN") | "#\(.number)"] | join(", "))'
+  ```
+  Sanity-check the jq field names against your `gh` version's actual output shape first (`gh issue list --json blockedBy --jq '.[0]'` on one issue) rather than trusting the snippet blind on a repo you haven't checked yet.
+- Every open ticket that doesn't show up in that list has no live blocker — those are the ones safe to hand out for parallel work (parallel worktrees/sessions, or just parallel priority) at the same time.
 
 ## Work-in-progress label
 Add an `in progress` label the moment a ticket is actually being worked (this includes research/drafting, not just code — see the pickup row in the table above for when a *worktree* also gets created, which is a narrower, later trigger). If the repo doesn't have that label yet (`gh label list`), create it first: `gh label create "in progress" --color fbca04 --description "Actively being worked on"`.
@@ -89,6 +112,7 @@ Every skill in this repo carries a semver `version` in its `SKILL.md` frontmatte
 ## Check
 - Research ticket done → is there a follow-up implementation ticket, or does one need opening?
 - About to run `gh issue create` → did the user see and confirm this exact text?
+- Drafting a ticket that depends on/blocks another, or belongs under an epic → did you wire `--blocked-by`/`--blocking`/`--parent` before showing the draft, not after?
 - Starting work on an issue → is the `in progress` label on it? (Label yes, always — worktree only once code is actually about to be written.)
 - About to `git push` or merge anything → did the user manually confirm in the browser that the change works? If not, stop and ask now.
 - Fix pushed to the default branch → did you close the issue right away, without waiting to be asked?

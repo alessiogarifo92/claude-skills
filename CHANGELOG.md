@@ -12,6 +12,10 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-08-16
+
+- product-ownership 1.10.0 — nuova sezione "Ticket relationships — dependencies and epics": usare i campi nativi di `gh` (`--blocked-by`/`--blocking` per dipendenze sequenziali, `--parent`/`--add-sub-issue` per epic) invece di convenzioni ad-hoc (frase "Blocked by #N" nel body, checklist scritta a mano per gli epic) — sono nativamente renderizzati in UI, restano sincronizzati da soli e sono interrogabili via `--json`. Include il one-liner per trovare, su tutto il backlog aperto, quali ticket sono bloccati adesso (hanno un blocker ancora aperto) e quali sono liberi e quindi assegnabili in parallelo. Richiesta esplicita dell'utente durante il lavoro sul progetto subsplit, a livello globale (non solo per quel repo): verificato che `gh` 2.96.0 espone questi campi/flag nativamente (`blockedBy`, `blocking`, `parent`, `subIssues`, `subIssuesSummary`), niente `issueType`/Issue Types nativi però su repo personali (campo risultato `null` via GraphQL) quindi gli epic restano un label `epic` + sub-issue, non un issue type dedicato.
+
 ## 2026-08-09
 
 - project-lifecycle 1.3.0 — nuova fase 3.5 "Design UI/UX" (proposta esplicitamente per ogni progetto con superficie utente, non solo quando il piano del progetto la prevede già), da confermare prima di disegnare qualunque ticket che tocchi schermate; nuovo check per intercettare il caso. Gap scoperto sul progetto subsplit: 5 ticket UI-bearing (#3/#4/#6/#8/#9) erano stati disegnati senza nessuna direzione di design, e la skill non aveva alcuna fase che lo prevenisse — la regola globale CLAUDE.md sul "non saltare una fase di design" scatta solo se il piano del progetto ne definisce già una, non se project-lifecycle stesso non la prevede mai.
