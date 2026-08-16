@@ -1,7 +1,7 @@
 ---
 name: product-ownership
 description: Use when drafting or creating a GitHub issue/ticket, researching external sources needed to write one, deciding whether something is a bug/research/implementation ticket, starting or finishing implementation work on a ticket, about to push or merge a completed change, or cleaning up branches after a PR merges or a commit supersedes it
-version: 1.11.1
+version: 1.12.0
 ---
 
 # Product Ownership
@@ -91,6 +91,14 @@ Automated tests passing is necessary but NOT sufficient to merge or push. After 
 
 If the change has no browser-observable surface (pure tooling, CI config, docs), say so explicitly and tell the user how to verify it instead — the stop-and-wait for their confirmation still applies before merge/push.
 
+### Recording the check: "Test info" section on the ticket
+The walkthrough in step 1 gets written into the ticket itself, not just described in chat — otherwise the evidence disappears once the session ends.
+
+1. While walking the flow with the `playwright` MCP server, capture a screenshot (`browser_take_screenshot`) for each step. For a long or repetitive walkthrough (e.g. ten similar form fields), a screenshot per fundamental step is enough — the starting state, the action's result, and any edge case checked — but never skip the step that's the actual point of the ticket.
+2. Commit the screenshots on the ticket's branch under `docs/test-evidence/<issue>-<slug>/NN-description.png` (numbered to match the steps), in the same commit as the change or a follow-up commit before the handoff. `gh` has no scriptable way to upload an image directly into an issue comment (that's the web UI's own attachment flow, not a public API) — a committed file with a stable URL is the reliable substitute.
+3. Post a `## Test info` comment on the issue (`gh issue comment <n> --body-file -`) with the numbered steps, each followed by its screenshot referenced via `https://raw.githubusercontent.com/<owner>/<repo>/<commit-sha>/docs/test-evidence/.../NN-description.png` so it renders inline — use the **commit SHA**, not the branch name, since the ticket branch gets deleted after merge (per "Branch cleanup" below) while the commit stays reachable through `main`'s history.
+4. Do this before the manual handoff (step 2 above): the ticket should already show what was checked when the user opens it, not just a chat message that scrolls away.
+
 | Excuse | Reality |
 |--------|---------|
 | "All tests pass, so it's safe to push" | Tests are not the gate; the user's manual check is. |
@@ -126,6 +134,7 @@ Every skill in this repo carries a semver `version` in its `SKILL.md` frontmatte
 - Drafting a batch of tickets for a phase/goal (MVP or otherwise) → does a milestone exist for it, and is each ticket in the batch assigned to it?
 - Starting work on an issue → is the `in progress` label on it? (Label yes, always — worktree only once code is actually about to be written.)
 - About to `git push` or merge anything → did the user manually confirm in the browser that the change works? If not, stop and ask now.
+- Did a browser walkthrough for the manual check → is it recorded in a `## Test info` comment (numbered steps + screenshots) before handing off to the user, not just described in chat?
 - Fix pushed to the default branch → did you close the issue right away, without waiting to be asked?
 - Closing an issue → was the `in progress` label removed?
 - Just merged/superseded a branch → does `git branch -a` show only the default branch, locally and remotely, when you're done?

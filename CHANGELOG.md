@@ -12,6 +12,10 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-08-16 (5)
+
+- product-ownership 1.12.0 — nuova sottosezione "Recording the check: 'Test info' section on the ticket" dentro "Manual user check": screenshot Playwright per ogni step del walkthrough (o per gli step fondamentali sui walkthrough lunghi/ripetitivi), committati sotto `docs/test-evidence/<issue>-<slug>/`, referenziati in un commento `## Test info` via URL `raw.githubusercontent.com` sul commit SHA (non sul branch, che viene cancellato al merge). Chiude #11.
+
 ## 2026-08-16 (4)
 
 - CLAUDE.md — nuova regola globale "Never wipe shared DB data while another ticket is in progress": operazioni distruttive su un DB condiviso (reset/seed fixture, `migrate:fresh`, wipe tabelle, cancellazione mock data) possono avvenire solo se nessun altro ticket ha la label `in progress`, altrimenti va usata una soluzione non distruttiva (dati scoped, transazione con rollback, schema/DB separato per i test automatici). Estende "one environment at a time" oltre il solo check manuale, coprendo anche i run di test automatici. Chiude #9.
