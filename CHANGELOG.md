@@ -12,6 +12,12 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-08-23 (2)
+
+- CLAUDE.md — nuova sezione in testa "Where a new rule/lesson goes: skill → CLAUDE.md → project memory", regola di instradamento per i prossimi apprendimenti; rimosse le sezioni "Manual verification" (4 sezioni + "always surface test credentials") e "Laravel Boost is standard equipment", spostate integralmente sotto. File sceso da 126 a 81 righe (~28KB → ~18.5KB) pur avendo aggiunto la nuova sezione.
+- test-verification 1.4.0 — assorbite le 5 sezioni "Manual verification" di CLAUDE.md: "Browser checks" arricchita con real data/standard ports/one environment at a time e lo swap del layer di serving (incl. dev server diretto tipo Expo); nuova sezione "Mobile + browser: verify both interfaces"; "Manual handoff" arricchita con l'apertura "walk it yourself first", il vincolo di non ripristinare l'ambiente prima dell'handoff, mock data per casi non coperti dal dataset reale, credenziali di test solo in chat mai in artefatti committati.
+- laravel-architecture 1.3.0 — sezione "Ground the design in the running app" ora contiene per intero la regola "Laravel Boost is standard equipment" (prima era solo un rimando a CLAUDE.md), così si carica solo quando si lavora davvero su un repo Laravel invece che in ogni conversazione.
+
 ## 2026-08-23 (1)
 
 - CLAUDE.md — sezione "Invoke product-ownership itself at ticket pickup" sostituisce le 5 sezioni globali aggiunte in precedenza oggi stesso (Test info comment, link blob su repo private, ListAgents prima di considerare orfano un worktree, blocco classificatore su `gh pr merge`, checkoff todo Notion): quelle regole pesavano su ogni conversazione di ogni progetto anche quando irrilevanti, essendo CLAUDE.md caricato per intero e sempre, a differenza delle skill (di cui sta sempre in contesto solo il nome+descrizione, il corpo si carica solo quando la skill viene invocata). Spostate nelle skill che già governano quelle fasi, sotto.
