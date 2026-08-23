@@ -12,7 +12,9 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
-## 2026-08-23 (3)
+## 2026-08-23 (4)
+
+- product-ownership 1.15.0 — "Recording the check": nuovo step che impone di verificare che i link agli screenshot nel commento `## Test info` risolvano davvero (branch pushato + `gh api .../contents/...?ref=<sha>`, non un `curl` non autenticato) prima dell'handoff, invece di assumere che il commit sia raggiungibile su GitHub solo perché `git commit` è andato a buon fine. Trovato su subsplit #37: il commento è stato pubblicato con lo SHA di un commit mai pushato, tutti i link erano 404 finché l'utente non l'ha segnalato.
 
 Verifica dei due commit precedenti: cercati i riferimenti incrociati rimasti appesi dopo lo spostamento di contenuto fuori da CLAUDE.md, e controllato come le regole spostate raggiungono i subagent.
 
