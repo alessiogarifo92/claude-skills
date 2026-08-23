@@ -1,7 +1,7 @@
 ---
 name: project-lifecycle
 description: Use when starting a new application or project from scratch, or evaluating one end to end — from initial idea through tool/stack and cost decisions, architecture, breaking the work into tickets, implementation, and deploy — not for a single scoped ticket already in flight
-version: 1.4.0
+version: 1.4.1
 ---
 
 # Project Lifecycle
@@ -31,7 +31,7 @@ Every phase that adds a tool, service, or hosting target restates: what it costs
 - A tool/service adopted without a `market-analyst` verdict? Get one before it lands in a ticket.
 - More than one ticket drafted before phase 3's architecture is confirmed? Architecture decisions ripple into every ticket — confirm shape first.
 - Tickets don't reference the phase 2/3 decisions? They'll re-derive and drift from what was actually decided.
-- Laravel project scaffolded without Laravel Boost? Install it before the first ticket, per CLAUDE.md — tickets written against source files instead of the running app start drifting from phase 3's decisions immediately.
+- Laravel project scaffolded without Laravel Boost? Install it before the first ticket, per `laravel-architecture`'s "Ground the design in the running app" — tickets written against source files instead of the running app start drifting from phase 3's decisions immediately.
 - About to make something publicly reachable without a `security-review` pass over secrets/auth/exposed endpoints? Do it before the deploy, not after the first incident.
 - Recurring cost of the deployed stack never restated at deploy time? Phase 2's estimate was for the plan; confirm what's actually being billed now.
 

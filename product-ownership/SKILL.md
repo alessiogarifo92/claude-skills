@@ -1,7 +1,7 @@
 ---
 name: product-ownership
 description: Use when drafting or creating a GitHub issue/ticket, researching external sources needed to write one, deciding whether something is a bug/research/implementation ticket, starting or finishing implementation work on a ticket, about to push or merge a completed change, or cleaning up branches after a PR merges or a commit supersedes it
-version: 1.14.0
+version: 1.14.1
 ---
 
 # Product Ownership
@@ -40,6 +40,8 @@ The table stays at phase level on purpose: domain skills are a category ("the re
 
 ## Labels — bug outranks feature, spike is exploration not delivery
 Reuse the repo's existing GitHub labels for ticket type instead of inventing new ones per project: `bug` for bug tickets, `feature` for feature/implementation tickets, `question` for research tickets, `spike` for spikes (create it once per repo if missing: `gh label create "spike" --color 1d76db --description "Time-boxed technical exploration/prototype to reduce uncertainty"`). `in progress` (see below) stacks on top of whichever type label applies — it is not itself a type.
+
+Deliberately `feature`, never GitHub's default `enhancement` — the user dislikes that name. If a repo still carries the stock `enhancement` label, **rename** it (`gh label edit enhancement --name feature`) rather than creating a `feature` duplicate alongside it: renaming preserves every existing issue association, creating a duplicate silently splits the backlog across two labels.
 
 When choosing what to pick up next and priorities aren't otherwise specified by the user, an open `bug` outranks an open `feature`: a broken existing behavior costs more the longer it sits than a not-yet-built feature does. This is a default, not an override of explicit user direction — if the user names what to work on next, that stands regardless of label.
 

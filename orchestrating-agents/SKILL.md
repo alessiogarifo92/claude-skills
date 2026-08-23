@@ -1,7 +1,7 @@
 ---
 name: orchestrating-agents
 description: Use when dispatching any subagent or coordinating multi-phase work (research → plan → implement → verify → deploy) — covers picking the model for the task, writing the dispatch brief, and verifying each agent's report before the next phase.
-version: 1.1.0
+version: 1.2.0
 ---
 
 # Orchestrating Agents
@@ -35,6 +35,14 @@ Override per dispatch with the `model` parameter when the task's weight clearly 
 ## Dispatch brief — what the agent receives
 
 Goal in one sentence; exact scope boundaries (files/areas in scope, what NOT to touch); the spec or reproduction (decisions already made — an agent never decides for you); the verification commands to run; the reminder that git belongs to the orchestrator.
+
+**Inline every rule the agent must follow — agents cannot load skills.** None of the custom agents in `~/.claude/agents/` carries the `Skill` tool (verified against all seven frontmatters), so an agent can never invoke `product-ownership`, `test-verification`, `laravel-architecture` or any other skill to find out how this project works. Whatever a skill says about the job you're delegating reaches the agent **only** if you paste the relevant constraint into the brief. Skills are an orchestrator-side resource: the main session loads them, extracts what applies, and hands the agent the concrete instruction.
+
+- Delegating Laravel work? The Boost rule lives in `laravel-architecture` — restate it, don't assume.
+- Delegating a test run that touches a shared DB? Restate the no-destructive-reset constraint (it's in the global CLAUDE.md, which the brief should still make explicit rather than rely on).
+- Delegating an implementation? Restate the test-coverage expectation and any convention the skill would have supplied.
+
+A brief that says "follow our conventions" delegates a lookup the agent has no way to perform. The failure is silent: the agent produces plausible work that quietly ignores a rule, and it surfaces only at your verification gate — or worse, after merge.
 
 ## Report contract — what the agent returns
 

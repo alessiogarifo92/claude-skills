@@ -12,6 +12,14 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-08-23 (3)
+
+Verifica dei due commit precedenti: cercati i riferimenti incrociati rimasti appesi dopo lo spostamento di contenuto fuori da CLAUDE.md, e controllato come le regole spostate raggiungono i subagent.
+
+- orchestrating-agents 1.2.0 — sezione "Dispatch brief": nuova regola "Inline every rule the agent must follow — agents cannot load skills". Verificato sui frontmatter di tutti e 7 gli agent in `agents/`: nessuno ha il tool `Skill`, quindi nessun subagent può invocare una skill per scoprire come si lavora in questo progetto. Le skill sono una risorsa lato orchestratore: la sessione principale le carica ed estrae il vincolo concreto nel brief. Conseguenza diretta dello spostamento di regole da CLAUDE.md (che gli agent vedono) alle skill (che non possono caricare) — senza questa regola il refactor avrebbe reso invisibili agli agent le regole spostate, con fallimento silenzioso.
+- project-lifecycle 1.4.1 — corretto riferimento appeso nel "Check": il bullet su Laravel Boost puntava a CLAUDE.md, da cui la regola è stata rimossa nel commit precedente; ora punta a `laravel-architecture`.
+- product-ownership 1.14.1 — sezione "Labels": ripristinato il dettaglio operativo che era solo nella memoria di progetto poi cancellata — `feature` è deliberatamente al posto del default `enhancement`, e un repo con la label stock va corretto con `gh label edit enhancement --name feature` (rinominare preserva le associazioni esistenti; creare un duplicato spacca il backlog su due label).
+
 ## 2026-08-23 (2)
 
 - CLAUDE.md — nuova sezione in testa "Where a new rule/lesson goes: skill → CLAUDE.md → project memory", regola di instradamento per i prossimi apprendimenti; rimosse le sezioni "Manual verification" (4 sezioni + "always surface test credentials") e "Laravel Boost is standard equipment", spostate integralmente sotto. File sceso da 126 a 81 righe (~28KB → ~18.5KB) pur avendo aggiunto la nuova sezione.

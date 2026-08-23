@@ -26,5 +26,6 @@
   "theme": "dark",
   "autoContinueAtUsageLimit": true,
   "inputNeededNotifEnabled": true,
-  "agentPushNotifEnabled": true
+  "agentPushNotifEnabled": true,
+  "model": "opus"
 }
