@@ -1,7 +1,7 @@
 ---
 name: product-ownership
 description: Use when drafting or creating a GitHub issue/ticket, researching external sources needed to write one, deciding whether something is a bug/research/implementation ticket, starting or finishing implementation work on a ticket, about to push or merge a completed change, or cleaning up branches after a PR merges or a commit supersedes it
-version: 1.13.1
+version: 1.14.0
 ---
 
 # Product Ownership
@@ -48,6 +48,7 @@ When choosing what to pick up next and priorities aren't otherwise specified by 
 - Run `gh label list` and reuse what exists instead of inventing new labels.
 - Match the repo's existing issue tone/language/section structure if prior issues establish one (check `gh issue list`/`gh issue view` on a couple of examples).
 - Check whether the new ticket depends on, blocks, or belongs under an existing one — wire the relationship in with the flags below *before* showing the draft to the user, not as a follow-up once work starts.
+- If the ticket originates from an unchecked todo item on a Notion page, check that item off (`- [ ]` → `- [x]`) on the source page as part of creating the ticket, appending a short reference to the ticket created from it (e.g. `— ticket subsplit#24`) — do this proactively, without waiting to be asked. If one todo spawns multiple tickets, list every resulting ticket number on the same checked line rather than splitting the bullet. Without this, Notion drifts out of sync with GitHub as the source of truth for "what's already been turned into a ticket" (missed on 6 tickets created from a subsplit planning page before this became standard). Applies in any project that uses Notion for planning.
 
 ## Ticket relationships — dependencies and epics
 GitHub has native issue-relationship fields — `blockedBy`/`blocking` (sequential dependencies) and `parent`/`subIssues` (epics) — exposed by `gh issue create`/`gh issue edit` as real flags, not just body text. Use these instead of ad-hoc conventions (a "Blocked by #N" sentence buried in the body, a hand-written epic checklist): they render as badges/progress bars in the GitHub UI, stay in sync automatically, and are queryable with `--json`. Confirm your `gh` version still has them (`gh issue create --help` / `gh issue edit --help`) before falling back to a body-text convention on an older CLI or host that lacks the feature.
@@ -103,7 +104,9 @@ The walkthrough in step 1 gets written into the ticket itself, not just describe
 1. While walking the flow with the `playwright` MCP server, capture a screenshot (`browser_take_screenshot`) for each step. For a long or repetitive walkthrough (e.g. ten similar form fields), a screenshot per fundamental step is enough — the starting state, the action's result, and any edge case checked — but never skip the step that's the actual point of the ticket.
 2. Commit the screenshots on the ticket's branch under `docs/test-evidence/<issue>-<slug>/NN-description.png` (numbered to match the steps), in the same commit as the change or a follow-up commit before the handoff. `gh` has no scriptable way to upload an image directly into an issue comment (that's the web UI's own attachment flow, not a public API) — a committed file with a stable URL is the reliable substitute.
 3. Post a `## Test info` comment on the issue (`gh issue comment <n> --body-file -`) with the numbered steps, each followed by its screenshot referenced via `https://raw.githubusercontent.com/<owner>/<repo>/<commit-sha>/docs/test-evidence/.../NN-description.png` so it renders inline — use the **commit SHA**, not the branch name, since the ticket branch gets deleted after merge (per "Branch cleanup" below) while the commit stays reachable through `main`'s history.
-4. Do this before the manual handoff (step 2 above): the ticket should already show what was checked when the user opens it, not just a chat message that scrolls away.
+   - **Private-repo gotcha:** `raw.githubusercontent.com` image embeds silently fail to render in issue comments on a **private** repo — the endpoint needs a token the viewer's browser session doesn't send, so the markdown image tag just shows broken with no error at write time. Check `gh repo view --json isPrivate` first; if private, use plain `https://github.com/<owner>/<repo>/blob/<sha>/<path>` markdown *links* instead of `![]()` embeds (they respect the viewer's github.com session and open the file's blob page, which does render the image — just not inline). Confirmed on subsplit issue #9: 4 raw.githubusercontent.com links posted, none displayed; fixed via `gh issue comment --edit-last` to blob links.
+   - **Never let a real/working credential land in a committed screenshot** — if a step needs to show a password in cleartext (e.g. a visibility-toggle demo), use an obviously-fake placeholder value, not an actual test account's password; real credentials are chat-only (see the global "always surface test credentials" rule). A screenshot that only needs to prove an outcome (e.g. a post-login screen) carries no such risk since the credential isn't on screen at that point.
+4. Do this before the manual handoff (step 2 above): the ticket should already show what was checked when the user opens it, not just a chat message that scrolls away. Treat "did I post the Test info comment yet" as a checklist item before every handoff — it's easy to substitute a verbal chat summary for the recorded version and feel like the gate was satisfied when it wasn't (confirmed missed entirely on subsplit #32, where only `worktree-manager` had been invoked at pickup and this section was never loaded into context — see global CLAUDE.md's "Invoke product-ownership itself at ticket pickup").
 
 | Excuse | Reality |
 |--------|---------|
@@ -140,7 +143,8 @@ Every skill in this repo carries a semver `version` in its `SKILL.md` frontmatte
 - Drafting a batch of tickets for a phase/goal (MVP or otherwise) → does a milestone exist for it, and is each ticket in the batch assigned to it?
 - Starting work on an issue → is the `in progress` label on it? (Label yes, always — worktree only once code is actually about to be written.)
 - About to `git push` or merge anything → did the user manually confirm in the browser that the change works? If not, stop and ask now.
-- Did a browser walkthrough for the manual check → is it recorded in a `## Test info` comment (numbered steps + screenshots) before handing off to the user, not just described in chat?
+- Did a browser walkthrough for the manual check → is it recorded in a `## Test info` comment (numbered steps + screenshots, blob links if the repo is private) before handing off to the user, not just described in chat?
+- Ticket created from a Notion todo → was the source checkbox checked off with a reference to the new ticket?
 - Fix pushed to the default branch → did you close the issue right away, without waiting to be asked?
 - Closing an issue → was the `in progress` label removed?
 - Just merged/superseded a branch → does `git branch -a` show only the default branch, locally and remotely, when you're done?

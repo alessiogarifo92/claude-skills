@@ -12,6 +12,13 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-08-23 (1)
+
+- CLAUDE.md — sezione "Invoke product-ownership itself at ticket pickup" sostituisce le 5 sezioni globali aggiunte in precedenza oggi stesso (Test info comment, link blob su repo private, ListAgents prima di considerare orfano un worktree, blocco classificatore su `gh pr merge`, checkoff todo Notion): quelle regole pesavano su ogni conversazione di ogni progetto anche quando irrilevanti, essendo CLAUDE.md caricato per intero e sempre, a differenza delle skill (di cui sta sempre in contesto solo il nome+descrizione, il corpo si carica solo quando la skill viene invocata). Spostate nelle skill che già governano quelle fasi, sotto.
+- product-ownership 1.14.0 — sezione "Recording the check" step 3: aggiunto il caveat sui repo privati (link `blob/<sha>/...` al posto di `raw.githubusercontent.com`, che non renderizza) e la nota su non far comparire credenziali reali negli screenshot committati; sezione "Before creating on GitHub": nuovo bullet per spuntare il todo Notion sorgente quando un ticket nasce da lì; nuove voci nel "Check" finale.
+- worktree-manager 1.4.0 — sezione "Lifecycle" step 1 (Pickup): nuova regola `ListAgents` prima di considerare orfano un worktree/ticket altrui, con l'incidente del ticket #8 come esempio; rimando dallo step 2 (During) alla stessa disciplina applicata al DB condiviso.
+- finishing-a-development-branch 1.1.0 — nuova sezione "`gh pr merge` is hard-blocked by the auto-mode classifier": il classificatore blocca `gh pr merge` e le modifiche a settings.json anche con autorizzazione esplicita dell'utente in conversazione; va girato all'utente via `!`; incluso anche il caso pratico del `git checkout` locale che fallisce se `main` è già in uso da un altro worktree (il merge remoto di solito è comunque riuscito).
+
 ## 2026-08-16 (6)
 
 - product-ownership 1.13.1 — rinominato il label di tipo ticket `enhancement` in `feature` nella sezione "Labels" (nome preferito dall'utente, che non gradisce "enhancement"); nessun cambio di comportamento.
