@@ -53,7 +53,9 @@ The environment must still be pointed at the ticket's code at the moment this ha
 
 ## Manual verification: mock data when the real dataset can't cover the case
 If the real dataset doesn't contain a case the user needs to see with their own eyes (a specific edge case, empty state, boundary condition, error state), don't skip the check, don't fake having verified it, and don't just describe what "should" happen — insert temporary mock/seed data into the running environment so the scenario is actually reproducible and clickable for the user's manual check.
-- Make clear to the user that what they're looking at is temporary mock data inserted for this check, not real catalog data.
+- Do this proactively, before handing off the check — don't wait for the user to say they can't find anything to test. If the ticket's feature depends on data being in a particular state (e.g. charges/payments spread across several periods, a multi-step workflow), reset or seed that state as part of preparing the handoff, the same way the environment/server swap is prepared.
+- Default to at least 3 varied scenarios per manual-verification handoff, not just one — pick cases that exercise different branches of the acceptance criteria (e.g. one that lands on each distinct state/threshold the feature distinguishes, not three copies of the same case), especially when state varies over time or across repeated periods (payments/charges across different months, multi-step statuses, etc).
+- Make clear to the user that what they're looking at is temporary mock data inserted for this check, not real catalog data — describe each scenario briefly (what it is, what it's meant to demonstrate) so the user knows which one to use for which check.
 - Only delete the mock data after the user has given explicit approval of the check — deleting data is a hard-to-reverse action, so it follows the same confirm-first default as any other destructive operation, it doesn't get a standing exception just because the data is fake.
 - Clean it up promptly once approved, so it doesn't linger and get mistaken for real data in later tests.
 
