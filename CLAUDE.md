@@ -86,6 +86,12 @@ Create the worktree only when code in the repo is actually about to be written o
 ## Remove the "in progress" label when a ticket closes
 GitHub does not strip labels on close automatically. Whenever a ticket/issue closes — for any reason and by any path (fix shipped, research report delivered, closed as duplicate/wontfix/not-planned, superseded by a different commit or PR) — remove the `in progress` label as part of that same closing action, not as a follow-up to remember later: `gh issue close <n> --comment "..."` paired with `gh issue edit <n> --remove-label "in progress"` (or the single combined call if the `gh` version supports it). This applies uniformly regardless of ticket type; don't treat it as specific to the bug/implementation workflow.
 
+## Manual verification: always surface the test credentials used
+Whenever a manual-verification check uses or resets a test account's login (email/username + password) — creating one, resetting its password, or reusing an existing one — always show those credentials back to the user directly in the chat response, so they can verify with that same account or spin up a new one.
+- Show them plainly in chat: email/username + password, and if more than one account is relevant (e.g. admin vs. non-admin member, to check role-based access), list each with its role/purpose so the user knows which to use for which check.
+- Never write the password (or an email meant to stay private) into test files, commit messages, PR descriptions, or any other committed artifact — chat-only.
+- Applies in every project, not just ones with a shared local dev DB — any manual check that involves logging in as a test user.
+
 ## Restore the stack to main when a ticket closes
 If the running stack was swapped to serve this ticket's worktree for manual verification (per "Manual verification: real data, standard ports, one environment at a time" above), swap the code-serving layer back to the primary checkout on its default branch (typically `main`) as part of the same closing action — never leave it pointed at a just-closed ticket's worktree. Do this before running `worktree.sh cleanup`: cleanup removes the worktree directory/branch, and a stack still pointed at it will break instead of falling back to anything. Applies regardless of why the ticket closed (merged, superseded, wontfix).
 
