@@ -12,6 +12,10 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-08-23 (5)
+
+- worktree-manager 1.5.0 — "During": nuove regole sui dev server come risorsa condivisa a livello di macchina (non isolata dal worktree, stesso pattern già usato per il DB Supabase condiviso): ogni progetto documenta le proprie porte di default, `ss -tln` + `ListAgents` prima di avviarne uno, e — quando un peer chiede una porta attiva — controllare prima un'alternativa libera invece di cedere automaticamente, specie se il proprio utente ha ancora un task pendente su quella porta. Trovato su subsplit #37/#27: una porta è stata liberata per un peer senza controllare che l'alternativa fosse libera e che il check manuale dell'utente su quella porta fosse ancora aperto.
+
 ## 2026-08-23 (4)
 
 - product-ownership 1.15.0 — "Recording the check": nuovo step che impone di verificare che i link agli screenshot nel commento `## Test info` risolvano davvero (branch pushato + `gh api .../contents/...?ref=<sha>`, non un `curl` non autenticato) prima dell'handoff, invece di assumere che il commit sia raggiungibile su GitHub solo perché `git commit` è andato a buon fine. Trovato su subsplit #37: il commento è stato pubblicato con lo SHA di un commit mai pushato, tutti i link erano 404 finché l'utente non l'ha segnalato.
