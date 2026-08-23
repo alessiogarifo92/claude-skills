@@ -1,7 +1,9 @@
 {
   "permissions": {
-    "defaultMode": "auto",
-    "allow": ["Bash(gh pr merge:*)"]
+    "allow": [
+      "Bash(gh pr merge:*)"
+    ],
+    "defaultMode": "auto"
   },
   "enabledPlugins": {
     "frontend-design@claude-plugins-official": true,
@@ -20,7 +22,9 @@
       "autoUpdate": true
     }
   },
+  "askUserQuestionTimeout": "never",
   "theme": "dark",
+  "autoContinueAtUsageLimit": true,
   "inputNeededNotifEnabled": true,
   "agentPushNotifEnabled": true
 }
