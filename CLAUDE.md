@@ -18,6 +18,17 @@ Each project's own `CLAUDE.md` therefore has to carry a bootstrap section that p
 - **The rule cannot live only here.** This file is loaded *because* the repo was attached; a rule inside it can never trigger its own attach. This section is the reminder to keep the bootstrap seeded in every project; the bootstrap itself must sit in the project repo.
 - **Why:** on subsplit #24, a remote session implemented a whole ticket without any of this — no `product-ownership`, so the `## Test info` comment with screenshots was never posted (the user had to ask for it), and the session wrote a project `CLAUDE.md` re-deriving conventions from scratch that duplicated, less precisely, rules the skills already owned. Same silent-failure shape as #32, but from a different cause: there the skill existed and wasn't invoked, here it could not be reached at all.
 
+## A project's committed `.mcp.json` must not break remote sessions
+A repo-level `.mcp.json` is loaded in every session, but the environments it lands in are not equivalent: a local machine has a Docker daemon and the user's own env vars; a **remote session** (Claude Code on the web, a cloud container, a GitHub Action) has neither, and already provides its own GitHub MCP server. Three failure modes follow, all silent — the tools simply never appear, and nothing surfaces in the conversation:
+
+- **Name collision.** A server declared under a name the managed environment also uses — `github` above all — shadows the built-in one, so *neither* loads. Prefix repo-level servers to keep them distinct: `github-local`, not `github`.
+- **Unavailable transport.** A `command: docker` stdio server cannot start in a cloud container (`/var/run/docker.sock` does not exist) and hangs in "connecting" indefinitely. Prefer a hosted HTTP MCP endpoint where one exists; keep Docker-based servers for what is genuinely local-only, and expect them to fail elsewhere.
+- **Unset token variable.** `"${SOME_TOKEN:-}"` resolves to an empty string in an environment that never defined it, so the server starts unauthenticated instead of failing loudly. Document which variables a project's `.mcp.json` needs.
+
+**When an expected `mcp__*` tool is missing,** read the project's `.mcp.json` first, then check `docker version` and whether the referenced env vars are actually set — before concluding the connector is down or the account lacks access.
+
+- **Why:** on ps-plus-catalog, `.mcp.json` declared a Docker-based GitHub MCP server named `github` (added in July, working locally ever since). The first cloud session on that repo got no GitHub tools at all — the entry shadowed the environment's own `github` server, then hung with no daemon to run it. `git` kept working throughout (separate proxy credential path), so it read as an account/permission problem rather than a config one. Same silent-failure shape as the bootstrap section above, and the same root cause: a setup that only ever ran locally, meeting a cloud container for the first time.
+
 ## Orchestration: direct execution by default
 These instructions take precedence over any skill's process (including superpowers plugin skills).
 
