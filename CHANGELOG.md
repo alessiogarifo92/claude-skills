@@ -12,6 +12,10 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-08-24 (1)
+
+- worktree-manager 1.5.1 — "During": corretto l'esempio delle porte di default di subsplit appena aggiunto in 1.5.0. Per un singolo test su un worksheet, web ed eventuale Expo Go LAN vanno sulla **stessa** porta (non una a testa) — così ogni agent in parallelo occupa una sola porta invece di due, e con più agent attivi ciascuno può avere la propria senza collidere.
+
 ## 2026-08-23 (5)
 
 - worktree-manager 1.5.0 — "During": nuove regole sui dev server come risorsa condivisa a livello di macchina (non isolata dal worktree, stesso pattern già usato per il DB Supabase condiviso): ogni progetto documenta le proprie porte di default, `ss -tln` + `ListAgents` prima di avviarne uno, e — quando un peer chiede una porta attiva — controllare prima un'alternativa libera invece di cedere automaticamente, specie se il proprio utente ha ancora un task pendente su quella porta. Trovato su subsplit #37/#27: una porta è stata liberata per un peer senza controllare che l'alternativa fosse libera e che il check manuale dell'utente su quella porta fosse ancora aperto.
