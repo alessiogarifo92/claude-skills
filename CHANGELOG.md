@@ -12,6 +12,10 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-08-24
+
+- CLAUDE.md — nuova sezione "Every project's CLAUDE.md must bootstrap this skills repo": una sessione remota (Claude Code sul web, container cloud, GitHub Action) parte da un container vuoto col solo repo di progetto clonato, quindi `~/.claude/` non esiste e né le skill né queste regole globali la raggiungono — falliscono in silenzio, senza nessun segnale. Il bootstrap (`add_repo` + clone + `register_repo_root` su `alessiogarifo92/claude-skills`) deve stare nel `CLAUDE.md` di ogni progetto, unico file che una sessione remota carica da sola; questa sezione è il promemoria a seminarlo e a verificarlo ogni volta che si crea o si modifica il `CLAUDE.md` di un progetto. La regola non può vivere solo qui: questo file è caricato *perché* il repo è stato attaccato, quindi una regola al suo interno non può innescare il proprio attach. Trovato su subsplit #24: una sessione remota ha implementato l'intero ticket senza `product-ownership` (nessun commento `## Test info` con screenshot finché l'utente non l'ha chiesto) e ha scritto un `CLAUDE.md` di progetto che ri-derivava da zero convenzioni già possedute dalle skill, in versione meno precisa. Stessa forma di fallimento silenzioso di #32, causa diversa: lì la skill esisteva e non è stata invocata, qui era irraggiungibile.
+
 ## 2026-08-23 (5)
 
 - worktree-manager 1.5.0 — "During": nuove regole sui dev server come risorsa condivisa a livello di macchina (non isolata dal worktree, stesso pattern già usato per il DB Supabase condiviso): ogni progetto documenta le proprie porte di default, `ss -tln` + `ListAgents` prima di avviarne uno, e — quando un peer chiede una porta attiva — controllare prima un'alternativa libera invece di cedere automaticamente, specie se il proprio utente ha ancora un task pendente su quella porta. Trovato su subsplit #37/#27: una porta è stata liberata per un peer senza controllare che l'alternativa fosse libera e che il check manuale dell'utente su quella porta fosse ancora aperto.
