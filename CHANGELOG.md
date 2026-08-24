@@ -12,9 +12,13 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
-## 2026-08-24
+## 2026-08-24 (2)
 
 - CLAUDE.md — nuova sezione "Every project's CLAUDE.md must bootstrap this skills repo": una sessione remota (Claude Code sul web, container cloud, GitHub Action) parte da un container vuoto col solo repo di progetto clonato, quindi `~/.claude/` non esiste e né le skill né queste regole globali la raggiungono — falliscono in silenzio, senza nessun segnale. Il bootstrap (`add_repo` + clone + `register_repo_root` su `alessiogarifo92/claude-skills`) deve stare nel `CLAUDE.md` di ogni progetto, unico file che una sessione remota carica da sola; questa sezione è il promemoria a seminarlo e a verificarlo ogni volta che si crea o si modifica il `CLAUDE.md` di un progetto. La regola non può vivere solo qui: questo file è caricato *perché* il repo è stato attaccato, quindi una regola al suo interno non può innescare il proprio attach. Trovato su subsplit #24: una sessione remota ha implementato l'intero ticket senza `product-ownership` (nessun commento `## Test info` con screenshot finché l'utente non l'ha chiesto) e ha scritto un `CLAUDE.md` di progetto che ri-derivava da zero convenzioni già possedute dalle skill, in versione meno precisa. Stessa forma di fallimento silenzioso di #32, causa diversa: lì la skill esisteva e non è stata invocata, qui era irraggiungibile.
+
+## 2026-08-24 (1)
+
+- worktree-manager 1.5.1 — "During": corretto e chiarito l'esempio delle porte aggiunto in 1.5.0. Le porte di un progetto sono un **pool di porte intercambiabili, una per sessione concorrente**, non una porta per superficie: una sessione prende una sola porta libera dal pool e ci serve sia il browser (`localhost:<porta>`) sia il client mobile/Expo Go via LAN (`<lan-ip>:<porta>`), perché è lo stesso dev server a rispondere a entrambi. Per subsplit il pool è 8081 e 8082 — un agent per porta, non un agent che ne occupa due. Aggiunto anche che prendere la seconda porta del pool non è una deviazione (uscire dal pool sì), e una nota di raccordo con `test-verification` ("real data, standard ports, one environment at a time"): ogni porta del pool è una porta standard documentata, e il backend/DB condiviso dietro resta soggetto a quella regola.
 
 ## 2026-08-23 (5)
 
