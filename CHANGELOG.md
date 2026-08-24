@@ -14,7 +14,7 @@ modifica alla skill.
 
 ## 2026-08-24 (1)
 
-- worktree-manager 1.5.1 — "During": corretto l'esempio delle porte di default di subsplit appena aggiunto in 1.5.0. Per un singolo test su un worksheet, web ed eventuale Expo Go LAN vanno sulla **stessa** porta (non una a testa) — così ogni agent in parallelo occupa una sola porta invece di due, e con più agent attivi ciascuno può avere la propria senza collidere.
+- worktree-manager 1.5.1 — "During": corretto e chiarito l'esempio delle porte aggiunto in 1.5.0. Le porte di un progetto sono un **pool di porte intercambiabili, una per sessione concorrente**, non una porta per superficie: una sessione prende una sola porta libera dal pool e ci serve sia il browser (`localhost:<porta>`) sia il client mobile/Expo Go via LAN (`<lan-ip>:<porta>`), perché è lo stesso dev server a rispondere a entrambi. Per subsplit il pool è 8081 e 8082 — un agent per porta, non un agent che ne occupa due. Aggiunto anche che prendere la seconda porta del pool non è una deviazione (uscire dal pool sì), e una nota di raccordo con `test-verification` ("real data, standard ports, one environment at a time"): ogni porta del pool è una porta standard documentata, e il backend/DB condiviso dietro resta soggetto a quella regola.
 
 ## 2026-08-23 (5)
 
