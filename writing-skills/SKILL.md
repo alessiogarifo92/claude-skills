@@ -1,7 +1,7 @@
 ---
 name: writing-skills
 description: Use when creating a new skill, editing an existing one, or renaming/consolidating skills in this repo, to decide whether it's warranted and verify it actually works before treating it as done
-version: 1.1.0
+version: 1.2.0
 ---
 
 # Writing Skills
@@ -26,6 +26,7 @@ Author skills that match this repo's own conventions, and verify each one works 
 | Orchestration (sequences other skills) | `project-lifecycle`, `multi-agent-brainstorm` | Check every cross-reference resolves to a real skill; walk through one scenario end-to-end |
 
 ## Rules
+- Before editing an existing skill, `git fetch origin` and check the local branch isn't behind `origin/main` — a cloud/remote session may have already merged the same fix (often better-worded) while the local checkout sat stale. Editing on a stale base risks redoing work that already landed, and the two versions conflict on push instead of one superseding the other. Confirmed on `worktree-manager`: a dev-server-ports correction was made locally against a 3-days-stale `main`, only to find `origin/main` already had a more complete fix for the same rule, merged via a cloud session's PR — the local edit had to be discarded and reconciled by resetting to `origin/main`.
 - Bump the skill's `version` (MAJOR = behavior change, MINOR = new section/rule, PATCH = fix/clarification) and add a `CHANGELOG.md` line for every skill touched, not just new ones — per `product-ownership`'s versioning rule.
 - Renaming a skill means fixing every cross-reference to its old name repo-wide (`grep -rl old-name`), not just the file itself.
 - Adding or renaming a skill means re-checking the three routing tables that sequence skills — `product-ownership`'s "End-to-end workflow and handoffs", `orchestrating-agents`' workflow phases, and `project-lifecycle`'s phases — in the same commit. A new skill nothing routes to is invisible.
