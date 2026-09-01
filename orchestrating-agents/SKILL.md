@@ -1,7 +1,7 @@
 ---
 name: orchestrating-agents
 description: Use when dispatching any subagent or coordinating multi-phase work (research → plan → implement → verify → deploy) — covers picking the model for the task, writing the dispatch brief, and verifying each agent's report before the next phase.
-version: 1.2.0
+version: 1.3.0
 ---
 
 # Orchestrating Agents
@@ -43,6 +43,13 @@ Goal in one sentence; exact scope boundaries (files/areas in scope, what NOT to 
 - Delegating an implementation? Restate the test-coverage expectation and any convention the skill would have supplied.
 
 A brief that says "follow our conventions" delegates a lookup the agent has no way to perform. The failure is silent: the agent produces plausible work that quietly ignores a rule, and it surfaces only at your verification gate — or worse, after merge.
+
+**Connecting a connector does not hand it to the agents.** Adding an MCP connector on claude.ai, or a server with `claude mcp add`, makes its tools available to the main session — not to subagents. An agent can use only what its own frontmatter `tools:` lists, and a tool that isn't listed produces no error: the agent doesn't know it exists and falls back in silence to whatever native tool it does have. You get a plausible report produced with the wrong instrument. Update the frontmatter of every agent that should use it in the same move as connecting it — part of adding the connector, not a follow-up.
+
+- **Syntax.** The server-level wildcard `mcp__<Server>__*` works in the frontmatter (`test-runner` carries `mcp__playwright__*`). Spell tools out one by one only where least privilege matters, as `github-ops` does.
+- **The server name is load-bearing.** `Context7` (the claude.ai connector) and `context7` (`claude mcp add context7`) are different names. A wildcard that doesn't match the real server name doesn't fail — it matches nothing, silently.
+- **The frontmatter is half the change.** If the agent's prompt doesn't say *when* to prefer the new tool, gravity stays with the native tool it already knows. `test-runner` needed an explicit Playwright constraint; `researcher` needed a precedence rule for Context7. Ship both halves or neither.
+- **Not every agent should get one.** All four must hold: the agent actually runs that phase (not "it might come up"); without the tool its fallback is materially worse, not merely different; the tool is read-only, or its writes are inside the agent's mandate; the prompt says when to prefer it. An agent failing any one keeps what it has — adding tools "just in case" widens the surface for nothing.
 
 ## Report contract — what the agent returns
 
