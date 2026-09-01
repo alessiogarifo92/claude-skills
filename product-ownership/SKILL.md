@@ -1,7 +1,7 @@
 ---
 name: product-ownership
 description: Use when drafting or creating a GitHub issue/ticket, researching external sources needed to write one, deciding whether something is a bug/research/implementation ticket, starting or finishing implementation work on a ticket, about to push or merge a completed change, or cleaning up branches after a PR merges or a commit supersedes it
-version: 1.15.0
+version: 1.16.0
 ---
 
 # Product Ownership
@@ -26,7 +26,7 @@ Every agent dispatch in any phase follows `orchestrating-agents`: the model matc
 
 The table stays at phase level on purpose: domain skills are a category ("the relevant domain skill"), not an exhaustive list. Rationale and diagram live in the decision record `docs/reports/2026-07-17-ticket-4-workflow-skills-agents.md` (#4).
 
-**Closing order is fixed.** The manual user gate comes first; only after the user confirms does `finishing-a-development-branch` present its merge/PR options, and only after the work lands do issue closing and cleanup happen. Never let finishing-a-development-branch's menu jump ahead of the gate.
+**Closing order is fixed.** The manual user gate comes first; only once that gate has cleared — by the user's confirmation, or through its carve-out — does `finishing-a-development-branch` present its merge/PR options, and only after the work lands do issue closing and cleanup happen. Never let finishing-a-development-branch's menu jump ahead of the gate.
 
 **Anti-friction rules:**
 - When multiple user confirmations are foreseeable (ticket draft, manual gate, follow-up ticket), prepare all the material first — report, drafts, closing text — and present the requests at a single stop point, so one reply unblocks the whole queue. The gate's content is unchanged; only the batching is.
@@ -98,7 +98,14 @@ Automated tests passing is necessary but NOT sufficient to merge or push. After 
 2. Tell the user exactly what to check manually, in the three-part split `test-verification` defines: what you already verified in the browser (so they don't repeat it), what needs their eyes (absolute URL, the action, a falsifiable expected result), and what you could not verify and why.
 3. Stop and wait for their explicit confirmation that it works. If they report a problem, fix it and repeat this gate from step 1.
 
-If the change has no browser-observable surface (pure tooling, CI config, docs), say so explicitly and tell the user how to verify it instead — the stop-and-wait for their confirmation still applies before merge/push.
+If the change has no browser-observable surface, say so explicitly and tell the user how to verify it instead. Whether the stop-and-wait still applies depends on two conditions, and both must hold to skip it:
+
+1. **The change cannot be verified before it lands.** Not "verifying is inconvenient" — genuinely impossible. The canonical case is this skills repo itself: a skill or agent edit only takes effect once it's merged and pulled into `~/.claude/`, so there is nothing for the user to check beforehand.
+2. **Landing is cheap to undo.** A revert commit with no residue — no data migration, no external side effect, nothing already consumed downstream.
+
+When both hold and the user has asked for the merge, proceed without waiting. The wait is not dropped, it is converted: the "how to verify" becomes mandatory and goes **in writing on the ticket** (the closing comment), not just in chat, so it survives the session and is there when the user next pulls.
+
+When either condition fails, the stop-and-wait applies before merge/push exactly as it does for a browser change. CI config, database migrations, deploy scripts and infrastructure-as-code all have no browser surface and all stay inside the gate — a CI config is in fact verifiable *on the PR branch*, which is better evidence than a human's confirmation, so verify it there rather than skipping.
 
 ### Recording the check: "Test info" section on the ticket
 The walkthrough in step 1 gets written into the ticket itself, not just described in chat — otherwise the evidence disappears once the session ends.
@@ -119,9 +126,10 @@ The walkthrough in step 1 gets written into the ticket itself, not just describe
 | "I already verified it in the browser myself" | Your own check prepares the handoff; it doesn't replace the user's. |
 | "Playwright drove the whole flow green, that's stronger than a human click" | Playwright proves it runs. It can't tell you the result is *right* — that judgment is what the gate is for. |
 | "The user seems away, I'll push and they can review later" | The push can wait. Waiting is the whole point of the gate. |
+| "It's not visible in a browser, so the gate doesn't apply" | Wrong axis. The carve-out is "the user cannot verify it before it lands **and** it is cheap to revert" — not "there's nothing to look at". CI config, migrations, deploy scripts and IaC have no browser surface and stay inside the gate. |
 
 ## Closing when the fix ships
-Once the fix is committed and pushed to the default branch (after tests pass **and** the user has confirmed the manual browser check above), close the issue directly — right away, without waiting to be asked. Don't rely on GitHub's auto-close commit-message keywords (`Fixes #N`/`Closes #N`) as the closing mechanism; close it explicitly via `gh issue close <N> --comment "..."`, referencing the commit SHA that shipped it, and remove the `in progress` label as part of that same step.
+Once the fix is committed and pushed to the default branch (after tests pass **and** the manual gate above has cleared), close the issue directly — right away, without waiting to be asked. Don't rely on GitHub's auto-close commit-message keywords (`Fixes #N`/`Closes #N`) as the closing mechanism; close it explicitly via `gh issue close <N> --comment "..."`, referencing the commit SHA that shipped it, and remove the `in progress` label as part of that same step.
 
 This is pre-authorized as standard practice for the ticket-implementation workflow described in this skill — it doesn't extend to other GitHub actions (merging PRs, force-pushing, etc.), which still default to asking first.
 
