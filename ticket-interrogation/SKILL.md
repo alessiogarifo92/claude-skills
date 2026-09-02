@@ -1,7 +1,7 @@
 ---
 name: ticket-interrogation
 description: Use when the user asks to interrogate, stress-test, pressure-test, poke holes in, sanity-check or "grill" a plan, design, approach or architecture, is about to start building something non-trivial while a direction is already chosen but its decisions are still open, or asks for help turning a rough idea into a well-specified ticket — not when the direction itself is still undecided, which is `brainstorming`
-version: 1.1.0
+version: 1.2.0
 ---
 
 # Ticket Interrogation
@@ -37,11 +37,13 @@ Decide from context; only ask if it's genuinely unclear.
 
 State which mode you picked in one line, then start.
 
-**A mode can be raised, never silently.** If the user asks for more depth than the picked mode allows ("dig deeper", "ask me everything", "don't be superficial"), that is a request to switch to `full` — not a licence to overrun `light`'s budget under a `light` header. Say you are switching and why, then run `full` properly, attack phase included. The same in reverse when the user cuts you short. What must never happen is a stated mode the run then contradicts.
+**A mode can be raised, never silently.** If the user asks for more depth than the picked mode allows ("dig deeper", "ask me everything", "don't be superficial"), that is a request to switch to `full` — not a licence to overrun `light`'s budget under a `light` header. Say you are switching and why, then run `full` properly, attack phase included. **The budget does not reset**: questions already asked count toward the new mode's total, so a raise after two `light` questions leaves six to eight, not eight to ten. The same in reverse when the user cuts you short. What must never happen is a stated mode the run then contradicts.
 
 ## Phase 1 — Interview
 
-Use **AskUserQuestion** for every question. Never pose questions as plain text. If AskUserQuestion is unavailable in the current client, fall back to one numbered question per message — still one at a time, still with the options listed.
+Use **AskUserQuestion** for every question — never type a question into prose while the tool is available. Only if AskUserQuestion is genuinely unavailable in the current client, fall back to one numbered question per message, still one at a time and still with its options listed. That fallback is the single exception; it is not a matter of preference.
+
+Ask in the language the user is writing in, not only the final output.
 
 Rules:
 
@@ -81,7 +83,9 @@ Work through:
 
 **Output: risks ordered by severity, each with a proposed mitigation.**
 
-If a risk is severe enough to invalidate a decision made during the interview, reopen that one decision: name the risk that forces it, then ask it again as a normal AskUserQuestion. That is the single exception to "the interview is closed", and it spends one question against the budget. If it can't be resolved here, don't stall the ticket — carry the decision into Phase 3 marked **provvisoria**, with the risk that makes it so listed under *Rischi noti*.
+If a risk is severe enough to invalidate a decision made during the interview, reopen that one decision: name the risk that forces it, then ask it again as a normal AskUserQuestion. That is the single exception to "the interview is closed", and it spends one question against the budget. Resolving it is the default. **provvisoria** is for a decision the user genuinely cannot settle now — it needs a fact nobody in the conversation has (a consumer outside this repo, a number from production, someone else's call) — not for one you'd rather not spend a question on. When it applies, don't stall the ticket: carry the decision into Phase 3 marked **provvisoria**, with the risk that makes it so listed under *Rischi noti*.
+
+A mitigation the plan now depends on is a **decision**, and belongs in *Decisioni tecniche* as well as in *Rischi noti* — a reconciliation job the ticket cannot ship without is not a footnote. A mitigation that is only advice for later (rotate these credentials, watch this metric) stays in *Rischi noti* alone.
 
 Don't manufacture risks to look thorough. Three real ones beat eight padded ones.
 
@@ -91,14 +95,17 @@ The output shape follows the mode, not the other way round.
 
 ### `light` — short summary
 
-No ticket template. Three blocks, nothing else:
+No ticket template. Four lines, nothing else:
 
 ```markdown
+**Titolo:** <imperative, one line>
 **Problema:** <what is actually wrong or needed, root cause if you found it>
 **Fix deciso:**
 - <decision + reason>
 **Da coprire nel test:** <the edge case that triggered this>
 ```
+
+The title is there because `light` output goes one of two ways, and only the user's original ask decides which: if they asked for a ticket, `product-ownership` publishes this as a `bug` ticket, mapping *Problema* to the context and *Da coprire nel test* to an acceptance criterion; if they asked for the fix itself, this is the brief for the fix and no issue gets created. Never decide that for them by silently inventing a ticket, or by silently skipping one.
 
 ### `full` — ticket
 
@@ -118,7 +125,10 @@ A ready-to-paste ticket. The first line is the **title**: `product-ownership` pu
 - <decision left open by Phase 2 + reason> — **provvisoria**, vedi Rischi noti
 
 ## Fuori scope
-- <what this ticket deliberately does not do>
+- <what this ticket deliberately does not do — only what the interview actually ruled out>
+
+## Dipendenze
+- <only if the interview surfaced one: this ticket is blocked by / blocks / belongs under X>
 
 ## Rischi noti
 - <risk + mitigation>
@@ -127,9 +137,11 @@ A ready-to-paste ticket. The first line is the **title**: `product-ownership` pu
 - [ ] <verifiable>
 ```
 
-Write the output in the language the user has been using in the conversation (the headings above are the Italian defaults this repo's issues use — translate them if the conversation is in another language). Keep every line traceable to something actually decided or surfaced — no invented requirements.
+Write the output in the language the user has been using in the conversation (the headings above are the Italian defaults this repo's issues use — translate them if the conversation is in another language). Keep every line traceable to something actually decided or surfaced — no invented requirements. **That binds *Fuori scope* exactly as much as the rest**: list only what the interview or the attack actually ruled out, not everything a reader might imagine. An exclusion nobody decided is an invented requirement wearing a negation.
 
-The output stops here: creating the issue on GitHub, choosing its labels and wiring its relationships is `product-ownership`'s job, including its confirm-before-create gate.
+These headings are this repo's default, not a contract: `product-ownership` may reshape them to match a repo whose issues are structured differently, as its own convention rule requires. What must survive that reshaping is the content, not the heading names.
+
+Then invoke `product-ownership` to publish it. The output stops here: creating the issue on GitHub, choosing its labels and wiring its relationships is that skill's job, including its confirm-before-create gate — but handing the body over is *this* skill's last step, not someone else's problem.
 
 ## Common mistakes
 
@@ -148,6 +160,10 @@ The output stops here: creating the issue on GitHub, choosing its labels and wir
 | Emitting the full ticket template in `light` mode | `light`'s output is the three-block summary. The template belongs to `full` |
 | Running nine questions under a `light` header because the user pushed for depth | Raising the mode is allowed, doing it silently is not. Announce the switch, then run `full` properly |
 | Spending one of the 2–4 option slots on "Other" | AskUserQuestion adds it for free — you just cut the real choices to three |
+| Emitting the ticket and stopping | Handing it to `product-ownership` is this skill's last step, not the next session's |
+| Filling *Fuori scope* with plausible exclusions nobody decided | Same rule as the rest of the ticket: an invented exclusion is an invented requirement |
+| Marking a decision **provvisoria** to avoid spending a question on it | That marker is for what the user genuinely cannot answer yet, not for what you didn't ask |
+| Restarting the budget after raising the mode | Questions already spent still count — a raise buys the difference, not a clean slate |
 
 ## Boundary
 
