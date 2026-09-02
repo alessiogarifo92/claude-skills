@@ -1,7 +1,7 @@
 ---
 name: product-ownership
 description: Use when drafting or creating a GitHub issue/ticket, researching external sources needed to write one, deciding whether something is a bug/research/implementation ticket, starting or finishing implementation work on a ticket, about to push or merge a completed change, or cleaning up branches after a PR merges or a commit supersedes it
-version: 1.16.0
+version: 1.17.0
 ---
 
 # Product Ownership
@@ -15,7 +15,7 @@ This skill is the entry and exit point of the task lifecycle; the custom chain (
 |---|---|---|
 | 0. Operating principles | `principal-engineering-core` for non-trivial tasks | — |
 | 1. Ideation | `brainstorming` (or `multi-agent-brainstorm` when the idea spans UI/UX + architecture + cost at once); `market-analyst` before locking in any external tool/API/SaaS/asset (cost + license due diligence) | `researcher` for external feasibility facts and current pricing/ToS pages; `Explore` to see what already exists in the code |
-| 2. Grounding / ticket | this skill (ticket type, draft + user confirmation, existing labels); a ticket that adopts an external dependency cites the `market-analyst` verdict | `researcher` for the ticket's external sources; `Explore` to verify in the code that the problem is where you think |
+| 2. Grounding / ticket | this skill (ticket type, draft + user confirmation, existing labels); `grill-me` first whenever the request is still fuzzy — it interviews the user, attacks the resulting plan, and emits the ticket body this skill then publishes; a ticket that adopts an external dependency cites the `market-analyst` verdict | `researcher` for the ticket's external sources; `Explore` to verify in the code that the problem is where you think |
 | 3. Pickup | this skill (`in progress` label, always) → `worktree-manager` **only once code work is about to start** (not for research/drafting) → `writing-plans` for multi-step work | `Explore` to locate the critical files before planning; `github-ops` to create/list the ticket's worktree and branch via the repo's own convention, called at the code-work point, not at pickup |
 | 4. Implementation | **Direct execution in the main session by default** (`direct-execution`) + `test-driven-development`, plus the relevant domain skill; `subagent-driven-development`/`executing-plans` only for genuinely independent parallel workstreams or plans spanning sessions; a research ticket delivers a report instead (see Ticket types) | `implementer` / `quick-debugger` / `refactor-optimizer` for one whole scoped piece, per `orchestrating-agents`; `researcher` writes the report on research tickets |
 | 5. Verification | `test-verification` picks the checks and enforces evidence before "done" | `test-runner` runs suites/lint/typecheck and reports only the outcome |

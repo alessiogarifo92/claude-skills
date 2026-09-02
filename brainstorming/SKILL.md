@@ -1,14 +1,14 @@
 ---
 name: brainstorming
 description: Use when starting new creative work with fuzzy requirements — a new feature, product idea, app, or UI — before any implementation plan or code exists, to surface intent, constraints, and tradeoffs rather than jumping straight to a solution shape
-version: 1.0.0
+version: 1.1.0
 ---
 
 # Brainstorming
 
 Before committing to a solution shape, understand the problem shape. This is the requirement-discovery step for genuinely open-ended work.
 
-**Pairs with:** `direct-execution` decides whether this applies at all — skip straight to execution for a linear, single-focus task; escalate here only when requirements are genuinely open. `project-lifecycle` calls this as phase 1 for new-project ideation. `docs-and-specs` writes up the decision once made. `multi-agent-brainstorm` is the parallel-lens version when one perspective isn't enough.
+**Pairs with:** `direct-execution` decides whether this applies at all — skip straight to execution for a linear, single-focus task; escalate here only when requirements are genuinely open. `project-lifecycle` calls this as phase 1 for new-project ideation. `docs-and-specs` writes up the decision once made. `multi-agent-brainstorm` is the parallel-lens version when one perspective isn't enough. `grill-me` takes over once a direction exists but is still fuzzy: it interrogates that direction into a ticket instead of generating alternatives to it.
 
 ## When this applies
 - A new feature, product, app, or UI surface where "what exactly should this do" isn't settled

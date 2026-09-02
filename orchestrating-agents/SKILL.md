@@ -1,7 +1,7 @@
 ---
 name: orchestrating-agents
 description: Use when dispatching any subagent or coordinating multi-phase work (research → plan → implement → verify → deploy) — covers picking the model for the task, writing the dispatch brief, and verifying each agent's report before the next phase.
-version: 1.3.0
+version: 1.4.0
 ---
 
 # Orchestrating Agents
@@ -16,7 +16,7 @@ This skill governs HOW to orchestrate once `direct-execution`'s decision tree sa
 
 | Phase | Who | Model |
 |---|---|---|
-| 1. Brainstorming / design decisions | Main session, with the user (`brainstorming`). Never delegated — decisions need the user. `multi-agent-brainstorm` may gather parallel lenses as phase-2 input, but the call still happens here. | main session |
+| 1. Brainstorming / design decisions | Main session, with the user (`brainstorming`; `grill-me` when a plan needs stress-testing into a ticket). Never delegated — decisions need the user, and `grill-me` needs AskUserQuestion, which no agent has. `multi-agent-brainstorm` may gather parallel lenses as phase-2 input, but the call still happens here. | main session |
 | 2. Data gathering | `researcher` (external facts, docs, feasibility); `Explore` (locating things in the codebase) | sonnet / haiku |
 | 3. Planning | Main session (`writing-plans` only for real multi-step work); user approves the plan | main session |
 | 4. Implementation | Direct by default (`test-driven-development` for the test/code order). Delegate one whole scoped piece: `implementer` (feature+tests), `quick-debugger` (localized bug), `refactor-optimizer` (behavior-preserving cleanup); `executing-plans` / `subagent-driven-development` when a written plan drives it | sonnet |

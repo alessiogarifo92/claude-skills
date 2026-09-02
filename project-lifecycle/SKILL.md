@@ -1,7 +1,7 @@
 ---
 name: project-lifecycle
 description: Use when starting a new application or project from scratch, or evaluating one end to end — from initial idea through tool/stack and cost decisions, architecture, breaking the work into tickets, implementation, and deploy — not for a single scoped ticket already in flight
-version: 1.5.0
+version: 1.6.0
 ---
 
 # Project Lifecycle
@@ -18,7 +18,7 @@ Owns the whole-project arc that sits above a single ticket: an idea becomes a va
 | 2. Tools & cost | `market-analyst` per external tool/API/SaaS/library candidate; state the free-tier and cheapest-viable path explicitly, not just the "best" option | User confirms the stack and its cost profile |
 | 3. Architecture | `principal-engineering-core` for operating principles, `architecture-review` for structural shape (plus `database-design` if persistence is involved) | User confirms the shape before any ticket is drafted |
 | 3.5. Design UI/UX (only if the project has a user-facing UI) | Propose it explicitly here, don't wait to be asked — see "Phase 3.5 in detail" below for the five steps it runs; the global CLAUDE.md rule "Never skip a Design UI/UX phase before development" states the failure mode this prevents | User picks **one** named direction out of several (or explicitly defers the phase, e.g. "ship default styling for now") before any UI-bearing ticket is drafted |
-| 4. Tickets | `product-ownership` — one ticket per independently shippable slice, referencing the phase 2/3/3.5 decisions instead of re-deriving them; the whole batch gets its own milestone (e.g. "MVP") per `product-ownership`'s milestone convention, instead of only naming the range in ticket text | Each ticket drafted and confirmed per `product-ownership`'s own gate |
+| 4. Tickets | `grill-me` first on any slice whose requirements are still fuzzy (it produces the ticket body), then `product-ownership` — one ticket per independently shippable slice, referencing the phase 2/3/3.5 decisions instead of re-deriving them; the whole batch gets its own milestone (e.g. "MVP") per `product-ownership`'s milestone convention, instead of only naming the range in ticket text | Each ticket drafted and confirmed per `product-ownership`'s own gate |
 | 5. Implementation | `product-ownership`'s per-ticket loop (worktree → `writing-plans` if multi-step → direct execution / `test-driven-development` → `test-verification` → `requesting-code-review` → manual gate → `finishing-a-development-branch`) | Same ticket-level gates, unchanged |
 | 6. Deploy | Cheapest viable hosting path first (see cost rule); `security-review` before anything becomes publicly reachable (secrets, auth, exposed endpoints); manual verification on the real deploy target, not just locally | User confirms the live deploy |
 
