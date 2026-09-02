@@ -1,10 +1,10 @@
 ---
-name: grill-me
-description: Use when the user says "grill me", asks to stress-test, pressure-test, poke holes in or sanity-check a plan, design, approach or architecture, is about to start building something non-trivial while the requirements are still fuzzy, or asks for help turning a rough idea into a well-specified ticket
+name: ticket-interrogation
+description: Use when the user asks to interrogate, stress-test, pressure-test, poke holes in, sanity-check or "grill" a plan, design, approach or architecture, is about to start building something non-trivial while the requirements are still fuzzy, or asks for help turning a rough idea into a well-specified ticket
 version: 1.0.0
 ---
 
-# Grill Me
+# Ticket Interrogation
 
 Two phases: interview, then attack. The interview collects decisions. The attack tries to break them. The output is a ticket.
 
@@ -13,7 +13,7 @@ Two phases: interview, then attack. The interview collects decisions. The attack
 ## When this applies
 - A plan, design or approach exists in the user's head and needs pressure before code gets written
 - A rough idea has to become a ticket someone (or Claude Code) can implement without guessing
-- The user explicitly asks to be grilled, or to have a plan stress-tested
+- The user explicitly asks to have a plan interrogated, stress-tested or grilled
 
 ## NOT for
 - Work already scoped by a confirmed ticket — that's `writing-plans` / direct execution, not another interview
@@ -67,7 +67,7 @@ Not a checklist to run through mechanically — open the branches that actually 
 
 ## Phase 2 — Attack
 
-**Full mode only.** Stop asking questions. Now actively try to break the plan you just helped build. Be direct — this is the part the user asked for when they said "grill".
+**Full mode only.** Stop asking questions. Now actively try to break the plan you just helped build. Be direct — this is the half the interview cannot do, and the reason the skill exists.
 
 Work through:
 
