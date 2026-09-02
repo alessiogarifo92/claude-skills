@@ -1,7 +1,7 @@
 ---
 name: product-ownership
 description: Use when drafting or creating a GitHub issue/ticket, researching external sources needed to write one, deciding whether something is a bug/research/implementation ticket, starting or finishing implementation work on a ticket, about to push or merge a completed change, or cleaning up branches after a PR merges or a commit supersedes it
-version: 1.17.0
+version: 1.18.0
 ---
 
 # Product Ownership
@@ -148,6 +148,7 @@ Once a branch's work has landed on the default branch, delete **both** copies �
 Every skill in this repo carries a semver `version` in its `SKILL.md` frontmatter. When you modify a skill, bump its version (MAJOR = behavior/approach change, MINOR = new section/rule/capability, PATCH = fixes/clarifications) and add a line to the root `CHANGELOG.md` under today's date — in the same commit as the change.
 
 ## Check
+- About to draft a ticket whose requirements are still fuzzy → run `ticket-interrogation` first: it interviews, attacks the plan, and hands back title + body. This skill publishes what it produces.
 - Research ticket done → is there a follow-up implementation ticket, or does one need opening?
 - About to run `gh issue create` → did the user see and confirm this exact text?
 - Drafting a ticket that depends on/blocks another, or belongs under an epic → did you wire `--blocked-by`/`--blocking`/`--parent` before showing the draft, not after?
