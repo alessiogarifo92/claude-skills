@@ -1,7 +1,7 @@
 ---
 name: project-lifecycle
 description: Use when starting a new application or project from scratch, or evaluating one end to end — from initial idea through tool/stack and cost decisions, architecture, breaking the work into tickets, implementation, and deploy — not for a single scoped ticket already in flight
-version: 1.5.0
+version: 1.6.0
 ---
 
 # Project Lifecycle
@@ -21,6 +21,18 @@ Owns the whole-project arc that sits above a single ticket: an idea becomes a va
 | 4. Tickets | `product-ownership` — one ticket per independently shippable slice, referencing the phase 2/3/3.5 decisions instead of re-deriving them; the whole batch gets its own milestone (e.g. "MVP") per `product-ownership`'s milestone convention, instead of only naming the range in ticket text | Each ticket drafted and confirmed per `product-ownership`'s own gate |
 | 5. Implementation | `product-ownership`'s per-ticket loop (worktree → `writing-plans` if multi-step → direct execution / `test-driven-development` → `test-verification` → `requesting-code-review` → manual gate → `finishing-a-development-branch`) | Same ticket-level gates, unchanged |
 | 6. Deploy | Cheapest viable hosting path first (see cost rule); `security-review` before anything becomes publicly reachable (secrets, auth, exposed endpoints); manual verification on the real deploy target, not just locally | User confirms the live deploy |
+
+## When the project's GitHub repo is created
+Whenever this skill creates the project's repository (or picks up a project whose repo it just created), turn on **Automatically delete head branches** in the same step, before the first ticket branch exists:
+
+```bash
+gh repo edit <owner>/<repo> --delete-branch-on-merge
+```
+
+- GitHub has no account- or org-wide default for it, and template repos copy files, not settings: it must be set per repo, at creation, or it silently stays off.
+- In a remote session without `gh` (the GitHub MCP server has no repo-settings tool), hand the user the one-click path instead — *Settings → General → Pull Requests → Automatically delete head branches* — and don't consider repo setup done until they confirm it.
+- It only deletes the head branch of a PR that is **merged**. Branches merged without a PR (fast-forward pushes) and PRs closed unmerged (superseded) still need `finishing-a-development-branch` / `worktree-manager` cleanup.
+- **Why:** on tisane-match the setting was off, so after the MVP PR merged, its head branch and four other merged ticket branches stayed on GitHub — and the remote session could not delete them (its git proxy refuses branch deletion), leaving the cleanup to the user by hand.
 
 ## Phase 3.5 in detail — producing options the user can actually choose between
 
@@ -74,6 +86,7 @@ Every phase that adds a tool, service, or hosting target restates: what it costs
 - A tool/service adopted without a `market-analyst` verdict? Get one before it lands in a ticket.
 - More than one ticket drafted before phase 3's architecture is confirmed? Architecture decisions ripple into every ticket — confirm shape first.
 - Tickets don't reference the phase 2/3 decisions? They'll re-derive and drift from what was actually decided.
+- Repo created without `--delete-branch-on-merge`? Turn it on now, before merged branches start piling up — see "When the project's GitHub repo is created".
 - Laravel project scaffolded without Laravel Boost? Install it before the first ticket, per `laravel-architecture`'s "Ground the design in the running app" — tickets written against source files instead of the running app start drifting from phase 3's decisions immediately.
 - About to make something publicly reachable without a `security-review` pass over secrets/auth/exposed endpoints? Do it before the deploy, not after the first incident.
 - Recurring cost of the deployed stack never restated at deploy time? Phase 2's estimate was for the plan; confirm what's actually being billed now.
