@@ -12,6 +12,14 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-10-01
+
+- project-lifecycle 1.6.0 — nuova sezione "When the project's GitHub repo is created": alla creazione del repository del progetto si attiva subito **Automatically delete head branches** (`gh repo edit <owner>/<repo> --delete-branch-on-merge`), con una voce corrispondente nella Check list.
+  - GitHub non ha un default per account od organizzazione e i template copiano i file, non le impostazioni: se non si attiva alla creazione resta spenta senza che nessuno se ne accorga.
+  - In una sessione remota senza `gh` (il server MCP GitHub non ha strumenti per le impostazioni del repo) si passa all'utente il percorso *Settings → General → Pull Requests*.
+  - L'opzione copre solo i branch di PR unite: quelli portati con fast-forward o con la PR chiusa senza merge restano compito di `finishing-a-development-branch` e `worktree-manager`.
+  - Nata su tisane-match: dopo il merge della PR MVP (#12) il branch della PR e altri quattro branch già uniti sono rimasti su GitHub, e la sessione remota non poteva cancellarli perché il suo proxy git rifiuta la cancellazione dei branch.
+
 ## 2026-09-01 (4)
 
 - database-design 1.1.0 — nuova sezione "Before assuming a DB connector gives you the live schema". Un connector DB (Neon, Supabase, PlanetScale, MongoDB Atlas) parla con l'**API di una piattaforma di hosting**, non con un protocollo: restituisce schema reale, branch e query tuning solo se il database gira davvero su quella piattaforma. Neon è Postgres-su-Neon e basta — non è un client Postgres, quindi non serve per MySQL né per un Postgres in container, su Cloud SQL, su RDS o su una VM; la risposta per MySQL è PlanetScale, e solo per database ospitati lì (non esiste un connector MySQL generico); in Laravel il ruolo è già coperto da `laravel-boost`. La regola operativa è verificare dove il database gira davvero (`DATABASE_URL`, `compose.yaml`, target di deploy) prima di proporne uno, e dire chiaramente che schema e `EXPLAIN` restano su migration + sessione `psql`/`mysql` quando nessuno si applica, invece di chiedere un connector che non si collegherebbe a niente. Nata dal punto 4 della nota Notion "Connector claude.ai per Claude Code" ("collegare il connector DB corrispondente al progetto, Neon se Postgres"): la verifica sui progetti attivi ha mostrato che nessuno è ospitato su una di quelle piattaforme — ps-plus-catalog ha Postgres in container (`DATABASE_URL=...@db:5432`), DamianoGuideSite è WordPress/wp-env su MySQL locale, subsplit e ProjectAmsterdam sono Laravel, i bot Telegram non hanno un DB — quindi l'azione corretta era non collegare niente, non scegliere il connector "più giusto". Chiude il rimando lasciato aperto in #16 sul lato `implementer`.
