@@ -1,7 +1,7 @@
 ---
 name: finishing-a-development-branch
 description: Use when implementation is complete, all tests pass, and a decision is needed on how to integrate the work — merge, PR, rebase, or direct push — before product-ownership's closing steps run
-version: 1.1.1
+version: 1.2.0
 ---
 
 # Finishing a Development Branch
@@ -28,6 +28,9 @@ Decide how completed work actually lands on the default branch. This sits betwee
 - Check `git log` for the pattern this repo already uses before picking a mode — follow existing convention unless told otherwise.
 - Never force-push or rewrite already-pushed shared history to fit a chosen mode.
 - Whichever mode is chosen, `product-ownership`'s closing steps (issue close, label removal, branch cleanup) still run after — this skill only decides the integration mechanism.
+
+## Merging from a remote session
+There is no `!` prefix on claude.ai web and often no `gh`. Merge with the GitHub MCP tool `merge_pull_request` (`github-ops` has it) — only after the manual gate has cleared and the user has said to merge, and pick the method by the repo's dominant pattern. If the tool is denied, say so and give the user the PR link to merge in the GitHub UI; do not retry by other routes. The standing `Bash(gh pr merge:*)` rule in `settings.json` is the user's own channel, but the classifier may still block the CLI call (next section), so never count on it.
 
 ## `gh pr merge` is hard-blocked by the auto-mode classifier — hand it to the user
 `gh pr merge` (and any attempt to edit `.claude/settings.json` / `.claude/settings.local.json` to grant standing permissions) is blocked by the Claude Code auto-mode classifier as a self-escalation guard — this holds even when the user has just explicitly said "you're authorized to merge/do X from now on" earlier in the same conversation. In-conversation verbal authorization is not accepted; the permission has to come through a channel outside Claude's own write access.

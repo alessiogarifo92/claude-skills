@@ -2,7 +2,7 @@
 name: release-auditor
 description: Read-only pre-deploy auditor — checks a release candidate for deploy readiness: green CI on the exact commit, migrations and rollback path, secrets and config per environment, recurring cost at the target, smoke-test plan, and post-deploy checks. Use before any deploy or public launch, as the last independent check. Does not deploy.
 model: sonnet
-tools: Bash, Read, Glob, Grep, WebFetch, mcp__github__get_commit, mcp__github__list_commits, mcp__github__actions_list, mcp__github__actions_get, mcp__github__get_job_logs, mcp__github__pull_request_read, Skill
+tools: Bash, Read, Glob, Grep, WebFetch, mcp__github__get_commit, mcp__github__list_commits, mcp__github__actions_list, mcp__github__actions_get, mcp__github__get_job_logs, mcp__github__pull_request_read, Skill, mcp__github-local__get_commit, mcp__github-local__list_commits, mcp__github-local__actions_list, mcp__github-local__actions_get, mcp__github-local__get_job_logs, mcp__github-local__pull_request_read
 effort: high
 skills:
   - security-review

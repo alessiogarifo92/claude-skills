@@ -12,6 +12,13 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-10-02 (2)
+
+- product-ownership 1.18.0 — nuova sezione "Without `gh`: the GitHub MCP equivalents" (tabella gh → MCP, con ciò che non ha percorso MCP: `blockedBy`, colori delle label, impostazioni repo) e sezione sui ticket dipendenti/paralleli/non presidiati: branch impilati sul ticket che blocca, un DB di test per worktree, gate manuale cumulativo per milestone **solo su richiesta esplicita**, e in sessione remota gate "parcheggiato: serve verifica locale" invece di bloccare tutto. Il gate per ticket resta il default.
+- finishing-a-development-branch 1.2.0 — nuova sezione per il merge da sessione remota con `merge_pull_request` (niente prefisso `!` su claude.ai web); la regola del blocco del classifier su `gh pr merge` resta valida per la CLI.
+- orchestrating-agents 2.0.1 — nota sui server con prefisso (`mcp__github-local__*`): `github-ops` e `release-auditor` elencano entrambi i prefissi.
+- (senza versione) `templates/session-start-hook.sh` (installazione prima dell'avvio della sessione, best effort); template di bootstrap con il caso "cartella agents nuova → riavvio o fallback". Verificato sulla documentazione: gli agent aggiunti a una `agents/` esistente sono rilevati senza riavvio, non quelli in una cartella nata dopo l'avvio; `effort` dipende dal modello e il comportamento sui non supportati non è documentato.
+
 ## 2026-10-02
 
 - autonomous-workflow 1.0.0 — nuova skill "direttore d'orchestra": mappa degli stadi dall'idea al deploy e al lancio (skill responsabile, agent con modello ed effort, livello di cross-verification, autonomia `A`/gate `G`), preflight di sessione, regole di autonomia (cosa si fa da soli, cosa ferma sempre l'utente, modalità autopilot che raggruppa le domande in un solo decision brief per gate), gestione dei fallimenti e dello stato.

@@ -1,7 +1,7 @@
 ---
 name: product-ownership
 description: Use when drafting or creating a GitHub issue/ticket, researching external sources needed to write one, deciding whether something is a bug/research/implementation ticket, starting or finishing implementation work on a ticket, about to push or merge a completed change, or cleaning up branches after a PR merges or a commit supersedes it
-version: 1.17.0
+version: 1.18.0
 ---
 
 # Product Ownership
@@ -76,6 +76,20 @@ GitHub has native issue-relationship fields — `blockedBy`/`blocking` (sequenti
   Re-check the shape on a future `gh` version before trusting this blind (`gh issue list --json blockedBy --jq '.[0]'` on one issue with a known relationship) — GitHub's dependency feature is recent and the JSON shape could still change.
 - Every open ticket that doesn't show up in that list has no live blocker — those are the ones safe to hand out for parallel work (parallel worktrees/sessions, or just parallel priority) at the same time.
 
+## Without `gh`: the GitHub MCP equivalents
+A remote session usually has the GitHub MCP server and no `gh`. The conventions above stay; only the instrument changes:
+
+| Need | `gh` | GitHub MCP (`mcp__github__*`, or `mcp__github-local__*`) |
+|---|---|---|
+| create / edit issue, labels, milestone, close with comment | `gh issue create/edit/close` | `issue_write`, `add_issue_comment` |
+| epic parent / sub-issue | `--parent`, `--add-sub-issue` | `sub_issue_write` |
+| backlog and `in progress` check | `gh issue list --label` | `list_issues`, `search_issues` |
+| PR, merge | `gh pr create/merge` | `create_pull_request`, `merge_pull_request` |
+| verify a screenshot exists at a SHA | `gh api .../contents/<path>?ref=<sha>` | `get_file_contents` |
+| `blockedBy` / `blocking`, create a label with a colour, repo settings (delete-branch-on-merge), private-repo check | `gh` flags | **no MCP path**: write the dependency in the ticket body, use an existing label, and hand repo settings to the user as a UI step |
+
+Pass an explicit slug to `worktree.sh start` (it derives the slug through `gh`) and label the issue through `issue_write` if its warning says labelling failed.
+
 ## Milestones — grouping tickets by phase or goal
 When a batch of tickets is drafted for a defined phase or goal (a `project-lifecycle` phase-4 ticket batch — e.g. "MVP" for the initial slice, or a later named batch like "v2"/"Deploy"), create a GitHub milestone for it and assign every ticket in the batch to it, instead of only cross-referencing "ticket #X-#Y" as free text in a ticket body — free text drifts as the backlog grows and isn't queryable (this is exactly what happened on subsplit: `#12` says "derogabile a dopo l'MVP, ticket #2-#11", something only discoverable by reading that one ticket's body, not by asking GitHub).
 
@@ -108,6 +122,13 @@ If the change has no browser-observable surface, say so explicitly and tell the 
 When both hold and the user has asked for the merge, proceed without waiting. The wait is not dropped, it is converted: the "how to verify" becomes mandatory and goes **in writing on the ticket** (the closing comment), not just in chat, so it survives the session and is there when the user next pulls.
 
 When either condition fails, the stop-and-wait applies before merge/push exactly as it does for a browser change. CI config, database migrations, deploy scripts and infrastructure-as-code all have no browser surface and all stay inside the gate — a CI config is in fact verifiable *on the PR branch*, which is better evidence than a human's confirmation, so verify it there rather than skipping.
+
+### Dependent tickets, parallel tickets and unattended runs
+The gate stays per ticket by default; these rules keep it from freezing an autonomous run:
+- **Dependent ticket**: it may branch from its blocker's unmerged branch (stacked branch) so work continues while the blocker waits at its gate. It cannot merge to the default branch before the blocker does, and its own manual gate still applies at merge. If the blocker changes, rebase the stacked branch onto it.
+- **Parallel tickets** never share a test database that suites reset: one test DB/schema per worktree, or run those suites serially.
+- **Opt-in batched gate**: only if the user explicitly asks for it (e.g. "check the whole milestone at the end"), several tickets of one milestone may share one manual check, recorded as one `## Test info` comment per ticket. Without that explicit opt-in, the per-ticket gate holds.
+- **Remote session**: the container's `localhost` is not reachable by the user. Use a preview deploy URL or tunnel if the project has one. Otherwise record the gate as **parked: needs local check** on the ticket with the exact local commands, and carry on with every independent ticket; nothing parked merges until the user confirms.
 
 ### Recording the check: "Test info" section on the ticket
 The walkthrough in step 1 gets written into the ticket itself, not just described in chat — otherwise the evidence disappears once the session ends.
