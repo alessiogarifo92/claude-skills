@@ -1,15 +1,17 @@
 ---
 name: product-ownership
 description: Use when drafting or creating a GitHub issue/ticket, researching external sources needed to write one, deciding whether something is a bug/research/implementation ticket, starting or finishing implementation work on a ticket, about to push or merge a completed change, or cleaning up branches after a PR merges or a commit supersedes it
-version: 1.16.0
+version: 1.17.0
 ---
 
 # Product Ownership
 
+**Run on:** sonnet · effort medium — ticket hygiene and lifecycle; opus when drafting a ticket from a vague problem.
+
 Own the lifecycle of a work item end to end: from a raw problem report to a grounded ticket, through to the branch cleanup once the work has actually shipped. Grounding tickets in the real code/data is expected baseline behavior, not this skill's job — this skill is about the parts that get skipped without a deliberate habit: separating ticket types, confirming before publishing, reusing repo conventions, and closing the loop on branches.
 
 ## End-to-end workflow and handoffs
-This skill is the entry and exit point of the task lifecycle; the custom chain (brainstorming → writing-plans → test-driven-development → requesting/receiving-code-review → finishing-a-development-branch) covers the middle — see `project-lifecycle` for the whole-project version of this table when the work spans multiple tickets, not just one. Who does what, per phase:
+`autonomous-workflow` conducts this table end to end when the user wants the work run unattended. This skill is the entry and exit point of the task lifecycle; the custom chain (brainstorming → writing-plans → test-driven-development → requesting/receiving-code-review → finishing-a-development-branch) covers the middle — see `project-lifecycle` for the whole-project version of this table when the work spans multiple tickets, not just one. Who does what, per phase:
 
 | Phase | Process skill | Agent |
 |---|---|---|
@@ -18,9 +20,9 @@ This skill is the entry and exit point of the task lifecycle; the custom chain (
 | 2. Grounding / ticket | this skill (ticket type, draft + user confirmation, existing labels); a ticket that adopts an external dependency cites the `market-analyst` verdict | `researcher` for the ticket's external sources; `Explore` to verify in the code that the problem is where you think |
 | 3. Pickup | this skill (`in progress` label, always) → `worktree-manager` **only once code work is about to start** (not for research/drafting) → `writing-plans` for multi-step work | `Explore` to locate the critical files before planning; `github-ops` to create/list the ticket's worktree and branch via the repo's own convention, called at the code-work point, not at pickup |
 | 4. Implementation | **Direct execution in the main session by default** (`direct-execution`) + `test-driven-development`, plus the relevant domain skill; `subagent-driven-development`/`executing-plans` only for genuinely independent parallel workstreams or plans spanning sessions; a research ticket delivers a report instead (see Ticket types) | `implementer` / `quick-debugger` / `refactor-optimizer` for one whole scoped piece, per `orchestrating-agents`; `researcher` writes the report on research tickets |
-| 5. Verification | `test-verification` picks the checks and enforces evidence before "done" | `test-runner` runs suites/lint/typecheck and reports only the outcome |
-| 6. Review | `requesting-code-review` (the discipline of asking before merging) drives the `code-review` plugin for the diff itself; add the `architecture-review` / `security-review` lens when the change touches structure or trust boundaries, the `market-analyst` lens for new external dependencies, and `receiving-code-review` when feedback comes back | reviewer subagent |
-| 7. Closing | manual user gate (below) → `finishing-a-development-branch` (merge/PR/rebase options) → this skill: close issue, remove label, branch cleanup, skill version bumps | `github-ops` for the mechanical follow-through once you've decided what to run: merge/push, `gh issue close`/label removal, local+remote branch and worktree cleanup |
+| 5. Verification | `test-verification` picks the checks and enforces evidence before "done" | `test-runner` runs suites/lint/typecheck and reports only the outcome; `verifier` re-derives a gating claim blind |
+| 6. Review | `requesting-code-review` (the discipline of asking before merging) drives the `code-review` plugin for the diff itself; add the `architecture-review` / `security-review` lens when the change touches structure or trust boundaries, the `market-analyst` lens for new external dependencies, and `receiving-code-review` when feedback comes back `reviewer` + `security-auditor` + `architect` in parallel, `critic` to reconcile (`cross-verification` Mode C) |
+| 7. Closing | manual user gate (below) → `finishing-a-development-branch` (merge/PR/rebase options) → this skill: close issue, remove label, branch cleanup, skill version bumps | `deploy-readiness` when the merge deploys; `github-ops` for the mechanical follow-through once you've decided what to run: merge/push, `gh issue close`/label removal, local+remote branch and worktree cleanup |
 
 Every agent dispatch in any phase follows `orchestrating-agents`: the model matches the task (haiku mechanical, sonnet code/research), the agent reports in the STATUS/CHANGES/EVIDENCE/FINDINGS/OPEN structure, and the orchestrator verifies the report before the next phase starts.
 

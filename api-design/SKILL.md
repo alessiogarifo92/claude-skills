@@ -1,10 +1,12 @@
 ---
 name: api-design
 description: Use when designing or reviewing a REST-style API contract - new endpoints, request/response shapes, validation and error formats, pagination, filtering, idempotency, or breaking-change risk
-version: 1.0.0
+version: 1.0.1
 ---
 
 # API Design
+
+**Run on:** sonnet · effort high — contract design is bounded; the review gate catches slips.
 
 Design APIs that are explicit, stable, and easy to consume safely.
 

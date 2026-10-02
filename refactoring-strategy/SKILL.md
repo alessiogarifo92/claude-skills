@@ -1,10 +1,12 @@
 ---
 name: refactoring-strategy
 description: Use when planning a refactor - sequencing safe steps, isolating mechanical changes from behavior changes, or deciding how to de-risk a large structural change
-version: 1.0.0
+version: 1.0.1
 ---
 
 # Refactoring Strategy
+
+**Run on:** sonnet · effort high — sequencing safe steps; `refactor-optimizer` executes.
 
 Refactor deliberately, with low blast radius and strong validation.
 

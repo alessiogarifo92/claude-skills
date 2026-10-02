@@ -1,10 +1,12 @@
 ---
 name: database-design
 description: Use when designing a new table, writing a migration, or reviewing schema changes for cardinality, nullability, constraints, indexes, transaction boundaries, or migration rollout risk
-version: 1.1.0
+version: 1.1.1
 ---
 
 # Database Design
+
+**Run on:** opus · effort high — schema mistakes are costly to migrate later.
 
 Design schemas for integrity, clarity, and safe evolution.
 

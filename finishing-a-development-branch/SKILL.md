@@ -1,10 +1,12 @@
 ---
 name: finishing-a-development-branch
 description: Use when implementation is complete, all tests pass, and a decision is needed on how to integrate the work — merge, PR, rebase, or direct push — before product-ownership's closing steps run
-version: 1.1.0
+version: 1.1.1
 ---
 
 # Finishing a Development Branch
+
+**Run on:** sonnet · effort low — integration choice is mechanical once the gate has cleared; `github-ops` (haiku) runs the commands.
 
 Decide how completed work actually lands on the default branch. This sits between the manual user gate (`product-ownership`) and the mechanical closing steps (issue close, label removal, branch cleanup — also `product-ownership`).
 

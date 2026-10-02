@@ -1,10 +1,12 @@
 ---
 name: executing-plans
 description: Use when executing an already-written multi-step plan, including across separate sessions or context resets, to keep steps in order and confirm each one before moving to the next
-version: 1.0.0
+version: 1.0.1
 ---
 
 # Executing Plans
+
+**Run on:** sonnet · effort medium — follows a written plan step by step.
 
 Run an already-written plan sequentially, with a checkpoint after each step — including when execution spans multiple sessions or a context reset, where the plan document is the source of truth, not memory.
 

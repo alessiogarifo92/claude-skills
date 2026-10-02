@@ -1,10 +1,12 @@
 ---
 name: product-marketing-strategist
 description: Use when writing or reviewing landing/home copy, positioning a product or feature for an audience, planning a launch or announcement (Product Hunt, Reddit, communities, blog, email), writing user-facing release notes or changelogs, improving SEO titles and meta descriptions, or turning a README into something that converts visitors into users
-version: 1.0.0
+version: 1.0.1
 ---
 
 # Product Marketing Strategist
+
+**Run on:** opus · effort medium — copy and positioning quality; `marketing-strategist` agent runs it.
 
 Connect a specific product or feature to a specific audience at a specific moment. This is the recurring work of getting a product used: messaging, landing pages, launches, release notes, SEO. Free and open-source products need it as much as paid ones — there it's called distribution.
 

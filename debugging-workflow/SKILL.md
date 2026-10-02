@@ -1,10 +1,12 @@
 ---
 name: debugging-workflow
 description: Use when investigating a regression, an unexplained failure, or a production incident and need a structured, evidence-first reproduction-to-root-cause process
-version: 1.0.2
+version: 1.0.3
 ---
 
 # Debugging Workflow
+
+**Run on:** sonnet · effort high — opus when the bug crosses subsystems or a second attempt failed.
 
 Debug systematically and evidence-first.
 

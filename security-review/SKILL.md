@@ -1,10 +1,12 @@
 ---
 name: security-review
 description: Use when reviewing any change that touches authentication, authorization, user input, file uploads, webhooks, SQL, secrets, or other trust boundaries, for realistic exploit paths and abuse scenarios
-version: 1.0.0
+version: 1.0.1
 ---
 
 # Security Review
+
+**Run on:** opus · effort high — exploit reasoning; `security-auditor` runs it.
 
 You review changes for realistic security risk, abuse paths, and implementation mistakes.
 

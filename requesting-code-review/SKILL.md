@@ -1,14 +1,16 @@
 ---
 name: requesting-code-review
 description: Use before merging or completing any non-trivial feature or fix, to decide whether a review pass is warranted and request one, rather than moving straight from tests passing to merge
-version: 1.0.0
+version: 1.1.0
 ---
 
 # Requesting Code Review
 
+**Run on:** opus · effort high — orchestrates the review panel; panelists are opus.
+
 Tests passing is necessary, not sufficient. Before merge, explicitly decide whether this change warrants a review pass — this is the trigger discipline, not the review mechanism itself.
 
-**Pairs with:** the `code-review` plugin runs the review once requested. `architecture-review`, `security-review`, `market-analyst` are the domain lenses to add when relevant. `receiving-code-review` governs what happens with the feedback that comes back.
+**Pairs with:** `cross-verification` (the panel), the `reviewer` / `security-auditor` / `architect` / `critic` agents run the review once requested; the `code-review` plugin is the user-triggered alternative. `architecture-review`, `security-review`, `market-analyst` are the domain lenses to add when relevant. `receiving-code-review` governs what happens with the feedback that comes back.
 
 ## When this applies
 - Any change beyond a trivial, self-contained fix, before merge — new feature, non-trivial bugfix, anything touching shared or critical code
@@ -18,6 +20,8 @@ Tests passing is necessary, not sufficient. Before merge, explicitly decide whet
 Default to requesting review for anything non-trivial. If skipping, say so and why — never skip silently just because tests are green.
 
 ## Trigger
+For a non-trivial diff, run the panel in parallel (`cross-verification` Mode C): `reviewer` (opus·high, correctness), plus `security-auditor` when a trust boundary is touched and `architect` when structure moves, then a `critic` to dedupe and rank. A small change gets `reviewer` alone. Give each the brief below — agents cannot see this conversation.
+
 Invoke the `code-review` plugin (or read the full diff in the main session if unavailable) with:
 - the diff or PR reference
 - which lens matters most: general correctness, `architecture-review` (structure/boundaries), `security-review` (trust boundaries/input), `market-analyst` (new external dependency)

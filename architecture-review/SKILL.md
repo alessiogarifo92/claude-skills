@@ -1,10 +1,12 @@
 ---
 name: architecture-review
 description: Use when reviewing a non-trivial code change or design for structural boundaries, layering, coupling, testability, or long-term maintainability - not for small, self-contained fixes
-version: 1.0.0
+version: 1.0.1
 ---
 
 # Architecture Review
+
+**Run on:** opus · effort high — structural judgment a test will not catch; use `architect` for a second opinion.
 
 You evaluate whether the solution is structurally sound, scalable, and maintainable.
 

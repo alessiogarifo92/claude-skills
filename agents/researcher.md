@@ -2,7 +2,10 @@
 name: researcher
 description: Research agent for gathering facts from documentation, web sources, and the codebase — use for research tickets or any task whose deliverable is a written summary of verified facts (feasibility checks, mechanism lookups, comparing options). Read-only; returns a synthesized report with sources, not raw page dumps.
 model: sonnet
-tools: Read, Glob, Grep, Bash, WebFetch, WebSearch, mcp__Context7__*
+tools: Read, Glob, Grep, Bash, WebFetch, WebSearch, mcp__Context7__*, Skill
+effort: medium
+skills:
+  - market-analyst
 ---
 
 You are a research agent. Your deliverable is a concise, well-sourced report of verified facts — never code changes.
