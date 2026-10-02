@@ -1,7 +1,7 @@
 ---
 name: ticket-interrogation
 description: Use when the user asks to interrogate, stress-test, pressure-test, poke holes in, sanity-check or "grill" a plan, design, approach or architecture, is about to start building something non-trivial while a direction is already chosen but its decisions are still open, or asks for help turning a rough idea into a well-specified ticket — not when the direction itself is still undecided, which is `brainstorming`
-version: 1.4.1
+version: 1.4.2
 model: opus
 effort: high
 ---
@@ -76,7 +76,7 @@ Not a checklist to run through mechanically — open the branches that actually 
 ## Phase 2 — Attack
 (Light mode skips it, except under autopilot: there the attack runs on the proposed defaults even for a light slice, because nobody is interviewed to catch them.)
 
-**Full mode only.** The interview is closed — no *new* decisions get opened here. Now actively try to break the plan you just helped build. Be direct — this is the half the interview cannot do, and the reason the skill exists.
+**Full mode (and light mode under autopilot).** The interview is closed — no *new* decisions get opened here. Now actively try to break the plan you just helped build. Be direct — this is the half the interview cannot do, and the reason the skill exists.
 
 Work through:
 
@@ -163,14 +163,14 @@ Autopilot replaces many small questions with one decision brief per gate, so one
 | Asking the user what the stack/framework is | It's in the repo. Read it — a question whose answer is in the code burns the budget for nothing |
 | Framing questions in generic framework-neutral terms | The user has to translate them back to their project. Use the project's own nouns |
 | Free-text questions ("what do you think about X?") | The whole point is 2–4 tappable options — that's what makes this usable from a phone |
-| Batching three questions into one turn | Later questions depend on earlier answers; batching pre-empts the branch you should have taken |
+| Batching three questions into one turn (outside autopilot) | Later questions depend on earlier answers; batching pre-empts the branch you should have taken |
 | Running the full interview on a one-line bug fix | That's `light` mode. Three questions, no attack phase |
 | Continuing past the budget because "one more decision is open" | Cheap-to-reverse decisions get an explicit proposed default and a confirmation, not a new branch |
 | Skipping the attack phase because the plan looks fine | The interview *builds* the plan, so of course it looks fine. The attack is the part that wasn't asked for politely |
 | Padding the risk list to look rigorous | Invented risks dilute the real ones and get the whole list ignored |
 | Putting requirements in the ticket that nobody decided | Every line must trace to an answer or a surfaced risk |
 | Handing over a ticket body with no title | `product-ownership` publishes both. A body alone stalls the handoff |
-| Emitting the full ticket template in `light` mode | `light`'s output is the three-block summary. The template belongs to `full` |
+| Emitting the full ticket template in `light` mode | `light`'s output is the four-line summary. The template belongs to `full` |
 | Running nine questions under a `light` header because the user pushed for depth | Raising the mode is allowed, doing it silently is not. Announce the switch, then run `full` properly |
 | Spending one of the 2–4 option slots on "Other" | AskUserQuestion adds it for free — you just cut the real choices to three |
 | Emitting the ticket and stopping | Handing it to `product-ownership` is this skill's last step, not the next session's |

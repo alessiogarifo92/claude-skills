@@ -1,7 +1,7 @@
 ---
 name: cross-verification
 description: Use when a decision or result is high-stakes or hard to reverse — an idea direction, stack, architecture, security-sensitive or data-migrating change, a non-trivial diff before merge, marketing copy or a launch, a deploy — (including a choice between two named options) and one agent's answer is not enough, so independent agents must work in parallel and be compared against each other before the result is accepted
-version: 1.1.3
+version: 1.1.4
 model: opus
 effort: high
 ---
@@ -21,8 +21,8 @@ Use the stakes ladder — never "to be safe" on linear work:
 |---|---|---|
 | 0 trivial, easy to undo | rename, typo, one-line fix, test addition | none — `direct-execution` |
 | 1 normal ticket | scoped feature or bug with tests | verification gate only: one narrowest re-run (via `test-runner`) and a single `reviewer`; no `verifier`, no panel |
-| 2 non-trivial or costly to reverse | multi-file change, new dependency, public API, UI direction, copy for a public page | one independent check: `reviewer` or `critic`, or a blind second run |
-| 3 high-stakes | architecture and stack choice, auth/payments/PII, data migration, deploy, public launch, anything that spends money | full panel, below |
+| 2 non-trivial or costly to reverse | multi-file change, new dependency, UI direction, copy for a public page | diffs: `reviewer` + the one relevant lens; other results: one independent check (`critic` or a blind second run) |
+| 3 high-stakes | architecture and stack choice, auth/payments/PII, data migration, public API, deploy, public launch, anything that spends money | full panel, below |
 
 NOT for: linear tasks whose steps depend on each other; questions with one verifiable answer (look it up); anything the user already decided.
 
