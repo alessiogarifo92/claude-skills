@@ -18,7 +18,7 @@ Once `writing-plans` has flagged which steps of a plan are genuinely independent
 
 ## Pattern
 1. From the plan, re-confirm which steps are truly independent — "listed separately" is not the same as "independent."
-2. Dispatch one agent per independent step in a single batch, per `orchestrating-agents`: model matched to task, full dispatch brief, no shared scope between agents.
+2. For code-writing steps the orchestrator first runs `worktree.sh start <issue> <slug>` per ticket and puts the absolute worktree path in that agent's brief — agents never share a checkout. Then dispatch one agent per independent step in a single batch, per `orchestrating-agents`: model matched to task, full dispatch brief, no shared scope between agents.
 3. Each agent reports in the STATUS/CHANGES/EVIDENCE/FINDINGS/OPEN contract.
 4. Apply the verification gate to every report individually before considering that plan phase done.
 5. For any report that gates the next phase, add a blind `verifier` (`cross-verification` Mode B) instead of re-reading the author's reasoning.

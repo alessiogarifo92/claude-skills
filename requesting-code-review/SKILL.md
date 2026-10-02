@@ -22,7 +22,7 @@ Default to requesting review for anything non-trivial. If skipping, say so and w
 ## Trigger
 For a non-trivial diff, run the panel in parallel (`cross-verification` Mode C): `reviewer` (opus·high, correctness), plus `security-auditor` when a trust boundary is touched and `architect` when structure moves, then a `critic` to dedupe and rank. A small change gets `reviewer` alone. Give each the brief below — agents cannot see this conversation.
 
-Invoke the `code-review` plugin (or read the full diff in the main session if unavailable) with:
+Give every reviewer (or, if the user asks for the `code-review` plugin instead, the plugin; or the main session reading the full diff) this brief:
 - the diff or PR reference
 - which lens matters most: general correctness, `architecture-review` (structure/boundaries), `security-review` (trust boundaries/input), `market-analyst` (new external dependency)
 - what NOT to re-litigate (decisions already confirmed with the user)
@@ -35,4 +35,4 @@ Invoke the `code-review` plugin (or read the full diff in the main session if un
 | "I'll request review after merging" | Review before merge is the point; after is just a postmortem |
 
 ## Boundary
-This decides *whether and when* to request review. Running it is the `code-review` plugin or a domain lens; processing what comes back is `receiving-code-review`.
+This decides *whether and when* to request review. Running it is the review panel (`reviewer` and domain-lens agents), or the `code-review` plugin on request; processing what comes back is `receiving-code-review`.

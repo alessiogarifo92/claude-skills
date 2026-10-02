@@ -8,7 +8,7 @@ import glob, os, re, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODELS = {"opus", "sonnet", "haiku", "main"}
-AGENT_MODELS = {"opus", "sonnet", "haiku", "fable", "inherit"}
+AGENT_MODELS = {"opus", "sonnet", "haiku", "inherit"}
 EFFORTS = {"low", "medium", "high", "xhigh", "max"}
 SEMVER = re.compile(r"^\d+\.\d+\.\d+$")
 # names legitimately referenced that are not directories of this repo
@@ -32,6 +32,8 @@ def frontmatter(path):
             fm.setdefault(key, []).append(line.strip()[2:].strip())
         elif ":" in line:
             key, _, v = line.partition(":"); key = key.strip(); v = v.strip()
+            if v.startswith("[") and v.endswith("]"):
+                v = [x.strip() for x in v[1:-1].split(",") if x.strip()]
             fm[key] = v if v else []
     return fm, s[m.end():]
 
@@ -56,7 +58,7 @@ for f in sorted(glob.glob(os.path.join(ROOT, "agents", "*.md"))):
     fm, body = frontmatter(f)
     if fm.get("name") != n: err(f"{rel}: name '{fm.get('name')}' != file '{n}'")
     if not fm.get("description"): err(f"{rel}: missing description")
-    if fm.get("model") not in AGENT_MODELS: err(f"{rel}: model '{fm.get('model')}' invalid")
+    if fm.get("model") not in AGENT_MODELS and not str(fm.get("model", "")).startswith("claude-"): err(f"{rel}: model '{fm.get('model')}' invalid")
     if fm.get("effort") not in EFFORTS: err(f"{rel}: effort missing/invalid")
     if not fm.get("tools"): err(f"{rel}: tools missing (agent would inherit everything)")
     for s in fm.get("skills", []) if isinstance(fm.get("skills"), list) else []:

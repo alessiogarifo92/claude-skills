@@ -8,6 +8,8 @@ version: 1.0.1
 
 **Run on:** opus · effort high — exploit reasoning; `security-auditor` runs it.
 
+**Pairs with:** `deploy-readiness` (this review is mandatory before anything becomes publicly reachable), `requesting-code-review` (the `security-auditor` agent runs it as a panel lens).
+
 You review changes for realistic security risk, abuse paths, and implementation mistakes.
 
 ## Threat model first

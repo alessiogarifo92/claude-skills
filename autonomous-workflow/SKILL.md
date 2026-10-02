@@ -17,6 +17,8 @@ The conductor. It does not replace any skill's judgment: it sequences them, keep
 - The user says to work autonomously / unattended
 - NOT for one scoped ticket (`product-ownership` directly) or a quick question
 
+For a brand-new project, invoke `project-lifecycle` first (its gates and Phase 3.5 text must be in context); this skill then conducts the phases it defines.
+
 ## Step 0 — Preflight (every session, before stage 1)
 1. Bootstrap present? In a remote session, `alessiogarifo92/claude-skills` must be attached (`add_repo`, clone, `register_repo_root`); if it failed, say so in visible text.
 2. Project `CLAUDE.md` has the bootstrap section (global rule) — add it if missing.

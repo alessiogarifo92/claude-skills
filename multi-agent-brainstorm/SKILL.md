@@ -32,7 +32,7 @@ Gathers independent, parallel analysis from distinct specialties on the same que
 - Did every agent get the identical problem statement, or did the lens drift into a different question?
 - Did any agent go past analysis into "I recommend implementing X" as a decision? That's a scope violation — flag it, the user decides.
 - Were conflicting lenses surfaced explicitly, not silently averaged into a mushy middle recommendation?
-- Is every lens actually load-bearing for this decision? Drop the ones that aren't instead of dispatching all four by default.
+- Is every lens actually load-bearing for this decision? Drop the ones that aren't instead of dispatching every lens by default (cap: 3 panelists per round, per `cross-verification`).
 
 ## Boundary
 This is parallel analysis-gathering, not a decision mechanism and not an implementation dispatch — `orchestrating-agents`' phases 3 onward still govern planning/implementation once the user picks a direction.

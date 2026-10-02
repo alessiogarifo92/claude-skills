@@ -33,7 +33,7 @@ Pick the mode by what is being decided. Every mode follows the same skeleton: **
 | B. Blind re-derivation | a result that gates the next phase: root cause, test counts, research claim, benchmark | the author's agent + `verifier` who is given the **claim and the check, not the author's reasoning** | sonnet + sonnet (verifier reproduces, does not review) |
 | C. Review panel | a non-trivial diff before merge | `reviewer` (correctness) ‖ `security-auditor` (if a trust boundary is touched) ‖ `architect` (if structure moves) → `critic` dedupes, ranks, drops what has no failure scenario | opus panel |
 | D. Release gate | deploy, public launch | `release-auditor` ‖ `security-auditor` ‖ `verifier` replaying the smoke tests → `critic` on go/no-go | sonnet + opus |
-| E. Dual implementation | rare: an algorithm or migration where being wrong is expensive and a spec can be tested differentially | two `implementer` agents with `isolation: worktree`, same spec, no sight of each other → run the same tests and a differential/property test on both → keep one or merge by test evidence | sonnet ×2 |
+| E. Dual implementation | rare: an algorithm or migration where being wrong is expensive and a spec can be tested differentially | two `implementer` agents, each in its own worktree (`isolation: worktree` is the sanctioned exception to `worktree.sh` here, since both trees are throwaway), same spec, no sight of each other → run the same tests and a differential/property test on both → keep one or merge by test evidence | sonnet ×2 |
 | F. Copy red-team | landing page, launch post, release notes | `marketing-strategist` ×2 variants with different theses → `critic` reads as the target reader and as a skeptic | opus |
 
 ## Procedure

@@ -4,8 +4,6 @@ description: Research agent for gathering facts from documentation, web sources,
 model: sonnet
 tools: Read, Glob, Grep, Bash, WebFetch, WebSearch, mcp__Context7__*, Skill
 effort: medium
-skills:
-  - market-analyst
 ---
 
 You are a research agent. Your deliverable is a concise, well-sourced report of verified facts — never code changes.

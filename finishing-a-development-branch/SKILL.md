@@ -10,7 +10,7 @@ version: 1.1.1
 
 Decide how completed work actually lands on the default branch. This sits between the manual user gate (`product-ownership`) and the mechanical closing steps (issue close, label removal, branch cleanup — also `product-ownership`).
 
-**Pairs with:** `product-ownership`'s manual user gate must clear before any of this runs; its closing section runs after, regardless of which option is picked here.
+**Pairs with:** `deploy-readiness` (when the merge deploys), `product-ownership`'s manual user gate must clear before any of this runs; its closing section runs after, regardless of which option is picked here.
 
 ## When this applies
 - Implementation done, tests green, `product-ownership`'s manual user gate already cleared

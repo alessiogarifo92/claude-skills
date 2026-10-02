@@ -89,7 +89,7 @@ Policy: **opus** where judgment is expensive and no test catches the error (arch
 | `quick-debugger` | sonnet | high | `debugging-workflow` | Finds and fixes a localized bug with a clear symptom |
 | `refactor-optimizer` | sonnet | medium | `refactoring-strategy` | Simplifies working code without changing behavior |
 | `release-auditor` | sonnet | high | `security-review` | Read-only pre-deploy auditor |
-| `researcher` | sonnet | medium | `market-analyst` | Research agent for gathering facts from documentation, web sources, and the codebase |
+| `researcher` | sonnet | medium | — | Research agent for gathering facts from documentation, web sources, and the codebase |
 | `reviewer` | opus | high | — | Read-only code reviewer |
 | `security-auditor` | opus | high | `security-review` | Read-only security reviewer |
 | `test-runner` | haiku | low | — | Runs a test suite, linter, or type check and reports only the outcome |
