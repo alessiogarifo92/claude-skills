@@ -1,7 +1,7 @@
 ---
 name: product-ownership
 description: Use when publishing or creating a GitHub issue/ticket whose content is already settled (if its own design decisions are still open, `ticket-interrogation` runs first and hands back the title and body), researching external sources needed to write one, deciding whether something is a bug/research/implementation ticket, starting or finishing implementation work on a ticket, about to push or merge a completed change, or cleaning up branches after a PR merges or a commit supersedes it
-version: 1.21.2
+version: 1.22.0
 ---
 
 # Product Ownership
@@ -87,9 +87,10 @@ A remote session usually has the GitHub MCP server and no `gh`. The conventions 
 | backlog and `in progress` check | `gh issue list --label` | `list_issues`, `search_issues` |
 | PR, merge | `gh pr create/merge` | `create_pull_request`, `merge_pull_request` |
 | verify a screenshot exists at a SHA | `gh api .../contents/<path>?ref=<sha>` | `get_file_contents` |
-| `blockedBy` / `blocking`, create a milestone, create or rename a label (`in progress`, `feature`, `enhancement` → `feature`), repo settings (delete-branch-on-merge), private-repo check | `gh` flags | **no MCP path**: write the dependency in the ticket body, use an existing label, and hand repo settings to the user as a UI step |
+| `blockedBy` / `blocking`, create a milestone, create or rename a label (`in progress`, `feature`, `enhancement` → `feature`), private-repo check | `gh` flags | **no MCP path, but REST works**: `gh api` (GraphQL is what the proxy blocks, REST is allowed): labels `POST repos/{owner}/{repo}/labels` and `.../issues/N/labels` (adds; MCP `issue_write` *replaces* the label list, so send the full list), milestones `POST .../milestones`, dependencies `POST .../issues/N/dependencies/blocked_by -F issue_id=<id>`, sub-issues `POST .../issues/N/sub_issues`, repo visibility `gh api repos/{owner}/{repo} --jq .private` (not `gh repo view`) |
+| repo **settings** (visibility, delete-branch-on-merge, Pages source, branch protection, environments) | `gh api -X PATCH` | **blocked by the proxy (403)**: hand it to the user as a UI step with the exact page |
 
-For the no-MCP row: first try `issue_write` with the label (GitHub may create a missing label on assignment — unverified; if rejected it is a UI step). A milestone has no MCP path: name the batch in the epic issue and ticket titles and hand milestone creation to the user, batched into the stage-1.5/4 handoff. Pass an explicit slug to `worktree.sh start` (it derives the slug through `gh`) and label the issue through `issue_write` if its warning says labelling failed.
+For the no-MCP row use `gh api` REST as listed (verified on a real remote run: labels, milestones, `blocked_by` dependencies, sub-issues, workflow-run polling). Only repo settings stay a UI step, batched into one handoff. `worktree.sh start` labels the issue itself through REST; if its warning says labelling failed, send the full label list through `issue_write`.
 
 ## Milestones — grouping tickets by phase or goal
 When a batch of tickets is drafted for a defined phase or goal (a `project-lifecycle` phase-4 ticket batch — e.g. "MVP" for the initial slice, or a later named batch like "v2"/"Deploy"), create a GitHub milestone for it and assign every ticket in the batch to it, instead of only cross-referencing "ticket #X-#Y" as free text in a ticket body — free text drifts as the backlog grows and isn't queryable (this is exactly what happened on subsplit: `#12` says "derogabile a dopo l'MVP, ticket #2-#11", something only discoverable by reading that one ticket's body, not by asking GitHub).
@@ -128,7 +129,7 @@ When either condition fails, the stop-and-wait applies before merge/push exactly
 The gate stays per ticket by default; these rules keep it from freezing an autonomous run:
 - **Dependent ticket**: it may branch from its blocker's unmerged branch (stacked branch) so work continues while the blocker waits at its gate. It cannot merge to the default branch before the blocker does, and its own manual gate still applies at merge. If the blocker changes, rebase the stacked branch onto it.
 - **Parallel tickets** never share a test database that suites reset: one test DB/schema per worktree, or run those suites serially.
-- **Opt-in batched gate**: only if the user explicitly asks for it (e.g. "check the whole milestone at the end"), several tickets of one milestone may share one manual check, recorded as one `## Test info` comment per ticket. Without that explicit opt-in, the per-ticket gate holds.
+- **Opt-in batched gate**: only if the user explicitly asks for it (e.g. "check the whole milestone at the end"), several tickets of one milestone may share one manual check, recorded as one `## Test info` comment per ticket. Without that explicit opt-in, the per-ticket gate holds. Implement it with an **integration branch** (e.g. `mvp`): ticket PRs target it (CI + review, squash), `worktree.sh start <n> --base mvp` branches from it, and one final PR `mvp` → default branch waits for the single manual check; merge it with a merge commit, then close the tickets (they stay open until then, because only the default-branch merge ships). Nothing reaches the default branch before the user's check, so the hard gate is intact.
 - **Remote session**: the container's `localhost` is not reachable by the user, so the gate needs a way for them to see the change. Take the first rung that exists:
   1. **The project's declared preview** (project `CLAUDE.md` field "Run / preview"): a per-PR preview deploy (Vercel/Netlify/Cloudflare Pages style, free tier first) — post its URL in the handoff. This is chosen once per project at repo bootstrap (`autonomous-workflow` stage 4.5), not per ticket.
   2. **A tunnel from the container**, only if the environment's network policy allows it (`read_documentation` topic `environment.network`); the URL lives as long as the session, so say so.

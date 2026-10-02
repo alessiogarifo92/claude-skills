@@ -1,7 +1,7 @@
 ---
 name: cross-verification
 description: Use when a decision or result is high-stakes or hard to reverse — an idea direction, stack, architecture, security-sensitive or data-migrating change, a non-trivial diff before merge, marketing copy or a launch, a deploy — (including a choice between two named options) and one agent's answer is not enough, so independent agents must work in parallel and be compared against each other before the result is accepted
-version: 1.1.4
+version: 1.1.5
 model: opus
 effort: high
 ---
@@ -65,6 +65,7 @@ Pick the mode by what is being decided. Every mode follows the same skeleton: **
 | "The opus agent disagreed, so it wins" | Evidence wins. A model rank is not evidence. |
 | "Average the proposals" | A blend nobody argued for is the likeliest to be wrong. Pick, or ask the user. |
 | "Another round, they still differ" | Cap is 2. Escalate with the comparison. |
+| "The critic said it's missing, so it is" | The critic is also a model: on a real run it claimed a design lacked a cycle counter that the design had. Before acting on a critic finding, check it against the artifact (grep, run the case); only a reproduced finding changes the plan. |
 
 ## Boundary
 This compares and verifies; it never decides what belongs to the user, never replaces the manual user gate before merge/push, and never lets an agent touch git (`orchestrating-agents`). Which stage calls which mode is `autonomous-workflow`'s table.
