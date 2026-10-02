@@ -108,13 +108,10 @@ FAKE_GH_DIR="$TMP/fakebin"
 mkdir -p "$FAKE_GH_DIR"
 cat > "$FAKE_GH_DIR/gh" <<EOF
 #!/usr/bin/env bash
-if [[ "\$1" == "pr" && "\$2" == "list" ]]; then
-  branch=""
-  for ((i=1; i<=\$#; i++)); do
-    if [[ "\${!i}" == "--head" ]]; then j=\$((i+1)); branch="\${!j}"; fi
-  done
-  if [[ "\$branch" == "$SQUASH_BRANCH" ]]; then echo 999; exit 0; fi
-  exit 1
+if [[ "\$1" == "api" && "\$2" == repos/*/pulls\?* ]]; then
+  # the script asks REST for closed PRs of this head branch and extracts the merged one's number
+  if [[ "\$2" == *"head={owner}:$SQUASH_BRANCH"* ]]; then echo 999; exit 0; fi
+  exit 0
 fi
 exec "$REAL_GH" "\$@"
 EOF

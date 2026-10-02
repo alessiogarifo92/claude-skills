@@ -1,7 +1,7 @@
 ---
 name: autonomous-workflow
 description: Use when the user hands over an end-to-end goal (an app idea, a whole feature set, "take it from here", "vai in autonomia") or asks you to run the workflow unattended — conducts every stage from idea through marketing and deploy by routing to the right skill, agent, model and cross-verification level, and says exactly where it may proceed alone and where it must stop
-version: 1.4.1
+version: 1.4.2
 model: opus
 effort: high
 ---
@@ -76,7 +76,7 @@ Parallelism: independent work inside a stage (research per tool, tickets with no
 - Same fix fails twice: stop guessing — dispatch `quick-debugger` or a blind `verifier` for a second view; third failure → report to the user with evidence.
 - Agent `blocked` or off-scope (git commits, extra files): treat as a violation, discard or review the diff, re-dispatch with a tighter brief.
 - Context getting long: write state (stage, decisions, open gates, next action) into tasks and the ticket before it compacts.
-- Remote session: there is no `~/.claude` and often no `gh`. Run `scripts/install.sh` from the attached clone first; if agents are not picked up in the running session, dispatch `general-purpose` with an explicit `model` and paste the agent file's body into the brief, tell it to load that agent's frontmatter `skills:` with the Skill tool first, and restate its read-only / no-git limits (the fallback does not inherit them). Use the GitHub MCP equivalents (`issue_write`, `sub_issue_write`, `list_issues`, `merge_pull_request`) where `gh` is missing, and hand repo-settings steps to the user. The browser manual gate needs a reachable preview URL; without one, park it as "needs local check" on the ticket with the exact commands. External design skills (`design`, `taste`, `frontend-design`) may be absent: use the Artifact quickstart for design, and give the `critic` exported screenshots or tokens, not a canvas link.
+- Remote session: there is no `~/.claude` and often no `gh`. Run `scripts/install.sh` from the attached clone first; if agents are not picked up in the running session, dispatch `general-purpose` with an explicit `model` and paste the agent file's body into the brief, tell it to load that agent's frontmatter `skills:` with the Skill tool first, and restate its read-only / no-git limits (the fallback does not inherit them). Use the GitHub MCP equivalents (`issue_write`, `sub_issue_write`, `list_issues`, `merge_pull_request` — it needs the full 40-char head SHA) where `gh` is missing; `gh api` REST also works through the proxy (labels, milestones, dependencies, sub-issues, workflow-run polling) while GraphQL (`gh issue/pr/repo ...`) is blocked, and only repo-settings writes (public, delete-branch-on-merge, Pages source) are handed to the user. Poll CI on the exact SHA with `gh api repos/{owner}/{repo}/actions/runs?head_sha=<sha>`. The browser manual gate needs a reachable preview URL; without one, park it as "needs local check" on the ticket with the exact commands. External design skills (`design`, `taste`, `frontend-design`) may be absent: use the Artifact quickstart for design, and give the `critic` exported screenshots or tokens, not a canvas link.
 - Remote session without a tool you need: `read_documentation` for the setup, tell the user the exact setting; do not improvise around a missing connector.
 
 ## Red flags

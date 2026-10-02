@@ -1,7 +1,7 @@
 ---
 name: worktree-manager
 description: Use when actual code work (not research/drafting) is about to start on a GitHub issue in any repo, when checking which worktrees/sessions are active, or after a branch merges — creates/lists/cleans per-ticket git worktrees so parallel Claude Code sessions never write to the same branch. Same convention across every project.
-version: 1.5.2
+version: 1.6.0
 ---
 
 **Run on:** haiku · effort low — mechanical script wrapper; `github-ops` can run it.
@@ -15,12 +15,12 @@ This is a **global** skill: the naming convention, branch/path scheme, and label
 ## Commands (work from anywhere inside any repo, including from a linked worktree)
 
 ```bash
-~/.claude/skills/worktree-manager/scripts/worktree.sh start <issue> [slug]   # create + lock .claude/worktrees/<slug> on branch worktree-<issue>-<slug>, label the issue "in progress"
+~/.claude/skills/worktree-manager/scripts/worktree.sh start <issue> [slug] [--base <branch>]   # (--base: branch from an integration branch instead of the current HEAD) create + lock .claude/worktrees/<slug> on branch worktree-<issue>-<slug>, label the issue "in progress"
 ~/.claude/skills/worktree-manager/scripts/worktree.sh list                   # active worktrees, their issue, lock state, plus ORPHAN dirs
 ~/.claude/skills/worktree-manager/scripts/worktree.sh cleanup [--dry-run]    # remove orphan dirs + merged unlocked worktrees/branches
 ```
 
-`start` prints the worktree path — `cd` there and do all work inside it. When the slug is omitted it is derived from the issue title via `gh` (which resolves the current repo from `git remote`, so no per-project config is needed). The worktree is locked with reason `issue #<n>`, which is how `list` (and other sessions) see who owns what.
+`start` prints the worktree path — `cd` there and do all work inside it. When the slug is omitted it is derived from the issue title via `gh api` (which resolves `{owner}/{repo}` from `git remote`, so no per-project config is needed). The script uses only REST calls: `gh issue/pr/label/repo ...` go through GraphQL, which a remote session's proxy blocks. The worktree is locked with reason `issue #<n>`, which is how `list` (and other sessions) see who owns what.
 
 `start` also applies the `in progress` label to the issue itself (creating the label first if the repo doesn't have it yet). This closes a gap where labeling was a separate manual step that got skipped under load (see `product-ownership`'s "Work-in-progress label" section) — it's now atomic with pickup instead of something to remember. If `gh` fails to label (auth/network hiccup), `start` prints a warning but still hands you the worktree — check the warning and label the issue manually if you see one.
 

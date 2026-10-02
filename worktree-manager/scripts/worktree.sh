@@ -4,12 +4,16 @@
 # doesn't. Resolves the current repo dynamically, so it works from inside any
 # git repo without per-project copies.
 #
-#   start <issue> [slug]  create + lock .claude/worktrees/<slug> on branch worktree-<issue>-<slug>,
+#   start <issue> [slug] [--base <branch>]
+#                         create + lock .claude/worktrees/<slug> on branch worktree-<issue>-<slug>
+#                          (from --base, e.g. an integration branch; default: current HEAD),
 #                          apply the "in progress" label to the issue
 #   list                  active worktrees with their issue and lock state, plus orphan directories
 #   cleanup [--dry-run]   remove orphan dirs and merged worktrees/branches (never unmerged work;
 #                          "merged" includes squash/rebase merges, detected via a merged GitHub PR
 #                          when the branch isn't a literal git ancestor)
+# GitHub access uses the REST API (`gh api`, with {owner}/{repo} resolved from the git remote),
+# never `gh issue/pr/label/repo ...`: those go through GraphQL, which a remote session's proxy blocks.
 set -euo pipefail
 
 die() { echo "worktree.sh: $*" >&2; exit 1; }
@@ -31,7 +35,7 @@ ensure_ignored() {
 }
 
 slug_from_issue() {
-  gh issue view "$1" --json title -q .title 2>/dev/null \
+  gh api "repos/{owner}/{repo}/issues/$1" --jq .title 2>/dev/null \
     | tr '[:upper:]' '[:lower:]' | sed -e 's/[^a-z0-9]\{1,\}/-/g' -e 's/^-//' \
     | cut -c1-40 | sed 's/-$//'
 }
@@ -45,11 +49,13 @@ registered_paths() { # absolute paths of linked worktrees under WT_DIR
 # block getting the worktree itself, but it must never be silently skipped either.
 mark_in_progress() {
   local issue="$1"
-  gh label list 2>/dev/null | grep -qF $'in progress\t' \
-    || gh label create "in progress" --color fbca04 --description "Actively being worked on" >&2 \
-    || { echo "warn: could not create 'in progress' label — add it manually: gh issue edit $issue --add-label 'in progress'" >&2; return; }
-  gh issue edit "$issue" --add-label "in progress" >&2 \
-    || echo "warn: could not label issue #$issue in progress — add it manually: gh issue edit $issue --add-label 'in progress'" >&2
+  gh api "repos/{owner}/{repo}/labels/in%20progress" >/dev/null 2>&1 \
+    || gh api -X POST "repos/{owner}/{repo}/labels" -f name="in progress" -f color=fbca04 \
+         -f description="Actively being worked on" >/dev/null \
+    || { echo "warn: could not create 'in progress' label — add it manually (UI, or issue_write with the full label list)" >&2; return; }
+  # POST adds to the issue's labels (it does not replace them).
+  gh api -X POST "repos/{owner}/{repo}/issues/$issue/labels" -f 'labels[]=in progress' >/dev/null \
+    || echo "warn: could not label issue #$issue in progress — add it manually (UI, or issue_write sending the full label list: it replaces)" >&2
 }
 
 lock_reason() { # lock_reason <path> — prints the lock reason, empty if unlocked
@@ -69,7 +75,8 @@ is_branch_merged() {
   local branch="$1"
   git -C "$ROOT" merge-base --is-ancestor "$branch" "$DEFAULT_BRANCH" && return 0
   local merged_pr
-  merged_pr="$(cd "$ROOT" && gh pr list --head "$branch" --state merged --json number -q '.[0].number' 2>/dev/null)" || return 1
+  merged_pr="$(cd "$ROOT" && gh api "repos/{owner}/{repo}/pulls?state=closed&head={owner}:$branch" \
+    --jq '[.[]|select(.merged_at != null)][0].number // empty' 2>/dev/null)" || return 1
   [[ -n "$merged_pr" ]]
 }
 
@@ -90,8 +97,15 @@ delete_branch_if_merged() {
 }
 
 cmd_start() {
-  local issue="${1:-}" slug="${2:-}"
-  [[ "$issue" =~ ^[0-9]+$ ]] || die "usage: worktree.sh start <issue-number> [slug]"
+  local issue="${1:-}" slug="" base=""
+  shift || true
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --base) base="${2:-}"; [[ -n "$base" ]] || die "--base needs a branch name"; shift 2 ;;
+      *) [[ -z "$slug" ]] || die "usage: worktree.sh start <issue-number> [slug] [--base <branch>]"; slug="$1"; shift ;;
+    esac
+  done
+  [[ "$issue" =~ ^[0-9]+$ ]] || die "usage: worktree.sh start <issue-number> [slug] [--base <branch>]"
   if [[ -z "$slug" ]]; then
     slug="$(slug_from_issue "$issue")"
     [[ -n "$slug" ]] || die "could not derive slug from issue #$issue (is gh authenticated?); pass one: worktree.sh start $issue <slug>"
@@ -103,7 +117,14 @@ cmd_start() {
   git -C "$ROOT" show-ref -q "refs/heads/$branch" && die "branch already exists: $branch"
   ensure_ignored
   mkdir -p "$WT_DIR"
-  git -C "$ROOT" worktree add "$path" -b "$branch" >&2
+  if [[ -n "$base" ]]; then
+    git -C "$ROOT" fetch -q origin "$base" 2>/dev/null || true # best effort: a local-only base is fine
+    local start_point="origin/$base"
+    git -C "$ROOT" rev-parse -q --verify "$start_point" >/dev/null || start_point="$base"
+    git -C "$ROOT" worktree add "$path" -b "$branch" "$start_point" >&2
+  else
+    git -C "$ROOT" worktree add "$path" -b "$branch" >&2
+  fi
   git -C "$ROOT" worktree lock "$path" --reason "issue #$issue"
   mark_in_progress "$issue"
   echo "$path"
