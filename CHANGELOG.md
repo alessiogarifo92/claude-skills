@@ -12,6 +12,11 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-10-02 (3)
+
+- `Run on` reso reale per le skill opus: `model: opus` ed `effort:` nel frontmatter (la documentazione conferma che un override di skill vale per il resto del turno corrente, poi torna il modello di sessione). Le skill sonnet/haiku/main **non** forzano nulla di proposito: un override verso il basso resterebbe per tutto un lungo turno autonomo e intrappolerebbe la sessione su un modello più debole. `validate.py` verifica la coerenza in entrambe le direzioni. MINOR bump: architecture-review 1.1.0, autonomous-workflow 1.1.0, brainstorming 1.1.0, brand-strategist 1.1.0, cross-verification 1.1.0, database-design 1.2.0, deploy-readiness 1.1.0, multi-agent-brainstorm 1.3.0, orchestrating-agents 2.1.0, principal-engineering-core 1.2.0, product-marketing-strategist 1.1.0, project-lifecycle 1.8.0, receiving-code-review 1.1.0, requesting-code-review 1.2.0, security-review 1.1.0, subagent-driven-development 1.2.0, writing-plans 1.1.0, writing-skills 1.4.0.
+- product-ownership 1.18.1 — gate manuale in sessione remota: scala a tre gradini in product-ownership (preview per PR dichiarata dal progetto → tunnel se la rete lo consente → screenshot Playwright nel container + gate parcheggiato). La scelta del meccanismo di preview si fa una volta sola allo stadio 4.5 e va scritta nel campo "Preview" del `CLAUDE.md` del progetto (template di bootstrap aggiornato).
+
 ## 2026-10-02 (2)
 
 - product-ownership 1.18.0 — nuova sezione "Without `gh`: the GitHub MCP equivalents" (tabella gh → MCP, con ciò che non ha percorso MCP: `blockedBy`, colori delle label, impostazioni repo) e sezione sui ticket dipendenti/paralleli/non presidiati: branch impilati sul ticket che blocca, un DB di test per worktree, gate manuale cumulativo per milestone **solo su richiesta esplicita**, e in sessione remota gate "parcheggiato: serve verifica locale" invece di bloccare tutto. Il gate per ticket resta il default.

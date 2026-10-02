@@ -1,7 +1,9 @@
 ---
 name: writing-plans
 description: Use when you have a spec or confirmed requirements for a multi-step task and need to sequence it into a written plan before touching code — turning confirmed intent into ordered, checkable steps
-version: 1.0.1
+version: 1.1.0
+model: opus
+effort: high
 ---
 
 # Writing Plans

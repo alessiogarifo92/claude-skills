@@ -1,7 +1,9 @@
 ---
 name: writing-skills
 description: Use when creating a new skill, editing an existing one, or renaming/consolidating skills in this repo, to decide whether it's warranted and verify it actually works before treating it as done
-version: 1.3.0
+version: 1.4.0
+model: opus
+effort: medium
 ---
 
 # Writing Skills
@@ -18,7 +20,7 @@ Author skills that match this repo's own conventions, and verify each one works 
 
 ## Format — match the repo's existing skills
 - Frontmatter: `name` (letters/numbers/hyphens only), `description` starting with "Use when..." stating only *triggers* — never summarize the skill's own process, or agents will follow the summary instead of reading the content — and a semver `version`
-- Right under the title: a `**Run on:** <opus|sonnet|haiku|main> · effort <low|medium|high> — <reason>` line (what model and effort should apply this skill; `README.md` lists them all)
+- Right under the title: a `**Run on:** <opus|sonnet|haiku|main> · effort <low|medium|high> — <reason>` line (what model and effort should apply this skill; `README.md` lists them all). An `opus` skill also carries `model: opus` and the same `effort:` in its frontmatter; sonnet/haiku/main skills never set `model`/`effort` (an override lasts the rest of the turn, so a downward one would trap a long autonomous run on a weaker model) — `validate.py` enforces both
 - Body: short overview, a `**Pairs with:**` line cross-referencing related skills by name, a `When this applies` / `NOT for` split, the core technique as steps/table/rules, a `Common mistakes` or red-flags table, and a `Boundary` line stating what this skill does NOT own
 
 ## Test before treating it as done — scaled to skill type

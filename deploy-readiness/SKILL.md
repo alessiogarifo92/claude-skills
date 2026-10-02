@@ -1,7 +1,9 @@
 ---
 name: deploy-readiness
 description: Use when a project or change is about to be deployed or made publicly reachable — choosing the hosting target, preparing secrets and config, migrations and rollback, the go/no-go check, post-deploy smoke tests, and the recurring cost actually billed
-version: 1.0.0
+version: 1.1.0
+model: opus
+effort: high
 ---
 
 # Deploy Readiness

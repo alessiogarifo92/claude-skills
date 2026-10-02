@@ -36,20 +36,20 @@ Private skills, agents and global rules for Claude Code. Goal: run a project fro
 
 ## Models and effort
 
-Policy: **opus** where judgment is expensive and no test catches the error (architecture, review, security, critique, positioning); **sonnet** for bounded code, research and verification work; **haiku** for mechanical run/locate/git work. The main session decides and owns git. Escalate a sonnet agent to opus when its task turns out to be a judgment call or a second attempt failed. `Run on` for a skill is advisory: skills execute on the session's model, so it tells you what to select (or which agent runs the work); only an agent's `model:`/`effort:` frontmatter is applied (the docs say the available effort levels depend on the model and do not say what happens for an unsupported one, so treat `effort` as best effort, notably on the haiku agents), and a dispatch can override the model but not the effort. The table is generated from the files (`python3 scripts/validate.py --write-readme`); the `Run on` line in each skill is the source for skills, frontmatter for agents.
+Policy: **opus** where judgment is expensive and no test catches the error (architecture, review, security, critique, positioning); **sonnet** for bounded code, research and verification work; **haiku** for mechanical run/locate/git work. The main session decides and owns git. Escalate a sonnet agent to opus when its task turns out to be a judgment call or a second attempt failed. For skills, `Run on: opus` is **enforced** by `model: opus` + `effort` in the frontmatter (Claude Code applies it for the rest of the current turn, then the session model resumes). `sonnet`/`haiku`/`main` rows are deliberately **not** enforced: a downward override would stick for the whole rest of a long autonomous turn, so they only say which agent should do the work or which model to select. For agents, an agent's `model:`/`effort:` frontmatter is applied (the docs say the available effort levels depend on the model and do not say what happens for an unsupported one, so treat `effort` as best effort, notably on the haiku agents), and a dispatch can override the model but not the effort. The table is generated from the files (`python3 scripts/validate.py --write-readme`); the `Run on` line in each skill is the source for skills, frontmatter for agents.
 
 <!-- matrix:begin -->
 | Skill | Version | Run on | Effort |
 |---|---|---|---|
 | `api-design` | 1.0.1 | sonnet | high |
-| `architecture-review` | 1.0.1 | opus | high |
-| `autonomous-workflow` | 1.0.0 | opus | high |
-| `brainstorming` | 1.0.1 | opus | high |
-| `brand-strategist` | 1.0.1 | opus | medium |
-| `cross-verification` | 1.0.0 | opus | high |
-| `database-design` | 1.1.1 | opus | high |
+| `architecture-review` | 1.1.0 | opus | high |
+| `autonomous-workflow` | 1.1.0 | opus | high |
+| `brainstorming` | 1.1.0 | opus | high |
+| `brand-strategist` | 1.1.0 | opus | medium |
+| `cross-verification` | 1.1.0 | opus | high |
+| `database-design` | 1.2.0 | opus | high |
 | `debugging-workflow` | 1.0.3 | sonnet | high |
-| `deploy-readiness` | 1.0.0 | opus | high |
+| `deploy-readiness` | 1.1.0 | opus | high |
 | `direct-execution` | 1.3.0 | main | medium |
 | `docs-and-specs` | 1.0.1 | sonnet | medium |
 | `executing-plans` | 1.0.1 | sonnet | medium |
@@ -58,25 +58,25 @@ Policy: **opus** where judgment is expensive and no test catches the error (arch
 | `handling-sudo-and-missing-tools` | 1.0.1 | haiku | low |
 | `laravel-architecture` | 1.3.1 | sonnet | high |
 | `market-analyst` | 1.0.1 | sonnet | medium |
-| `multi-agent-brainstorm` | 1.2.0 | opus | high |
-| `orchestrating-agents` | 2.0.1 | opus | high |
-| `principal-engineering-core` | 1.1.1 | opus | high |
-| `product-marketing-strategist` | 1.0.1 | opus | medium |
-| `product-ownership` | 1.18.0 | sonnet | medium |
-| `project-lifecycle` | 1.7.0 | opus | high |
+| `multi-agent-brainstorm` | 1.3.0 | opus | high |
+| `orchestrating-agents` | 2.1.0 | opus | high |
+| `principal-engineering-core` | 1.2.0 | opus | high |
+| `product-marketing-strategist` | 1.1.0 | opus | medium |
+| `product-ownership` | 1.18.1 | sonnet | medium |
+| `project-lifecycle` | 1.8.0 | opus | high |
 | `python-backend` | 1.0.1 | sonnet | high |
-| `receiving-code-review` | 1.0.1 | opus | medium |
+| `receiving-code-review` | 1.1.0 | opus | medium |
 | `refactoring-strategy` | 1.0.1 | sonnet | high |
-| `requesting-code-review` | 1.1.0 | opus | high |
-| `security-review` | 1.0.1 | opus | high |
+| `requesting-code-review` | 1.2.0 | opus | high |
+| `security-review` | 1.1.0 | opus | high |
 | `sql-performance` | 1.0.1 | sonnet | high |
-| `subagent-driven-development` | 1.1.0 | opus | medium |
+| `subagent-driven-development` | 1.2.0 | opus | medium |
 | `test-driven-development` | 1.0.1 | sonnet | medium |
 | `test-verification` | 1.4.1 | sonnet | medium |
 | `vue-frontend` | 1.0.1 | sonnet | high |
 | `worktree-manager` | 1.5.2 | haiku | low |
-| `writing-plans` | 1.0.1 | opus | high |
-| `writing-skills` | 1.3.0 | opus | medium |
+| `writing-plans` | 1.1.0 | opus | high |
+| `writing-skills` | 1.4.0 | opus | medium |
 
 | Agent | Model | Effort | Preloaded skills | Role |
 |---|---|---|---|---|

@@ -51,6 +51,11 @@ for f in sorted(glob.glob(os.path.join(ROOT, "*", "SKILL.md"))):
         model, effort = m.groups()
         if model not in MODELS: err(f"{rel}: Run on model '{model}' not in {sorted(MODELS)}")
         if effort not in EFFORTS: err(f"{rel}: Run on effort '{effort}' invalid")
+    fmodel = fm.get("model")
+    if model == "opus" and (fmodel != "opus" or fm.get("effort") != effort):
+        err(f"{rel}: Run on says opus/{effort} but frontmatter has model={fmodel} effort={fm.get('effort')}")
+    if model != "opus" and (fmodel or fm.get("effort")):
+        err(f"{rel}: only opus skills may set model/effort in frontmatter (an override lasts the rest of the turn; never force a session down)")
     skills[n] = dict(model=model, effort=effort, version=fm.get("version", "?"), body=body, desc=fm.get("description", ""))
 
 for f in sorted(glob.glob(os.path.join(ROOT, "agents", "*.md"))):

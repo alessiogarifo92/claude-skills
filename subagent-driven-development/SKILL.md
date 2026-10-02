@@ -1,7 +1,9 @@
 ---
 name: subagent-driven-development
 description: Use when executing a written plan whose steps are genuinely independent, dispatching one subagent per independent task in the current session instead of running them sequentially
-version: 1.1.0
+version: 1.2.0
+model: opus
+effort: medium
 ---
 
 # Subagent-Driven Development

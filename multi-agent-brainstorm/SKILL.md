@@ -1,7 +1,9 @@
 ---
 name: multi-agent-brainstorm
 description: Use when a new idea or design question needs input from multiple distinct specialties at once — UI/UX, architecture, cost/tooling, code feasibility — before a direction is picked, to gather independent parallel analysis rather than one agent covering every lens sequentially
-version: 1.2.0
+version: 1.3.0
+model: opus
+effort: high
 ---
 
 # Multi-Agent Brainstorm

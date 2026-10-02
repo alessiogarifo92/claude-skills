@@ -1,7 +1,9 @@
 ---
 name: orchestrating-agents
 description: Use when dispatching any subagent or coordinating multi-phase work (research → plan → implement → verify → deploy) — covers picking the model for the task, writing the dispatch brief, and verifying each agent's report before the next phase.
-version: 2.0.1
+version: 2.1.0
+model: opus
+effort: high
 ---
 
 # Orchestrating Agents

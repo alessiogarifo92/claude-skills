@@ -1,7 +1,9 @@
 ---
 name: requesting-code-review
 description: Use before merging or completing any non-trivial feature or fix, to decide whether a review pass is warranted and request one, rather than moving straight from tests passing to merge
-version: 1.1.0
+version: 1.2.0
+model: opus
+effort: high
 ---
 
 # Requesting Code Review

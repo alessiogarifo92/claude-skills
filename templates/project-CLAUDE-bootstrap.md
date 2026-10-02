@@ -8,4 +8,6 @@ This project relies on the private repo `alessiogarifo92/claude-skills` (skills,
    Claude Code detects agent files added to an existing `~/.claude/agents/` without a restart, but not when that directory did not exist at session start (typical in a fresh container). Then either restart the session once, or use the fallback above for this session. `templates/session-start-hook.sh` can install everything before the session starts (best effort).
 4. If the attach fails, say so in visible text and ask the user how to proceed. Never continue silently without the rules.
 
+Run / preview (manual gate): <dev run command and URLs; per-PR preview deploy URL pattern, or `none` — then the gate is parked with local commands>.
+
 Needed environment variables / connectors for this project: <list them here; document every variable `.mcp.json` expects>.

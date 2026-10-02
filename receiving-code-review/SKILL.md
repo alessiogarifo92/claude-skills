@@ -1,7 +1,9 @@
 ---
 name: receiving-code-review
 description: Use when receiving code review feedback, before implementing any suggested change, to verify it technically rather than agreeing performatively or blindly applying it
-version: 1.0.1
+version: 1.1.0
+model: opus
+effort: medium
 ---
 
 # Receiving Code Review

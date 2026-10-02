@@ -1,7 +1,9 @@
 ---
 name: project-lifecycle
 description: Use when starting a new application or project from scratch, or evaluating one end to end — from initial idea through tool/stack and cost decisions, architecture, breaking the work into tickets, implementation, and deploy — not for a single scoped ticket already in flight
-version: 1.7.0
+version: 1.8.0
+model: opus
+effort: high
 ---
 
 # Project Lifecycle

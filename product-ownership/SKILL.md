@@ -1,7 +1,7 @@
 ---
 name: product-ownership
 description: Use when drafting or creating a GitHub issue/ticket, researching external sources needed to write one, deciding whether something is a bug/research/implementation ticket, starting or finishing implementation work on a ticket, about to push or merge a completed change, or cleaning up branches after a PR merges or a commit supersedes it
-version: 1.18.0
+version: 1.18.1
 ---
 
 # Product Ownership
@@ -128,7 +128,10 @@ The gate stays per ticket by default; these rules keep it from freezing an auton
 - **Dependent ticket**: it may branch from its blocker's unmerged branch (stacked branch) so work continues while the blocker waits at its gate. It cannot merge to the default branch before the blocker does, and its own manual gate still applies at merge. If the blocker changes, rebase the stacked branch onto it.
 - **Parallel tickets** never share a test database that suites reset: one test DB/schema per worktree, or run those suites serially.
 - **Opt-in batched gate**: only if the user explicitly asks for it (e.g. "check the whole milestone at the end"), several tickets of one milestone may share one manual check, recorded as one `## Test info` comment per ticket. Without that explicit opt-in, the per-ticket gate holds.
-- **Remote session**: the container's `localhost` is not reachable by the user. Use a preview deploy URL or tunnel if the project has one. Otherwise record the gate as **parked: needs local check** on the ticket with the exact local commands, and carry on with every independent ticket; nothing parked merges until the user confirms.
+- **Remote session**: the container's `localhost` is not reachable by the user, so the gate needs a way for them to see the change. Take the first rung that exists:
+  1. **The project's declared preview** (project `CLAUDE.md` field "Preview"): a per-PR preview deploy (Vercel/Netlify/Cloudflare Pages style, free tier first) — post its URL in the handoff. This is chosen once per project at repo bootstrap (`autonomous-workflow` stage 4.5), not per ticket.
+  2. **A tunnel from the container**, only if the environment's network policy allows it (`read_documentation` topic `environment.network`); the URL lives as long as the session, so say so.
+  3. **Recorded evidence plus a parked gate**: drive the running app in the container with Playwright (Chromium is preinstalled; a script works when the MCP is absent), commit the screenshots per the Test info convention, and mark the gate **parked: needs local check** with the exact local commands. Carry on with every independent ticket; nothing parked merges until the user confirms.
 
 ### Recording the check: "Test info" section on the ticket
 The walkthrough in step 1 gets written into the ticket itself, not just described in chat — otherwise the evidence disappears once the session ends.

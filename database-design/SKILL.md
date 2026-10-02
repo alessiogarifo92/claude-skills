@@ -1,7 +1,9 @@
 ---
 name: database-design
 description: Use when designing a new table, writing a migration, or reviewing schema changes for cardinality, nullability, constraints, indexes, transaction boundaries, or migration rollout risk
-version: 1.1.1
+version: 1.2.0
+model: opus
+effort: high
 ---
 
 # Database Design

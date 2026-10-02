@@ -1,7 +1,9 @@
 ---
 name: autonomous-workflow
 description: Use when the user hands over an end-to-end goal (an app idea, a whole feature set, "take it from here", "vai in autonomia") or asks you to run the workflow unattended — conducts every stage from idea through marketing and deploy by routing to the right skill, agent, model and cross-verification level, and says exactly where it may proceed alone and where it must stop
-version: 1.0.0
+version: 1.1.0
+model: opus
+effort: high
 ---
 
 # Autonomous Workflow
@@ -36,7 +38,7 @@ For a brand-new project, invoke `project-lifecycle` first (its gates and Phase 3
 | 3 | Architecture | `principal-engineering-core`, `architecture-review`, `database-design`, `api-design` | `architect` (opus·high) + a second `architect` dispatched with `model: "sonnet"` and a different lens, then `critic` | Mode A, L3 | **G**: shape confirmed |
 | 3.5 | Design UI/UX (if any UI) | `project-lifecycle` phase 3.5, `design` | ≥3 directions on one canvas; `critic` reviews comparability | Mode A | **G**: user picks one direction |
 | 4 | Tickets | `product-ownership` | `researcher`/`Explore` to ground; milestone + dependencies wired | — | **G**: user confirms the batch once (batched stop point) |
-| 4.5 | Repo & CI bootstrap | `project-lifecycle` (repo settings incl. delete-branch-on-merge), `test-verification` | direct; CI runs `python`/`npm`/project test + coverage per the stack | — | **A** (repo creation itself is a user-confirmed action) |
+| 4.5 | Repo & CI bootstrap | `project-lifecycle` (repo settings incl. delete-branch-on-merge), `test-verification`; also pick the **preview mechanism** for the manual gate (per-PR preview deploy on a free tier via `market-analyst`, or none) and write it, with the run command and URLs, into the project `CLAUDE.md` "Preview" field | direct; CI runs `python`/`npm`/project test + coverage per the stack | — | **A** (repo creation itself is a user-confirmed action) |
 | 5 | Implementation | `worktree-manager` → `writing-plans` (multi-step) → `test-driven-development` + stack skill (`laravel-architecture`, `go-backend`, `python-backend`, `vue-frontend`; `sql-performance` for slow queries, `refactoring-strategy` before a structural change) | direct by default; `implementer` (sonnet·high), `quick-debugger` (sonnet·high), `refactor-optimizer` (sonnet·med); independent tickets in parallel worktrees via `subagent-driven-development` | L1; L2-3 for risky logic | **A** |
 | 6 | Verification | `test-verification` | `test-runner` (haiku·low) runs and is the single narrowest re-run at L1; `verifier` (sonnet·med) only at L2+ or for a claim that gates the next phase | Mode B on gating claims | **A**; unit tests for changed logic are mandatory |
 | 7 | Review | `requesting-code-review` → `receiving-code-review` | level-gated: L1 `reviewer` alone (or the `code-review` plugin); L2 `reviewer` + the one relevant lens; L3 full Mode C with `critic` | Mode C only at L3 | **A** to fix findings, then at most one re-review by `reviewer` on the changed hunks; **G** if a finding contradicts a user decision |

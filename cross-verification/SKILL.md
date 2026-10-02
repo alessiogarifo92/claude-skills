@@ -1,7 +1,9 @@
 ---
 name: cross-verification
 description: Use when a decision or result is high-stakes or hard to reverse — an idea direction, stack, architecture, security-sensitive or data-migrating change, a non-trivial diff before merge, marketing copy or a launch, a deploy — and one agent's answer is not enough, so independent agents must work in parallel and be compared against each other before the result is accepted
-version: 1.0.0
+version: 1.1.0
+model: opus
+effort: high
 ---
 
 # Cross-Verification
