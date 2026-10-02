@@ -1,7 +1,7 @@
 ---
 name: orchestrating-agents
 description: Use when dispatching any subagent or coordinating multi-phase work (research → plan → implement → verify → deploy) — covers picking the model for the task, writing the dispatch brief, and verifying each agent's report before the next phase.
-version: 2.1.0
+version: 2.2.0
 model: opus
 effort: high
 ---
@@ -22,7 +22,7 @@ This skill governs HOW to orchestrate once `direct-execution`'s decision tree sa
 
 | Phase | Who | Model · effort |
 |---|---|---|
-| 1. Brainstorming / design decisions | Main session, with the user (`brainstorming`). The call is never delegated. For high-stakes questions, `cross-verification` Mode A gathers blind parallel proposals (`architect`, `researcher`, `marketing-strategist`, UI/UX `general-purpose`) and a `critic` compares them — the user still decides | main session · `architect`/`critic` opus·high, others sonnet |
+| 1. Brainstorming / design decisions | Main session, with the user (`brainstorming`; `ticket-interrogation` when a decided direction still has open decisions and must become a ticket). The call is never delegated — decisions need the user, and `ticket-interrogation` needs AskUserQuestion, which no agent has. For high-stakes questions, `cross-verification` Mode A gathers blind parallel proposals (`architect`, `researcher`, `marketing-strategist`, UI/UX `general-purpose`) and a `critic` compares them — the user still decides | main session · `architect`/`critic` opus·high, others sonnet |
 | 2. Data gathering | `researcher` (external facts, docs, feasibility); `Explore` (locating things in the codebase) | sonnet·medium / haiku·low |
 | 3. Planning | Main session (`writing-plans` only for real multi-step work); `architect` as second opinion on L3 designs; user approves the plan | main session · opus·high |
 | 4. Implementation | Direct by default (`test-driven-development`). Delegate one whole scoped piece: `implementer` (feature+tests), `quick-debugger` (localized bug), `refactor-optimizer` (behavior-preserving cleanup); independent tickets in parallel via `subagent-driven-development`; `executing-plans` when a written plan drives it | sonnet·high (refactor medium) |

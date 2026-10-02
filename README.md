@@ -7,6 +7,7 @@ Private skills, agents and global rules for Claude Code. Goal: run a project fro
 | You want to… | Invoke |
 |---|---|
 | Build a whole app / run a backlog end to end, even unattended | `autonomous-workflow` (enters `project-lifecycle` for a new project) |
+| Turn a chosen-but-vague plan into a well-specified ticket | `ticket-interrogation`, then `product-ownership` |
 | Work one ticket | `product-ownership` |
 | Decide something high-stakes with independent agents compared against each other | `cross-verification` |
 | Ship to production | `deploy-readiness` |
@@ -43,14 +44,14 @@ Policy: **opus** where judgment is expensive and no test catches the error (arch
 |---|---|---|---|
 | `api-design` | 1.0.1 | sonnet | high |
 | `architecture-review` | 1.1.0 | opus | high |
-| `autonomous-workflow` | 1.1.0 | opus | high |
-| `brainstorming` | 1.1.0 | opus | high |
+| `autonomous-workflow` | 1.2.0 | opus | high |
+| `brainstorming` | 1.2.0 | opus | high |
 | `brand-strategist` | 1.1.0 | opus | medium |
 | `cross-verification` | 1.1.0 | opus | high |
 | `database-design` | 1.2.0 | opus | high |
 | `debugging-workflow` | 1.0.3 | sonnet | high |
 | `deploy-readiness` | 1.1.0 | opus | high |
-| `direct-execution` | 1.3.0 | main | medium |
+| `direct-execution` | 1.4.0 | main | medium |
 | `docs-and-specs` | 1.0.1 | sonnet | medium |
 | `executing-plans` | 1.0.1 | sonnet | medium |
 | `finishing-a-development-branch` | 1.2.0 | sonnet | low |
@@ -59,11 +60,11 @@ Policy: **opus** where judgment is expensive and no test catches the error (arch
 | `laravel-architecture` | 1.3.1 | sonnet | high |
 | `market-analyst` | 1.0.1 | sonnet | medium |
 | `multi-agent-brainstorm` | 1.3.0 | opus | high |
-| `orchestrating-agents` | 2.1.0 | opus | high |
+| `orchestrating-agents` | 2.2.0 | opus | high |
 | `principal-engineering-core` | 1.2.0 | opus | high |
 | `product-marketing-strategist` | 1.1.0 | opus | medium |
-| `product-ownership` | 1.18.1 | sonnet | medium |
-| `project-lifecycle` | 1.8.0 | opus | high |
+| `product-ownership` | 1.20.0 | sonnet | medium |
+| `project-lifecycle` | 1.9.0 | opus | high |
 | `python-backend` | 1.0.1 | sonnet | high |
 | `receiving-code-review` | 1.1.0 | opus | medium |
 | `refactoring-strategy` | 1.0.1 | sonnet | high |
@@ -73,10 +74,11 @@ Policy: **opus** where judgment is expensive and no test catches the error (arch
 | `subagent-driven-development` | 1.2.0 | opus | medium |
 | `test-driven-development` | 1.0.1 | sonnet | medium |
 | `test-verification` | 1.4.1 | sonnet | medium |
+| `ticket-interrogation` | 1.3.0 | opus | high |
 | `vue-frontend` | 1.0.1 | sonnet | high |
 | `worktree-manager` | 1.5.2 | haiku | low |
-| `writing-plans` | 1.1.0 | opus | high |
-| `writing-skills` | 1.4.0 | opus | medium |
+| `writing-plans` | 1.2.0 | opus | high |
+| `writing-skills` | 1.5.0 | opus | medium |
 
 | Agent | Model | Effort | Preloaded skills | Role |
 |---|---|---|---|---|

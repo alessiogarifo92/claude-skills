@@ -1,7 +1,7 @@
 ---
 name: writing-skills
 description: Use when creating a new skill, editing an existing one, or renaming/consolidating skills in this repo, to decide whether it's warranted and verify it actually works before treating it as done
-version: 1.4.0
+version: 1.5.0
 model: opus
 effort: medium
 ---
@@ -38,6 +38,7 @@ Author skills that match this repo's own conventions, and verify each one works 
 - Cross-references go both ways: if skill A names B as its next/previous step, B should name A back. One-way links leave the entry point unable to send anyone onward.
 - Run `python3 scripts/validate.py` before committing: it checks frontmatter, versions, `Run on` lines, agent frontmatter, `Pairs with` cross-references and the README matrix. CI runs the same script.
 - Adding a skill or agent also means a row in `README.md`'s model matrix and, if it is a stage of the workflow, a row in `autonomous-workflow`'s stage map.
+- **A rule that keeps being violated usually has wrong data behind it — fix the data before adding a check.** When a rule is broken systematically, the reflex is to write it more forcefully or to enforce it with a hook or a script. Look first for artifacts in the repo that *contradict* it: a backlog carrying the label the rule forbids, a config using the pattern it bans, existing files doing it the old way. Observed precedent beats prose — a session reads the rule once and sees the counter-examples repeatedly, so it follows the counter-examples. And measure before building any check: count the actual violations (`git log`, the issue list) instead of assuming there are many. **Why:** `product-ownership`'s "never `enhancement`, always `feature`" was written on 2026-08-16 (`bd8fa36`). Every issue opened after it — #16, #18, #19, #22, then #24 — used `enhancement` anyway: three different sessions, each with the rule loaded in context, each following the seven existing issues in front of it. The fix was deleting the label, not enforcing the sentence: GitHub then rejects the wrong value in every session and every client, with nothing to maintain. The same measurement killed a proposed commit hook for the version-bump rule — 2 violations in 27 `SKILL.md` commits, none in the last month, i.e. a rule already being followed, where a fragile matcher would only have added false confidence.
 - Don't skip verification because "it's just a reference" or "a simple addition" — an untested skill's gaps cost more to find later than to test now.
 
 ## Boundary

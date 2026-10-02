@@ -1,7 +1,7 @@
 ---
 name: product-ownership
-description: Use when drafting or creating a GitHub issue/ticket, researching external sources needed to write one, deciding whether something is a bug/research/implementation ticket, starting or finishing implementation work on a ticket, about to push or merge a completed change, or cleaning up branches after a PR merges or a commit supersedes it
-version: 1.18.1
+description: Use when publishing or creating a GitHub issue/ticket whose content is already settled (if its own design decisions are still open, `ticket-interrogation` runs first and hands back the title and body), researching external sources needed to write one, deciding whether something is a bug/research/implementation ticket, starting or finishing implementation work on a ticket, about to push or merge a completed change, or cleaning up branches after a PR merges or a commit supersedes it
+version: 1.20.0
 ---
 
 # Product Ownership
@@ -17,7 +17,7 @@ Own the lifecycle of a work item end to end: from a raw problem report to a grou
 |---|---|---|
 | 0. Operating principles | `principal-engineering-core` for non-trivial tasks | — |
 | 1. Ideation | `brainstorming` (or `multi-agent-brainstorm` when the idea spans UI/UX + architecture + cost at once); `market-analyst` before locking in any external tool/API/SaaS/asset (cost + license due diligence) | `researcher` for external feasibility facts and current pricing/ToS pages; `Explore` to see what already exists in the code |
-| 2. Grounding / ticket | this skill (ticket type, draft + user confirmation, existing labels); a ticket that adopts an external dependency cites the `market-analyst` verdict | `researcher` for the ticket's external sources; `Explore` to verify in the code that the problem is where you think |
+| 2. Grounding / ticket | this skill (ticket type, draft + user confirmation, existing labels); `ticket-interrogation` first whenever the request is still fuzzy — it interviews the user, attacks the resulting plan, and emits the ticket body this skill then publishes; a ticket that adopts an external dependency cites the `market-analyst` verdict | `researcher` for the ticket's external sources; `Explore` to verify in the code that the problem is where you think |
 | 3. Pickup | this skill (`in progress` label, always) → `worktree-manager` **only once code work is about to start** (not for research/drafting) → `writing-plans` for multi-step work | `Explore` to locate the critical files before planning; `github-ops` to create/list the ticket's worktree and branch via the repo's own convention, called at the code-work point, not at pickup |
 | 4. Implementation | **Direct execution in the main session by default** (`direct-execution`) + `test-driven-development`, plus the relevant domain skill; `subagent-driven-development`/`executing-plans` only for genuinely independent parallel workstreams or plans spanning sessions; a research ticket delivers a report instead (see Ticket types) | `implementer` / `quick-debugger` / `refactor-optimizer` for one whole scoped piece, per `orchestrating-agents`; `researcher` writes the report on research tickets |
 | 5. Verification | `test-verification` picks the checks and enforces evidence before "done" | `test-runner` runs suites/lint/typecheck and reports only the outcome; `verifier` re-derives a gating claim blind |
@@ -48,6 +48,7 @@ Deliberately `feature`, never GitHub's default `enhancement` — the user dislik
 When choosing what to pick up next and priorities aren't otherwise specified by the user, an open `bug` outranks an open `feature`: a broken existing behavior costs more the longer it sits than a not-yet-built feature does. This is a default, not an override of explicit user direction — if the user names what to work on next, that stands regardless of label.
 
 ## Before creating on GitHub
+- **First, is the request still fuzzy?** If the feature's own decisions are not settled — how it works, who can do it, what happens on failure — run `ticket-interrogation` before drafting anything. It interviews the user, attacks the resulting plan, and hands back a title and body to publish here. Drafting a ticket over undecided design is how a ticket gets implemented against assumptions nobody made.
 - Draft the full title + body and show it to the user; wait for confirmation before `gh issue create`, unless they've explicitly said to just create it directly.
 - Run `gh label list` and reuse what exists instead of inventing new labels.
 - Match the repo's existing issue tone/language/section structure if prior issues establish one (check `gh issue list`/`gh issue view` on a couple of examples).
@@ -174,6 +175,7 @@ Once a branch's work has landed on the default branch, delete **both** copies �
 Every skill in this repo carries a semver `version` in its `SKILL.md` frontmatter. When you modify a skill, bump its version (MAJOR = behavior/approach change, MINOR = new section/rule/capability, PATCH = fixes/clarifications) and add a line to the root `CHANGELOG.md` under today's date — in the same commit as the change.
 
 ## Check
+- About to draft a ticket whose requirements are still fuzzy → run `ticket-interrogation` first; this skill publishes what it produces. In `full` mode that is a title plus a six-section body. In `light` mode it is a title plus a three-line summary — publish it as a `bug` ticket, mapping *Problema* to the context and *Da coprire nel test* to an acceptance criterion, and only if the user actually asked for a ticket rather than for the fix itself.
 - Research ticket done → is there a follow-up implementation ticket, or does one need opening?
 - About to run `gh issue create` → did the user see and confirm this exact text?
 - Drafting a ticket that depends on/blocks another, or belongs under an epic → did you wire `--blocked-by`/`--blocking`/`--parent` before showing the draft, not after?
