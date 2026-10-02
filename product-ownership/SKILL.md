@@ -1,7 +1,7 @@
 ---
 name: product-ownership
 description: Use when publishing or creating a GitHub issue/ticket whose content is already settled (if its own design decisions are still open, `ticket-interrogation` runs first and hands back the title and body), researching external sources needed to write one, deciding whether something is a bug/research/implementation ticket, starting or finishing implementation work on a ticket, about to push or merge a completed change, or cleaning up branches after a PR merges or a commit supersedes it
-version: 1.21.0
+version: 1.21.1
 ---
 
 # Product Ownership
@@ -89,7 +89,7 @@ A remote session usually has the GitHub MCP server and no `gh`. The conventions 
 | verify a screenshot exists at a SHA | `gh api .../contents/<path>?ref=<sha>` | `get_file_contents` |
 | `blockedBy` / `blocking`, create a milestone, create or rename a label (`in progress`, `feature`, `enhancement` → `feature`), repo settings (delete-branch-on-merge), private-repo check | `gh` flags | **no MCP path**: write the dependency in the ticket body, use an existing label, and hand repo settings to the user as a UI step |
 
-Pass an explicit slug to `worktree.sh start` (it derives the slug through `gh`) and label the issue through `issue_write` if its warning says labelling failed.
+For the no-MCP row: first try `issue_write` with the label (GitHub may create a missing label on assignment — unverified; if rejected it is a UI step). A milestone has no MCP path: name the batch in the epic issue and ticket titles and hand milestone creation to the user, batched into the stage-1.5/4 handoff. Pass an explicit slug to `worktree.sh start` (it derives the slug through `gh`) and label the issue through `issue_write` if its warning says labelling failed.
 
 ## Milestones — grouping tickets by phase or goal
 When a batch of tickets is drafted for a defined phase or goal (a `project-lifecycle` phase-4 ticket batch — e.g. "MVP" for the initial slice, or a later named batch like "v2"/"Deploy"), create a GitHub milestone for it and assign every ticket in the batch to it, instead of only cross-referencing "ticket #X-#Y" as free text in a ticket body — free text drifts as the backlog grows and isn't queryable (this is exactly what happened on subsplit: `#12` says "derogabile a dopo l'MVP, ticket #2-#11", something only discoverable by reading that one ticket's body, not by asking GitHub).

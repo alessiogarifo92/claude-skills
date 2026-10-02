@@ -29,7 +29,7 @@ Private skills, agents and global rules for Claude Code. Goal: run a project fro
 
 ## How the workflow runs
 
-1. `autonomous-workflow` holds the stage map: idea → tools & cost → architecture → design → tickets → implementation → verification → review → manual gate/merge → deploy → launch → close, with the owner skill, agents, models and gate type per stage.
+1. `autonomous-workflow` holds the stage map: idea → repo & decision log → tools & cost → architecture → design → tickets → CI & preview → implementation → verification → review → manual gate/merge → deploy → launch → close, with the owner skill, agents, models and gate type per stage.
 2. Linear work stays direct. Independent work (research per tool, unblocked tickets, panelists) is dispatched in parallel, in one message.
 3. High-stakes work goes through `cross-verification`: blind parallel agents (mixed models) → a `critic` compares them on evidence → the orchestrator decides; user-owned decisions go to the user with a recommendation. Caps: 3 panelists, 2 rounds.
 4. Every agent report is a claim: the orchestrator verifies it (`orchestrating-agents`) before the next phase; gating claims are re-derived blind by `verifier`.
@@ -44,13 +44,13 @@ Policy: **opus** where judgment is expensive and no test catches the error (arch
 |---|---|---|---|
 | `api-design` | 1.0.1 | sonnet | high |
 | `architecture-review` | 1.1.1 | opus | high |
-| `autonomous-workflow` | 1.3.0 | opus | high |
+| `autonomous-workflow` | 1.4.0 | opus | high |
 | `brainstorming` | 1.2.1 | opus | high |
 | `brand-strategist` | 1.1.0 | opus | medium |
-| `cross-verification` | 1.1.2 | opus | high |
+| `cross-verification` | 1.1.3 | opus | high |
 | `database-design` | 1.2.0 | opus | high |
 | `debugging-workflow` | 1.0.3 | sonnet | high |
-| `deploy-readiness` | 1.1.2 | opus | high |
+| `deploy-readiness` | 1.1.3 | opus | high |
 | `direct-execution` | 1.4.0 | main | medium |
 | `docs-and-specs` | 1.0.1 | sonnet | medium |
 | `executing-plans` | 1.0.1 | sonnet | medium |
@@ -63,18 +63,18 @@ Policy: **opus** where judgment is expensive and no test catches the error (arch
 | `orchestrating-agents` | 2.3.0 | opus | high |
 | `principal-engineering-core` | 1.2.0 | opus | high |
 | `product-marketing-strategist` | 1.1.0 | opus | medium |
-| `product-ownership` | 1.21.0 | sonnet | medium |
-| `project-lifecycle` | 1.10.0 | opus | high |
+| `product-ownership` | 1.21.1 | sonnet | medium |
+| `project-lifecycle` | 1.10.1 | opus | high |
 | `python-backend` | 1.0.1 | sonnet | high |
 | `receiving-code-review` | 1.1.0 | opus | medium |
 | `refactoring-strategy` | 1.0.1 | sonnet | high |
-| `requesting-code-review` | 1.2.1 | opus | high |
+| `requesting-code-review` | 1.2.2 | opus | high |
 | `security-review` | 1.1.0 | opus | high |
 | `sql-performance` | 1.0.1 | sonnet | high |
 | `subagent-driven-development` | 1.2.0 | opus | medium |
 | `test-driven-development` | 1.0.1 | sonnet | medium |
 | `test-verification` | 1.4.1 | sonnet | medium |
-| `ticket-interrogation` | 1.4.0 | opus | high |
+| `ticket-interrogation` | 1.4.1 | opus | high |
 | `vue-frontend` | 1.0.1 | sonnet | high |
 | `worktree-manager` | 1.5.2 | haiku | low |
 | `writing-plans` | 1.2.0 | opus | high |

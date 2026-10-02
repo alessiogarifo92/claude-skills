@@ -1,7 +1,7 @@
 ---
 name: ticket-interrogation
 description: Use when the user asks to interrogate, stress-test, pressure-test, poke holes in, sanity-check or "grill" a plan, design, approach or architecture, is about to start building something non-trivial while a direction is already chosen but its decisions are still open, or asks for help turning a rough idea into a well-specified ticket — not when the direction itself is still undecided, which is `brainstorming`
-version: 1.4.0
+version: 1.4.1
 model: opus
 effort: high
 ---
@@ -45,7 +45,7 @@ State which mode you picked in one line, then start.
 
 ## Phase 1 — Interview
 
-Use **AskUserQuestion** for every question — never type a question into prose while the tool is available. Only if AskUserQuestion is genuinely unavailable in the current client, fall back to one numbered question per message, still one at a time and still with its options listed. That fallback is the single exception; it is not a matter of preference.
+Use **AskUserQuestion** for every question — never type a question into prose while the tool is available. Only if AskUserQuestion is genuinely unavailable in the current client, fall back to one numbered question per message, still one at a time and still with its options listed. That fallback is the single exception to the AskUserQuestion rule (the autopilot batch below is an exception to the one-at-a-time rule, not to the tool); it is not a matter of preference.
 
 Ask in the language the user is writing in, not only the final output.
 
@@ -74,6 +74,7 @@ Not a checklist to run through mechanically — open the branches that actually 
 - **Observability** — how would we notice this is broken after release?
 
 ## Phase 2 — Attack
+(Light mode skips it, except under autopilot: there the attack runs on the proposed defaults even for a light slice, because nobody is interviewed to catch them.)
 
 **Full mode only.** The interview is closed — no *new* decisions get opened here. Now actively try to break the plan you just helped build. Be direct — this is the half the interview cannot do, and the reason the skill exists.
 
@@ -87,7 +88,7 @@ Work through:
 
 **Output: risks ordered by severity, each with a proposed mitigation.**
 
-If a risk is severe enough to invalidate a decision made during the interview, reopen that one decision: name the risk that forces it, then ask it again as a normal AskUserQuestion. That is the single exception to "the interview is closed", and it spends one question against the budget. Resolving it is the default. **provvisoria** is for a decision the user genuinely cannot settle now — it needs a fact nobody in the conversation has (a consumer outside this repo, a number from production, someone else's call) — not for one you'd rather not spend a question on. When it applies, don't stall the ticket: carry the decision into Phase 3 marked **provvisoria**, with the risk that makes it so listed under *Rischi noti*.
+If a risk is severe enough to invalidate a decision made during the interview, reopen that one decision: name the risk that forces it, then ask it again as a normal AskUserQuestion (under autopilot, add it to the batched brief instead). That is the single exception to "the interview is closed", and it spends one question against the budget. Resolving it is the default. **provvisoria** is for a decision the user genuinely cannot settle now — it needs a fact nobody in the conversation has (a consumer outside this repo, a number from production, someone else's call) — not for one you'd rather not spend a question on. When it applies, don't stall the ticket: carry the decision into Phase 3 marked **provvisoria**, with the risk that makes it so listed under *Rischi noti*.
 
 A mitigation the plan now depends on is a **decision**, and belongs in *Decisioni tecniche* as well as in *Rischi noti* — a reconciliation job the ticket cannot ship without is not a footnote. A mitigation that is only advice for later (rotate these credentials, watch this metric) stays in *Rischi noti* alone.
 
@@ -152,6 +153,7 @@ Autopilot replaces many small questions with one decision brief per gate, so one
 - Anything derivable from the confirmed idea/stack/architecture/design decisions becomes a **proposed default** in the ticket; confirming a default does not count against the question budget.
 - Only decisions that genuinely belong to the user go into the stage-4 brief, as **one batched set** (at most 4 questions in a single AskUserQuestion call), across all tickets of the batch rather than ticket by ticket.
 - The attack phase still runs, on the defaults too; findings that change a default are listed in the brief.
+- More than 4 genuine user decisions across the batch: ask the 4 that block the most tickets, park the rest in the brief with a proposed default marked `unconfirmed`, and let each affected ticket stay `blocked: needs decision` rather than guessing.
 - If the user is unreachable, park the batch with the brief complete and move on to tickets that need no decision; never leave an interview half-finished mid-state.
 
 ## Common mistakes

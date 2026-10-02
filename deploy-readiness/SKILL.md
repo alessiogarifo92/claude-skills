@@ -1,7 +1,7 @@
 ---
 name: deploy-readiness
 description: Use when a project or change is about to be deployed or made publicly reachable — choosing the hosting target, preparing secrets and config, migrations and rollback, the go/no-go check, post-deploy smoke tests, and the recurring cost actually billed — the deploy itself, not the earlier choice of stack or hosting (`market-analyst`)
-version: 1.1.2
+version: 1.1.3
 model: opus
 effort: high
 ---
@@ -28,7 +28,7 @@ Deploy is where an unverified assumption becomes an incident. This skill makes t
 7. **User go/no-go**: present SHA, cost, blockers/follow-ups, rollback, smoke list, in one self-contained message. Deploying, tagging, DNS changes and spend need the user's explicit yes — standing approval for a ticket does not cover them.
 8. **Deploy the pinned SHA** (main session; provider credentials come from the environment's secrets or the user — `read_documentation` topic `environment.secrets` in a remote session — never from the repo). Take the pre-deploy restore point first.
 9. **Smoke test on the real target** (not only locally): run the list, record outputs (`## Test info` convention from `product-ownership` where a ticket exists). A failed smoke test triggers the rollback decision immediately.
-10. **After**: restate the recurring cost actually billed vs the estimate; confirm error reporting and logs are live; check the public-facing basics before launch — analytics/measurement in place, privacy policy and terms where personal data is collected (GDPR for EU users), cookie consent if tracking, an observation window and alert threshold after the deploy, and the store-submission path for a mobile app — then hand to launch (`product-marketing-strategist`) only now.
+10. **After**: restate the recurring cost actually billed vs the estimate; confirm error reporting and logs are live; check the public-facing basics before launch — analytics/measurement in place, privacy policy and terms where personal data is collected (GDPR for EU users), cookie consent if tracking, an observation window and alert threshold after the deploy, and the store-submission path for a mobile app — then, if a public launch was asked for, hand to launch (`product-marketing-strategist`) — only now.
 
 ## Common mistakes
 | Mistake | Fix |
