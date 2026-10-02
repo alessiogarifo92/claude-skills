@@ -4,7 +4,7 @@
 Usage: python3 scripts/validate.py [--write-readme]
 Exit code 1 on any error. Warnings never fail the run.
 """
-import glob, os, re, sys
+import glob, json, os, re, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODELS = {"opus", "sonnet", "haiku", "main"}
@@ -26,12 +26,21 @@ def frontmatter(path):
     m = re.match(r"---\n(.*?)\n---\n", s, re.S)
     if not m:
         err(f"{path}: missing frontmatter"); return {}, s
+    try:
+        import yaml
+        yaml.safe_load(m.group(1))
+    except ImportError:
+        warn("PyYAML not installed: strict YAML check skipped")
+    except Exception as e:
+        err(f"{path}: frontmatter is not valid YAML ({str(e).splitlines()[0]}) — quote values containing ': '")
     fm, key = {}, None
     for line in m.group(1).split("\n"):
         if re.match(r"^\s+- ", line) and key:
             fm.setdefault(key, []).append(line.strip()[2:].strip())
         elif ":" in line:
             key, _, v = line.partition(":"); key = key.strip(); v = v.strip()
+            if v.startswith('"') and v.endswith('"'):
+                import json; v = json.loads(v)
             if v.startswith("[") and v.endswith("]"):
                 v = [x.strip() for x in v[1:-1].split(",") if x.strip()]
             fm[key] = v if v else []

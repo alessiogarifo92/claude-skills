@@ -8,5 +8,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - run: pip install pyyaml
       - run: python3 scripts/validate.py
       - run: bash worktree-manager/scripts/worktree_test.sh

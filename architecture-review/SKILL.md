@@ -1,7 +1,7 @@
 ---
 name: architecture-review
-description: Use when reviewing a non-trivial code change or design for structural boundaries, layering, coupling, testability, or long-term maintainability - not for small, self-contained fixes
-version: 1.1.0
+description: Use when reviewing a non-trivial code change or design for structural boundaries, layering, coupling, testability, or long-term maintainability — or when choosing between structural options (monolith vs services, build vs buy) - not for small, self-contained fixes
+version: 1.1.1
 model: opus
 effort: high
 ---

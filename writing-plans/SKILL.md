@@ -1,7 +1,7 @@
 ---
 name: writing-plans
 description: Use when you have a spec or confirmed requirements for a multi-step task and need to sequence it into a written plan before touching code — turning confirmed intent into ordered, checkable steps
-version: 1.1.0
+version: 1.2.0
 model: opus
 effort: high
 ---
@@ -12,7 +12,7 @@ effort: high
 
 Turn confirmed intent into an ordered, checkable sequence before any code is written. This is the sequencing discipline; `docs-and-specs` is the document format the plan gets written in.
 
-**Pairs with:** `brainstorming` confirms intent first — this skill starts once direction is picked, not before. `docs-and-specs` supplies the Context/Goal/Constraints/Options/Decision/Risks/Verification structure for the plan document itself. `direct-execution` skips this entirely for linear, single-focus tasks. `executing-plans` and `subagent-driven-development` run the plan once written.
+**Pairs with:** `brainstorming` confirms intent first — this skill starts once direction is picked, not before; `ticket-interrogation` sits between the two when the picked direction still has open decisions, and hands over a ticket to plan against. `docs-and-specs` supplies the Context/Goal/Constraints/Options/Decision/Risks/Verification structure for the plan document itself. `direct-execution` skips this entirely for linear, single-focus tasks. `executing-plans` and `subagent-driven-development` run the plan once written.
 
 ## When this applies
 - Multi-step task where steps have real dependencies or a real risk of drift between them, and the spec/requirements are already confirmed (post-`brainstorming`)

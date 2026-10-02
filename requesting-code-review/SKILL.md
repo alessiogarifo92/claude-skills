@@ -1,7 +1,7 @@
 ---
 name: requesting-code-review
-description: Use before merging or completing any non-trivial feature or fix, to decide whether a review pass is warranted and request one, rather than moving straight from tests passing to merge
-version: 1.2.0
+description: Use before merging or completing any non-trivial feature or fix, to decide whether a review pass is warranted and request one, rather than moving straight from tests passing to merge (a change touching a trust boundary also gets `security-review`)
+version: 1.2.2
 model: opus
 effort: high
 ---
@@ -22,7 +22,7 @@ Tests passing is necessary, not sufficient. Before merge, explicitly decide whet
 Default to requesting review for anything non-trivial. If skipping, say so and why — never skip silently just because tests are green.
 
 ## Trigger
-For a non-trivial diff, run the panel in parallel (`cross-verification` Mode C): `reviewer` (opus·high, correctness), plus `security-auditor` when a trust boundary is touched and `architect` when structure moves, then a `critic` to dedupe and rank. A small change gets `reviewer` alone. Give each the brief below — agents cannot see this conversation.
+Weight the review by the `cross-verification` ladder: L1 `reviewer` alone (opus·high, correctness); L2 `reviewer` plus the one relevant lens (`security-auditor` when a trust boundary is touched, `architect` when structure moves); L3 (auth/payments/PII, data migration, public API, architecture) the full panel in parallel (Mode C) and a `critic` to dedupe and rank. Give each the brief below — agents cannot see this conversation.
 
 Give every reviewer (or, if the user asks for the `code-review` plugin instead, the plugin; or the main session reading the full diff) this brief:
 - the diff or PR reference

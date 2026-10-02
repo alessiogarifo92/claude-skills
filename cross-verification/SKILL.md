@@ -1,7 +1,7 @@
 ---
 name: cross-verification
-description: Use when a decision or result is high-stakes or hard to reverse — an idea direction, stack, architecture, security-sensitive or data-migrating change, a non-trivial diff before merge, marketing copy or a launch, a deploy — and one agent's answer is not enough, so independent agents must work in parallel and be compared against each other before the result is accepted
-version: 1.1.0
+description: Use when a decision or result is high-stakes or hard to reverse — an idea direction, stack, architecture, security-sensitive or data-migrating change, a non-trivial diff before merge, marketing copy or a launch, a deploy — (including a choice between two named options) and one agent's answer is not enough, so independent agents must work in parallel and be compared against each other before the result is accepted
+version: 1.1.4
 model: opus
 effort: high
 ---
@@ -21,8 +21,8 @@ Use the stakes ladder — never "to be safe" on linear work:
 |---|---|---|
 | 0 trivial, easy to undo | rename, typo, one-line fix, test addition | none — `direct-execution` |
 | 1 normal ticket | scoped feature or bug with tests | verification gate only: one narrowest re-run (via `test-runner`) and a single `reviewer`; no `verifier`, no panel |
-| 2 non-trivial or costly to reverse | multi-file change, new dependency, public API, UI direction, copy for a public page | one independent check: `reviewer` or `critic`, or a blind second run |
-| 3 high-stakes | architecture and stack choice, auth/payments/PII, data migration, deploy, public launch, anything that spends money | full panel, below |
+| 2 non-trivial or costly to reverse | multi-file change, new dependency, UI direction, copy for a public page | diffs: `reviewer` + the one relevant lens; other results: one independent check (`critic` or a blind second run) |
+| 3 high-stakes | architecture and stack choice, auth/payments/PII, data migration, public API, deploy, public launch, anything that spends money | full panel, below |
 
 NOT for: linear tasks whose steps depend on each other; questions with one verifiable answer (look it up); anything the user already decided.
 
@@ -33,8 +33,8 @@ Pick the mode by what is being decided. Every mode follows the same skeleton: **
 |---|---|---|---|
 | A. Competing proposals | idea shape, stack, architecture, UI direction, naming, plan | 2-3 proposers with the **identical** brief but different lens or model: `architect`, `researcher` (cost/tooling, via `market-analyst`), `general-purpose` (UI/UX), `marketing-strategist` for positioning → then `critic` over all outputs | different lens **or** model per panelist, ideally both an opus and a sonnet, so errors correlate less (pass `model:` explicitly — `general-purpose` inherits the session model) |
 | B. Blind re-derivation | a result that gates the next phase: root cause, test counts, research claim, benchmark | the author's agent + `verifier` who is given the **claim and the check, not the author's reasoning** | sonnet + sonnet (verifier reproduces, does not review) |
-| C. Review panel | a non-trivial diff before merge | `reviewer` (correctness) ‖ `security-auditor` (if a trust boundary is touched) ‖ `architect` (if structure moves) → `critic` dedupes, ranks, drops what has no failure scenario | opus panel |
-| D. Release gate | deploy, public launch | `release-auditor` ‖ `security-auditor` ‖ `verifier` replaying the smoke tests → `critic` on go/no-go | sonnet + opus |
+| C. Review panel | an L3 diff before merge (L2: `reviewer` + one lens, no panel) | `reviewer` (correctness) ‖ `security-auditor` (if a trust boundary is touched) ‖ `architect` (if structure moves) → `critic` dedupes, ranks, drops what has no failure scenario | opus panel |
+| D. Release gate | deploy, public launch | `release-auditor` ‖ `security-auditor` ‖ `verifier` replaying CI/staging checks (the live smoke test follows the deploy) → `critic` on go/no-go | sonnet + opus |
 | E. Dual implementation | rare: an algorithm or migration where being wrong is expensive and a spec can be tested differentially | two `implementer` agents, each in its own worktree (`isolation: worktree` is the sanctioned exception to `worktree.sh` here, since both trees are throwaway), same spec, no sight of each other → run the same tests and a differential/property test on both → keep one or merge by test evidence | sonnet ×2 |
 | F. Copy red-team | landing page, launch post, release notes | `marketing-strategist` ×2 variants with different theses → `critic` reads as the target reader and as a skeptic | opus |
 

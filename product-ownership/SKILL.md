@@ -1,7 +1,7 @@
 ---
 name: product-ownership
-description: Use when drafting or creating a GitHub issue/ticket, researching external sources needed to write one, deciding whether something is a bug/research/implementation ticket, starting or finishing implementation work on a ticket, about to push or merge a completed change, or cleaning up branches after a PR merges or a commit supersedes it
-version: 1.18.1
+description: Use when publishing or creating a GitHub issue/ticket whose content is already settled (if its own design decisions are still open, `ticket-interrogation` runs first and hands back the title and body), researching external sources needed to write one, deciding whether something is a bug/research/implementation ticket, starting or finishing implementation work on a ticket, about to push or merge a completed change, or cleaning up branches after a PR merges or a commit supersedes it
+version: 1.21.2
 ---
 
 # Product Ownership
@@ -17,11 +17,11 @@ Own the lifecycle of a work item end to end: from a raw problem report to a grou
 |---|---|---|
 | 0. Operating principles | `principal-engineering-core` for non-trivial tasks | — |
 | 1. Ideation | `brainstorming` (or `multi-agent-brainstorm` when the idea spans UI/UX + architecture + cost at once); `market-analyst` before locking in any external tool/API/SaaS/asset (cost + license due diligence) | `researcher` for external feasibility facts and current pricing/ToS pages; `Explore` to see what already exists in the code |
-| 2. Grounding / ticket | this skill (ticket type, draft + user confirmation, existing labels); a ticket that adopts an external dependency cites the `market-analyst` verdict | `researcher` for the ticket's external sources; `Explore` to verify in the code that the problem is where you think |
+| 2. Grounding / ticket | this skill (ticket type, draft + user confirmation, existing labels); `ticket-interrogation` first whenever the request is still fuzzy — it interviews the user, attacks the resulting plan, and emits the ticket body this skill then publishes; a ticket that adopts an external dependency cites the `market-analyst` verdict | `researcher` for the ticket's external sources; `Explore` to verify in the code that the problem is where you think |
 | 3. Pickup | this skill (`in progress` label, always) → `worktree-manager` **only once code work is about to start** (not for research/drafting) → `writing-plans` for multi-step work | `Explore` to locate the critical files before planning; `github-ops` to create/list the ticket's worktree and branch via the repo's own convention, called at the code-work point, not at pickup |
 | 4. Implementation | **Direct execution in the main session by default** (`direct-execution`) + `test-driven-development`, plus the relevant domain skill; `subagent-driven-development`/`executing-plans` only for genuinely independent parallel workstreams or plans spanning sessions; a research ticket delivers a report instead (see Ticket types) | `implementer` / `quick-debugger` / `refactor-optimizer` for one whole scoped piece, per `orchestrating-agents`; `researcher` writes the report on research tickets |
 | 5. Verification | `test-verification` picks the checks and enforces evidence before "done" | `test-runner` runs suites/lint/typecheck and reports only the outcome; `verifier` re-derives a gating claim blind |
-| 6. Review | `requesting-code-review` (the discipline of asking before merging) runs the review panel for the diff (the `code-review` plugin if the user prefers it); add the `architecture-review` / `security-review` lens when the change touches structure or trust boundaries, the `market-analyst` lens for new external dependencies, and `receiving-code-review` when feedback comes back | `reviewer` + `security-auditor` + `architect` in parallel, `critic` to reconcile (`cross-verification` Mode C) |
+| 6. Review | `requesting-code-review` (the discipline of asking before merging) runs the review panel for the diff (the `code-review` plugin if the user prefers it); add the `architecture-review` / `security-review` lens when the change touches structure or trust boundaries, the `market-analyst` lens for new external dependencies, and `receiving-code-review` when feedback comes back | level-gated per `cross-verification`: `reviewer` alone at L1, `reviewer` + the relevant lens at L2, full Mode C with `critic` at L3 |
 | 7. Closing | manual user gate (below) → `finishing-a-development-branch` (merge/PR/rebase options) → this skill: close issue, remove label, branch cleanup, skill version bumps | `deploy-readiness` when the merge deploys; `github-ops` for the mechanical follow-through once you've decided what to run: merge/push, `gh issue close`/label removal, local+remote branch and worktree cleanup |
 
 Every agent dispatch in any phase follows `orchestrating-agents`: the model matches the task (haiku mechanical, sonnet code/research/verification, opus for the judgment agents `architect`, `reviewer`, `security-auditor`, `critic`, `marketing-strategist`), the agent reports in the STATUS/CHANGES/EVIDENCE/FINDINGS/OPEN structure, and the orchestrator verifies the report before the next phase starts.
@@ -48,6 +48,7 @@ Deliberately `feature`, never GitHub's default `enhancement` — the user dislik
 When choosing what to pick up next and priorities aren't otherwise specified by the user, an open `bug` outranks an open `feature`: a broken existing behavior costs more the longer it sits than a not-yet-built feature does. This is a default, not an override of explicit user direction — if the user names what to work on next, that stands regardless of label.
 
 ## Before creating on GitHub
+- **First, is the request still fuzzy?** If the feature's own decisions are not settled — how it works, who can do it, what happens on failure — run `ticket-interrogation` before drafting anything. It interviews the user, attacks the resulting plan, and hands back a title and body to publish here. Drafting a ticket over undecided design is how a ticket gets implemented against assumptions nobody made.
 - Draft the full title + body and show it to the user; wait for confirmation before `gh issue create`, unless they've explicitly said to just create it directly.
 - Run `gh label list` and reuse what exists instead of inventing new labels.
 - Match the repo's existing issue tone/language/section structure if prior issues establish one (check `gh issue list`/`gh issue view` on a couple of examples).
@@ -86,9 +87,9 @@ A remote session usually has the GitHub MCP server and no `gh`. The conventions 
 | backlog and `in progress` check | `gh issue list --label` | `list_issues`, `search_issues` |
 | PR, merge | `gh pr create/merge` | `create_pull_request`, `merge_pull_request` |
 | verify a screenshot exists at a SHA | `gh api .../contents/<path>?ref=<sha>` | `get_file_contents` |
-| `blockedBy` / `blocking`, create a label with a colour, repo settings (delete-branch-on-merge), private-repo check | `gh` flags | **no MCP path**: write the dependency in the ticket body, use an existing label, and hand repo settings to the user as a UI step |
+| `blockedBy` / `blocking`, create a milestone, create or rename a label (`in progress`, `feature`, `enhancement` → `feature`), repo settings (delete-branch-on-merge), private-repo check | `gh` flags | **no MCP path**: write the dependency in the ticket body, use an existing label, and hand repo settings to the user as a UI step |
 
-Pass an explicit slug to `worktree.sh start` (it derives the slug through `gh`) and label the issue through `issue_write` if its warning says labelling failed.
+For the no-MCP row: first try `issue_write` with the label (GitHub may create a missing label on assignment — unverified; if rejected it is a UI step). A milestone has no MCP path: name the batch in the epic issue and ticket titles and hand milestone creation to the user, batched into the stage-1.5/4 handoff. Pass an explicit slug to `worktree.sh start` (it derives the slug through `gh`) and label the issue through `issue_write` if its warning says labelling failed.
 
 ## Milestones — grouping tickets by phase or goal
 When a batch of tickets is drafted for a defined phase or goal (a `project-lifecycle` phase-4 ticket batch — e.g. "MVP" for the initial slice, or a later named batch like "v2"/"Deploy"), create a GitHub milestone for it and assign every ticket in the batch to it, instead of only cross-referencing "ticket #X-#Y" as free text in a ticket body — free text drifts as the backlog grows and isn't queryable (this is exactly what happened on subsplit: `#12` says "derogabile a dopo l'MVP, ticket #2-#11", something only discoverable by reading that one ticket's body, not by asking GitHub).
@@ -129,7 +130,7 @@ The gate stays per ticket by default; these rules keep it from freezing an auton
 - **Parallel tickets** never share a test database that suites reset: one test DB/schema per worktree, or run those suites serially.
 - **Opt-in batched gate**: only if the user explicitly asks for it (e.g. "check the whole milestone at the end"), several tickets of one milestone may share one manual check, recorded as one `## Test info` comment per ticket. Without that explicit opt-in, the per-ticket gate holds.
 - **Remote session**: the container's `localhost` is not reachable by the user, so the gate needs a way for them to see the change. Take the first rung that exists:
-  1. **The project's declared preview** (project `CLAUDE.md` field "Preview"): a per-PR preview deploy (Vercel/Netlify/Cloudflare Pages style, free tier first) — post its URL in the handoff. This is chosen once per project at repo bootstrap (`autonomous-workflow` stage 4.5), not per ticket.
+  1. **The project's declared preview** (project `CLAUDE.md` field "Run / preview"): a per-PR preview deploy (Vercel/Netlify/Cloudflare Pages style, free tier first) — post its URL in the handoff. This is chosen once per project at repo bootstrap (`autonomous-workflow` stage 4.5), not per ticket.
   2. **A tunnel from the container**, only if the environment's network policy allows it (`read_documentation` topic `environment.network`); the URL lives as long as the session, so say so.
   3. **Recorded evidence plus a parked gate**: drive the running app in the container with Playwright (Chromium is preinstalled; a script works when the MCP is absent), commit the screenshots per the Test info convention, and mark the gate **parked: needs local check** with the exact local commands. Carry on with every independent ticket; nothing parked merges until the user confirms.
 
@@ -174,6 +175,7 @@ Once a branch's work has landed on the default branch, delete **both** copies �
 Every skill in this repo carries a semver `version` in its `SKILL.md` frontmatter. When you modify a skill, bump its version (MAJOR = behavior/approach change, MINOR = new section/rule/capability, PATCH = fixes/clarifications) and add a line to the root `CHANGELOG.md` under today's date — in the same commit as the change.
 
 ## Check
+- About to draft a ticket whose requirements are still fuzzy → run `ticket-interrogation` first; this skill publishes what it produces. In `full` mode that is a title plus a six-section body. In `light` mode it is a title plus a three-line summary — publish it as a `bug` ticket, mapping *Problema* to the context and *Da coprire nel test* to an acceptance criterion, and only if the user actually asked for a ticket rather than for the fix itself.
 - Research ticket done → is there a follow-up implementation ticket, or does one need opening?
 - About to run `gh issue create` → did the user see and confirm this exact text?
 - Drafting a ticket that depends on/blocks another, or belongs under an epic → did you wire `--blocked-by`/`--blocking`/`--parent` before showing the draft, not after?

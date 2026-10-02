@@ -1,7 +1,7 @@
 ---
 name: project-lifecycle
-description: Use when starting a new application or project from scratch, or evaluating one end to end — from initial idea through tool/stack and cost decisions, architecture, breaking the work into tickets, implementation, and deploy — not for a single scoped ticket already in flight
-version: 1.8.0
+description: Use when starting a new application or project from scratch, or evaluating one end to end — from initial idea through tool/stack and cost decisions, architecture, breaking the work into tickets, implementation, and deploy — with the user steering each phase (when unattended, `autonomous-workflow` conducts it) — not for a single scoped ticket already in flight
+version: 1.10.1
 model: opus
 effort: high
 ---
@@ -20,12 +20,13 @@ Owns the whole-project arc that sits above a single ticket: an idea becomes a va
 |---|---|---|
 | 1. Idea | `brainstorming` (or `multi-agent-brainstorm` for multi-specialty ideas, with its cross-critique round) — goal, users, constraints, 2-3 shapes | User picks a direction |
 | 2. Tools & cost | `market-analyst` per external tool/API/SaaS/library candidate; state the free-tier and cheapest-viable path explicitly, not just the "best" option | User confirms the stack and its cost profile |
-| 3. Architecture | `principal-engineering-core` for operating principles, `architecture-review` for structural shape (plus `database-design` if persistence is involved); two `architect` agents with different lenses (override one to `model: sonnet`) + a `critic` (`cross-verification` Mode A) | User confirms the shape before any ticket is drafted |
+| 3. Architecture | `principal-engineering-core` for operating principles, `architecture-review` for structural shape (plus `database-design` if persistence is involved); `architect` agents with different lenses (override one to `model: sonnet`) + a `critic` (`cross-verification` Mode A) when the architecture is a real risk; a small, no-spend project gets one `architect` + `critic` | User confirms the shape before any ticket is drafted |
 | 3.5. Design UI/UX (only if the project has a user-facing UI) | Propose it explicitly here, don't wait to be asked — see "Phase 3.5 in detail" below for the five steps it runs; the global CLAUDE.md rule "Never skip a Design UI/UX phase before development" states the failure mode this prevents | User picks **one** named direction out of several (or explicitly defers the phase, e.g. "ship default styling for now") before any UI-bearing ticket is drafted |
-| 4. Tickets | `product-ownership` — one ticket per independently shippable slice, referencing the phase 2/3/3.5 decisions instead of re-deriving them; the whole batch gets its own milestone (e.g. "MVP") per `product-ownership`'s milestone convention, instead of only naming the range in ticket text | Each ticket drafted and confirmed per `product-ownership`'s own gate |
+| R. Repo & CI (not a numbered phase: after phase 1, before phase 4) | the repo is created at the **end of phase 1** (confirmed in the phase-1 gate), with bootstrap `CLAUDE.md` and `docs/decisions.md`; CI and the manual-gate preview mechanism are set up before the first implementation ticket (`autonomous-workflow` stages 1.5 and 4.5) | User confirms repo creation; provider accounts are the user's |
+| 4. Tickets | `ticket-interrogation` first on any slice whose requirements are still fuzzy (it produces the ticket body), then `product-ownership` — one ticket per independently shippable slice, referencing the phase 2/3/3.5 decisions instead of re-deriving them; the whole batch gets its own milestone (e.g. "MVP") per `product-ownership`'s milestone convention, instead of only naming the range in ticket text | Each ticket drafted and confirmed per `product-ownership`'s own gate |
 | 5. Implementation | `product-ownership`'s per-ticket loop (worktree → `writing-plans` if multi-step → direct execution / `test-driven-development` → `test-verification` → `requesting-code-review` → manual gate → `finishing-a-development-branch`) | Same ticket-level gates, unchanged |
 | 6. Deploy | `deploy-readiness` — cheapest viable hosting path first (see cost rule); `security-review` before anything becomes publicly reachable (secrets, auth, exposed endpoints); `release-auditor` + `security-auditor` + `verifier` panel; smoke test on the real deploy target, not just locally | User confirms go/no-go, then the live deploy |
-| 7. Launch | `product-marketing-strategist` (+ `brand-strategist`): positioning, landing copy, launch channels; `marketing-strategist` agent drafts 2+ variants, `critic` red-teams them (`cross-verification` Mode F) | User approves everything before it is published or sent |
+| 7. Launch (only if a public launch was asked for) | `product-marketing-strategist` (+ `brand-strategist`): positioning, landing copy, launch channels; `marketing-strategist` agent drafts 2+ variants, `critic` red-teams them (`cross-verification` Mode F) | User approves everything before it is published or sent |
 
 ## When the project's GitHub repo is created
 Whenever this skill creates the project's repository (or picks up a project whose repo it just created), turn on **Automatically delete head branches** in the same step, before the first ticket branch exists:
@@ -34,6 +35,7 @@ Whenever this skill creates the project's repository (or picks up a project whos
 gh repo edit <owner>/<repo> --delete-branch-on-merge
 ```
 
+- **Commit the project `CLAUDE.md` in the first commit**, built from `templates/project-CLAUDE-bootstrap.md` (the attach-the-skills-repo section plus the "Run / preview" field). A project created without it runs every later remote session with none of these rules.
 - GitHub has no account- or org-wide default for it, and template repos copy files, not settings: it must be set per repo, at creation, or it silently stays off.
 - In a remote session without `gh` (the GitHub MCP server has no repo-settings tool), hand the user the one-click path instead — *Settings → General → Pull Requests → Automatically delete head branches* — and don't consider repo setup done until they confirm it.
 - It only deletes the head branch of a PR that is **merged**. Branches merged without a PR (fast-forward pushes) and PRs closed unmerged (superseded) still need `finishing-a-development-branch` / `worktree-manager` cleanup.
