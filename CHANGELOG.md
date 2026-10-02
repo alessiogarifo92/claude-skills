@@ -14,6 +14,8 @@ modifica alla skill.
 
 ## 2026-10-02 (4)
 
+- (senza versione) `agents/Explore.md`, `verifier.md`, `release-auditor.md`: `description` tra virgolette — conteneva ": " non quotato, YAML non valido per un parser rigoroso (un agent con frontmatter invalido rischia di non caricarsi). `validate.py` ora fa il parse YAML rigoroso (PyYAML, installato in CI).
+
 - Portato su `main` il branch `new-skill-setup-4zgekd` (5 commit del 2 settembre mai mergiati, in conflitto con 6 file): **ticket-interrogation 1.3.0** (skill opus: intervista, fase adversarial, corpo del ticket; ora con riga `Run on` e frontmatter `model: opus`), più i rimandi reciproci già scritti in brainstorming 1.2.0, direct-execution 1.4.0, orchestrating-agents 2.2.0 (fase 1: mai delegata perché richiede AskUserQuestion), product-ownership 1.20.0 (description, handoff e riga Check), project-lifecycle 1.9.0 (fase 4), writing-plans 1.2.0, writing-skills 1.5.0 (regola "sistema il dato prima di aggiungere un controllo"). Le versioni sono state rialzate oltre quelle del ramo di settembre e di quelle di questo giro per evitare collisioni. autonomous-workflow 1.2.0: lo stadio 4 passa da `ticket-interrogation` quando le decisioni sono ancora aperte.
 
 ## 2026-10-02 (3)

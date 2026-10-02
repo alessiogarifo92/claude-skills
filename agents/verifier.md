@@ -1,6 +1,6 @@
 ---
 name: verifier
-description: Independent verifier — re-derives a claim from scratch without trusting the author's report: re-runs the tests, reproduces the bug or the fix, checks the diff against the stated scope, and confirms numbers. Use as the verification gate for any code-changing or research report on non-trivial work, and for blind second runs of a check. Read-only on source; reports a verdict.
+description: "Independent verifier — re-derives a claim from scratch without trusting the author's report: re-runs the tests, reproduces the bug or the fix, checks the diff against the stated scope, and confirms numbers. Use as the verification gate for any code-changing or research report on non-trivial work, and for blind second runs of a check. Read-only on source; reports a verdict."
 model: sonnet
 tools: Bash, Read, Glob, Grep, mcp__playwright__*, Skill
 effort: medium
