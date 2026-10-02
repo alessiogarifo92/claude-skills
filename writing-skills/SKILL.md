@@ -1,10 +1,14 @@
 ---
 name: writing-skills
 description: Use when creating a new skill, editing an existing one, or renaming/consolidating skills in this repo, to decide whether it's warranted and verify it actually works before treating it as done
-version: 1.2.0
+version: 1.4.0
+model: opus
+effort: medium
 ---
 
 # Writing Skills
+
+**Run on:** opus · effort medium — authoring conventions and verification.
 
 Author skills that match this repo's own conventions, and verify each one works before calling it done — scaled to what the skill actually is, not a fixed ritual.
 
@@ -16,6 +20,7 @@ Author skills that match this repo's own conventions, and verify each one works 
 
 ## Format — match the repo's existing skills
 - Frontmatter: `name` (letters/numbers/hyphens only), `description` starting with "Use when..." stating only *triggers* — never summarize the skill's own process, or agents will follow the summary instead of reading the content — and a semver `version`
+- Right under the title: a `**Run on:** <opus|sonnet|haiku|main> · effort <low|medium|high> — <reason>` line (what model and effort should apply this skill; `README.md` lists them all). An `opus` skill also carries `model: opus` and the same `effort:` in its frontmatter; sonnet/haiku/main skills never set `model`/`effort` (an override lasts the rest of the turn, so a downward one would trap a long autonomous run on a weaker model) — `validate.py` enforces both
 - Body: short overview, a `**Pairs with:**` line cross-referencing related skills by name, a `When this applies` / `NOT for` split, the core technique as steps/table/rules, a `Common mistakes` or red-flags table, and a `Boundary` line stating what this skill does NOT own
 
 ## Test before treating it as done — scaled to skill type
@@ -31,6 +36,8 @@ Author skills that match this repo's own conventions, and verify each one works 
 - Renaming a skill means fixing every cross-reference to its old name repo-wide (`grep -rl old-name`), not just the file itself.
 - Adding or renaming a skill means re-checking the three routing tables that sequence skills — `product-ownership`'s "End-to-end workflow and handoffs", `orchestrating-agents`' workflow phases, and `project-lifecycle`'s phases — in the same commit. A new skill nothing routes to is invisible.
 - Cross-references go both ways: if skill A names B as its next/previous step, B should name A back. One-way links leave the entry point unable to send anyone onward.
+- Run `python3 scripts/validate.py` before committing: it checks frontmatter, versions, `Run on` lines, agent frontmatter, `Pairs with` cross-references and the README matrix. CI runs the same script.
+- Adding a skill or agent also means a row in `README.md`'s model matrix and, if it is a stage of the workflow, a row in `autonomous-workflow`'s stage map.
 - Don't skip verification because "it's just a reference" or "a simple addition" — an untested skill's gaps cost more to find later than to test now.
 
 ## Boundary

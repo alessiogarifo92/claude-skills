@@ -1,10 +1,12 @@
 ---
 name: docs-and-specs
 description: Use when writing a feature spec, ADR, implementation plan, rollout or migration note, or post-incident summary that needs to be concise and structured for future maintainers
-version: 1.0.0
+version: 1.0.1
 ---
 
 # Docs and Specs
+
+**Run on:** sonnet · effort medium — structured writing from decided content.
 
 Write concise engineering documentation that improves implementation quality.
 

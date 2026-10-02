@@ -1,10 +1,14 @@
 ---
 name: writing-plans
 description: Use when you have a spec or confirmed requirements for a multi-step task and need to sequence it into a written plan before touching code — turning confirmed intent into ordered, checkable steps
-version: 1.0.0
+version: 1.1.0
+model: opus
+effort: high
 ---
 
 # Writing Plans
+
+**Run on:** opus · effort high — sequencing and independence decisions.
 
 Turn confirmed intent into an ordered, checkable sequence before any code is written. This is the sequencing discipline; `docs-and-specs` is the document format the plan gets written in.
 

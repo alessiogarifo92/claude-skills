@@ -1,15 +1,17 @@
 ---
 name: product-ownership
 description: Use when drafting or creating a GitHub issue/ticket, researching external sources needed to write one, deciding whether something is a bug/research/implementation ticket, starting or finishing implementation work on a ticket, about to push or merge a completed change, or cleaning up branches after a PR merges or a commit supersedes it
-version: 1.16.0
+version: 1.18.1
 ---
 
 # Product Ownership
 
+**Run on:** sonnet · effort medium — ticket hygiene and lifecycle; opus when drafting a ticket from a vague problem.
+
 Own the lifecycle of a work item end to end: from a raw problem report to a grounded ticket, through to the branch cleanup once the work has actually shipped. Grounding tickets in the real code/data is expected baseline behavior, not this skill's job — this skill is about the parts that get skipped without a deliberate habit: separating ticket types, confirming before publishing, reusing repo conventions, and closing the loop on branches.
 
 ## End-to-end workflow and handoffs
-This skill is the entry and exit point of the task lifecycle; the custom chain (brainstorming → writing-plans → test-driven-development → requesting/receiving-code-review → finishing-a-development-branch) covers the middle — see `project-lifecycle` for the whole-project version of this table when the work spans multiple tickets, not just one. Who does what, per phase:
+`autonomous-workflow` conducts this table end to end when the user wants the work run unattended. This skill is the entry and exit point of the task lifecycle; the custom chain (brainstorming → writing-plans → test-driven-development → requesting/receiving-code-review → finishing-a-development-branch) covers the middle — see `project-lifecycle` for the whole-project version of this table when the work spans multiple tickets, not just one. Who does what, per phase:
 
 | Phase | Process skill | Agent |
 |---|---|---|
@@ -18,11 +20,11 @@ This skill is the entry and exit point of the task lifecycle; the custom chain (
 | 2. Grounding / ticket | this skill (ticket type, draft + user confirmation, existing labels); a ticket that adopts an external dependency cites the `market-analyst` verdict | `researcher` for the ticket's external sources; `Explore` to verify in the code that the problem is where you think |
 | 3. Pickup | this skill (`in progress` label, always) → `worktree-manager` **only once code work is about to start** (not for research/drafting) → `writing-plans` for multi-step work | `Explore` to locate the critical files before planning; `github-ops` to create/list the ticket's worktree and branch via the repo's own convention, called at the code-work point, not at pickup |
 | 4. Implementation | **Direct execution in the main session by default** (`direct-execution`) + `test-driven-development`, plus the relevant domain skill; `subagent-driven-development`/`executing-plans` only for genuinely independent parallel workstreams or plans spanning sessions; a research ticket delivers a report instead (see Ticket types) | `implementer` / `quick-debugger` / `refactor-optimizer` for one whole scoped piece, per `orchestrating-agents`; `researcher` writes the report on research tickets |
-| 5. Verification | `test-verification` picks the checks and enforces evidence before "done" | `test-runner` runs suites/lint/typecheck and reports only the outcome |
-| 6. Review | `requesting-code-review` (the discipline of asking before merging) drives the `code-review` plugin for the diff itself; add the `architecture-review` / `security-review` lens when the change touches structure or trust boundaries, the `market-analyst` lens for new external dependencies, and `receiving-code-review` when feedback comes back | reviewer subagent |
-| 7. Closing | manual user gate (below) → `finishing-a-development-branch` (merge/PR/rebase options) → this skill: close issue, remove label, branch cleanup, skill version bumps | `github-ops` for the mechanical follow-through once you've decided what to run: merge/push, `gh issue close`/label removal, local+remote branch and worktree cleanup |
+| 5. Verification | `test-verification` picks the checks and enforces evidence before "done" | `test-runner` runs suites/lint/typecheck and reports only the outcome; `verifier` re-derives a gating claim blind |
+| 6. Review | `requesting-code-review` (the discipline of asking before merging) runs the review panel for the diff (the `code-review` plugin if the user prefers it); add the `architecture-review` / `security-review` lens when the change touches structure or trust boundaries, the `market-analyst` lens for new external dependencies, and `receiving-code-review` when feedback comes back | `reviewer` + `security-auditor` + `architect` in parallel, `critic` to reconcile (`cross-verification` Mode C) |
+| 7. Closing | manual user gate (below) → `finishing-a-development-branch` (merge/PR/rebase options) → this skill: close issue, remove label, branch cleanup, skill version bumps | `deploy-readiness` when the merge deploys; `github-ops` for the mechanical follow-through once you've decided what to run: merge/push, `gh issue close`/label removal, local+remote branch and worktree cleanup |
 
-Every agent dispatch in any phase follows `orchestrating-agents`: the model matches the task (haiku mechanical, sonnet code/research), the agent reports in the STATUS/CHANGES/EVIDENCE/FINDINGS/OPEN structure, and the orchestrator verifies the report before the next phase starts.
+Every agent dispatch in any phase follows `orchestrating-agents`: the model matches the task (haiku mechanical, sonnet code/research/verification, opus for the judgment agents `architect`, `reviewer`, `security-auditor`, `critic`, `marketing-strategist`), the agent reports in the STATUS/CHANGES/EVIDENCE/FINDINGS/OPEN structure, and the orchestrator verifies the report before the next phase starts.
 
 The table stays at phase level on purpose: domain skills are a category ("the relevant domain skill"), not an exhaustive list. Rationale and diagram live in the decision record `docs/reports/2026-07-17-ticket-4-workflow-skills-agents.md` (#4).
 
@@ -74,6 +76,20 @@ GitHub has native issue-relationship fields — `blockedBy`/`blocking` (sequenti
   Re-check the shape on a future `gh` version before trusting this blind (`gh issue list --json blockedBy --jq '.[0]'` on one issue with a known relationship) — GitHub's dependency feature is recent and the JSON shape could still change.
 - Every open ticket that doesn't show up in that list has no live blocker — those are the ones safe to hand out for parallel work (parallel worktrees/sessions, or just parallel priority) at the same time.
 
+## Without `gh`: the GitHub MCP equivalents
+A remote session usually has the GitHub MCP server and no `gh`. The conventions above stay; only the instrument changes:
+
+| Need | `gh` | GitHub MCP (`mcp__github__*`, or `mcp__github-local__*`) |
+|---|---|---|
+| create / edit issue, labels, milestone, close with comment | `gh issue create/edit/close` | `issue_write`, `add_issue_comment` |
+| epic parent / sub-issue | `--parent`, `--add-sub-issue` | `sub_issue_write` |
+| backlog and `in progress` check | `gh issue list --label` | `list_issues`, `search_issues` |
+| PR, merge | `gh pr create/merge` | `create_pull_request`, `merge_pull_request` |
+| verify a screenshot exists at a SHA | `gh api .../contents/<path>?ref=<sha>` | `get_file_contents` |
+| `blockedBy` / `blocking`, create a label with a colour, repo settings (delete-branch-on-merge), private-repo check | `gh` flags | **no MCP path**: write the dependency in the ticket body, use an existing label, and hand repo settings to the user as a UI step |
+
+Pass an explicit slug to `worktree.sh start` (it derives the slug through `gh`) and label the issue through `issue_write` if its warning says labelling failed.
+
 ## Milestones — grouping tickets by phase or goal
 When a batch of tickets is drafted for a defined phase or goal (a `project-lifecycle` phase-4 ticket batch — e.g. "MVP" for the initial slice, or a later named batch like "v2"/"Deploy"), create a GitHub milestone for it and assign every ticket in the batch to it, instead of only cross-referencing "ticket #X-#Y" as free text in a ticket body — free text drifts as the backlog grows and isn't queryable (this is exactly what happened on subsplit: `#12` says "derogabile a dopo l'MVP, ticket #2-#11", something only discoverable by reading that one ticket's body, not by asking GitHub).
 
@@ -94,7 +110,7 @@ A step that only exists as a phrase in a skill, disconnected from the action tha
 ## Manual user check — the gate before any merge or push
 Automated tests passing is necessary but NOT sufficient to merge or push. After implementation and tests, and before any `git push`, branch merge, or PR merge:
 
-1. Make the change live and reachable in the browser: dev stack running (`docker compose up -d` in this repo — frontend at http://localhost:3000, API docs at http://localhost:8010/docs) with the change active. Walk the page yourself first with the `playwright` MCP server — navigate, perform the action, read the console — to confirm the handoff isn't broken before you hand it over.
+1. Make the change live and reachable in the browser: the project's dev stack running (its documented run command and URLs — project `CLAUDE.md`, the `run` skill, or project memory; never assume another project's ports) with the change active. Walk the page yourself first with the `playwright` MCP server — navigate, perform the action, read the console — to confirm the handoff isn't broken before you hand it over.
 2. Tell the user exactly what to check manually, in the three-part split `test-verification` defines: what you already verified in the browser (so they don't repeat it), what needs their eyes (absolute URL, the action, a falsifiable expected result), and what you could not verify and why.
 3. Stop and wait for their explicit confirmation that it works. If they report a problem, fix it and repeat this gate from step 1.
 
@@ -106,6 +122,16 @@ If the change has no browser-observable surface, say so explicitly and tell the 
 When both hold and the user has asked for the merge, proceed without waiting. The wait is not dropped, it is converted: the "how to verify" becomes mandatory and goes **in writing on the ticket** (the closing comment), not just in chat, so it survives the session and is there when the user next pulls.
 
 When either condition fails, the stop-and-wait applies before merge/push exactly as it does for a browser change. CI config, database migrations, deploy scripts and infrastructure-as-code all have no browser surface and all stay inside the gate — a CI config is in fact verifiable *on the PR branch*, which is better evidence than a human's confirmation, so verify it there rather than skipping.
+
+### Dependent tickets, parallel tickets and unattended runs
+The gate stays per ticket by default; these rules keep it from freezing an autonomous run:
+- **Dependent ticket**: it may branch from its blocker's unmerged branch (stacked branch) so work continues while the blocker waits at its gate. It cannot merge to the default branch before the blocker does, and its own manual gate still applies at merge. If the blocker changes, rebase the stacked branch onto it.
+- **Parallel tickets** never share a test database that suites reset: one test DB/schema per worktree, or run those suites serially.
+- **Opt-in batched gate**: only if the user explicitly asks for it (e.g. "check the whole milestone at the end"), several tickets of one milestone may share one manual check, recorded as one `## Test info` comment per ticket. Without that explicit opt-in, the per-ticket gate holds.
+- **Remote session**: the container's `localhost` is not reachable by the user, so the gate needs a way for them to see the change. Take the first rung that exists:
+  1. **The project's declared preview** (project `CLAUDE.md` field "Preview"): a per-PR preview deploy (Vercel/Netlify/Cloudflare Pages style, free tier first) — post its URL in the handoff. This is chosen once per project at repo bootstrap (`autonomous-workflow` stage 4.5), not per ticket.
+  2. **A tunnel from the container**, only if the environment's network policy allows it (`read_documentation` topic `environment.network`); the URL lives as long as the session, so say so.
+  3. **Recorded evidence plus a parked gate**: drive the running app in the container with Playwright (Chromium is preinstalled; a script works when the MCP is absent), commit the screenshots per the Test info convention, and mark the gate **parked: needs local check** with the exact local commands. Carry on with every independent ticket; nothing parked merges until the user confirms.
 
 ### Recording the check: "Test info" section on the ticket
 The walkthrough in step 1 gets written into the ticket itself, not just described in chat — otherwise the evidence disappears once the session ends.

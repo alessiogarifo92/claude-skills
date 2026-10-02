@@ -1,10 +1,12 @@
 ---
 name: go-backend
 description: Use when writing or reviewing Go service code - goroutine lifecycle, context propagation and cancellation, channel ownership, error handling, or interface boundaries
-version: 1.0.0
+version: 1.0.1
 ---
 
 # Go Backend
+
+**Run on:** sonnet · effort high — writing and reviewing code.
 
 Review and design Go code for correctness, concurrency safety, and simplicity.
 

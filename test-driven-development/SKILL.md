@@ -1,10 +1,12 @@
 ---
 name: test-driven-development
 description: Use when implementing any feature or bugfix in a codebase with an existing test setup, before writing implementation code, to decide whether a test should be written first and to follow red-green-refactor instead of writing tests after the fact
-version: 1.0.0
+version: 1.0.1
 ---
 
 # Test-Driven Development
+
+**Run on:** sonnet · effort medium — red-green-refactor discipline.
 
 Write the test that describes the intended behavior before the code that produces it, whenever the codebase has a test setup capable of running it.
 

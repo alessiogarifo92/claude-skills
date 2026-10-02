@@ -1,10 +1,14 @@
 ---
 name: brainstorming
 description: Use when starting new creative work with fuzzy requirements — a new feature, product idea, app, or UI — before any implementation plan or code exists, to surface intent, constraints, and tradeoffs rather than jumping straight to a solution shape
-version: 1.0.0
+version: 1.1.0
+model: opus
+effort: high
 ---
 
 # Brainstorming
+
+**Run on:** opus · effort high — framing errors propagate to every later phase.
 
 Before committing to a solution shape, understand the problem shape. This is the requirement-discovery step for genuinely open-ended work.
 

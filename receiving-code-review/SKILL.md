@@ -1,10 +1,14 @@
 ---
 name: receiving-code-review
 description: Use when receiving code review feedback, before implementing any suggested change, to verify it technically rather than agreeing performatively or blindly applying it
-version: 1.0.0
+version: 1.1.0
+model: opus
+effort: medium
 ---
 
 # Receiving Code Review
+
+**Run on:** opus · effort medium — judging feedback technically, not applying it blindly.
 
 A review comment is a claim, not a fact — verify it before acting, exactly like `orchestrating-agents`' verification gate treats a subagent's report.
 

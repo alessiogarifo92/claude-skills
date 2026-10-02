@@ -1,10 +1,12 @@
 ---
 name: test-verification
 description: Use when deciding what to run to verify a code change - choosing the narrowest meaningful set of tests, lint, type checks, or manual smoke checks for backend, frontend, database, or API changes - and before claiming any change is done, fixed, or passing
-version: 1.4.0
+version: 1.4.1
 ---
 
 # Test Verification
+
+**Run on:** sonnet · effort medium — choosing checks; `test-runner` (haiku) runs them.
 
 Select the narrowest meaningful verification set first, then expand if justified.
 

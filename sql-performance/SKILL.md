@@ -1,10 +1,12 @@
 ---
 name: sql-performance
 description: Use when a query is slow, a query plan looks wrong, or you're adding an index, join, or pagination and need to reason about planner behavior, selectivity, or locking
-version: 1.0.0
+version: 1.0.1
 ---
 
 # SQL Performance
+
+**Run on:** sonnet · effort high — planner reasoning on a concrete query.
 
 Optimize queries for correctness first, then performance.
 

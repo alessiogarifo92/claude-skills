@@ -1,12 +1,14 @@
 ---
 name: direct-execution
 description: Use when a task is linear and single-focus (one bug, one feature, one file, dependent steps) and you are tempted to orchestrate it — split it into a task list, dispatch subagents per step, or enter a planning workflow — instead of just doing it.
-version: 1.2.0
+version: 1.3.0
 ---
 
 # Direct Execution
 
-**Pairs with:** `orchestrating-agents` governs HOW to delegate once this skill's tree says delegation buys something. The escalation targets below (`brainstorming`, `writing-plans`, `executing-plans`, `subagent-driven-development`) all defer to this tree first — they are what "escalate" means, not alternatives to it.
+**Run on:** main · effort medium — a decision rule applied in the current session, any model.
+
+**Pairs with:** `autonomous-workflow` (end-to-end conductor), `cross-verification` (parallel compare for high stakes), `orchestrating-agents` governs HOW to delegate once this skill's tree says delegation buys something. The escalation targets below (`brainstorming`, `writing-plans`, `executing-plans`, `subagent-driven-development`) all defer to this tree first — they are what "escalate" means, not alternatives to it.
 
 ## Overview
 
@@ -41,6 +43,7 @@ When a single piece of work is well-scoped but you want it off the main context,
 - `test-runner` (haiku) — run a suite, report outcome only
 - `researcher` (sonnet) — external facts/docs; `Explore` (haiku) — locate things in the codebase
 - `github-ops` (haiku) — mechanical git/GitHub follow-through, decisions already made
+- `reviewer`, `security-auditor`, `architect`, `critic` (opus, read-only) — independent judgment on a diff, a trust boundary, a design, a proposal; `verifier` (sonnet) — independent re-run of a claim; `marketing-strategist` (opus), `release-auditor` (sonnet) — copy and release readiness
 
 Every dispatch follows the `orchestrating-agents` skill: model per task, dispatch brief, structured report (STATUS/CHANGES/EVIDENCE/FINDINGS/OPEN), and the orchestrator's verification gate before any next phase.
 
@@ -51,7 +54,8 @@ Escalate only when the task genuinely needs decisions: architecture choices, unc
 - unclear *what* to build → `brainstorming` (or `multi-agent-brainstorm` when the idea spans UI/UX + architecture + cost at once)
 - intent confirmed, many dependent steps → `writing-plans`, then `executing-plans` to run it
 - genuinely independent workstreams → `subagent-driven-development`, per `orchestrating-agents`
-- whole project, not one task → `project-lifecycle`
+- whole project, not one task → `project-lifecycle`; the user wants it run end to end or unattended → `autonomous-workflow`
+- the work is linear but the **stakes are high** (architecture, security, data migration, deploy, public copy) → stay direct for the work itself and add `cross-verification` for the check — more agents on the *verification*, not on the steps
 
 ## Red flags — you are about to over-orchestrate
 

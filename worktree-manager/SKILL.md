@@ -1,8 +1,10 @@
 ---
 name: worktree-manager
 description: Use when actual code work (not research/drafting) is about to start on a GitHub issue in any repo, when checking which worktrees/sessions are active, or after a branch merges — creates/lists/cleans per-ticket git worktrees so parallel Claude Code sessions never write to the same branch. Same convention across every project.
-version: 1.5.1
+version: 1.5.2
 ---
+
+**Run on:** haiku · effort low — mechanical script wrapper; `github-ops` can run it.
 
 Every Claude Code session that's about to write or modify code for a ticket gets its own worktree and branch. Never commit ticket work directly on the default branch in the primary checkout, and never reuse another session's worktree.
 

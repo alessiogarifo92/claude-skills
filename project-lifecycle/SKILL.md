@@ -1,26 +1,31 @@
 ---
 name: project-lifecycle
 description: Use when starting a new application or project from scratch, or evaluating one end to end — from initial idea through tool/stack and cost decisions, architecture, breaking the work into tickets, implementation, and deploy — not for a single scoped ticket already in flight
-version: 1.6.0
+version: 1.8.0
+model: opus
+effort: high
 ---
 
 # Project Lifecycle
 
+**Run on:** opus · effort high — phase gates and decisions.
+
 Owns the whole-project arc that sits above a single ticket: an idea becomes a validated stack, a sound architecture, a set of tickets, and eventually a deployed app. `product-ownership` owns each ticket's lifecycle once it exists; this skill decides what tickets should exist and in what order.
 
-**Pairs with:** `brainstorming` (phase 1) or `multi-agent-brainstorm` when the idea spans specialties; `market-analyst` (phase 2); `principal-engineering-core` + `architecture-review` (phase 3); `design`, plus the external `frontend-design` / `taste` and `brand-strategist` (phase 3.5); `product-ownership` (phases 4-6, per ticket); `orchestrating-agents` for any parallel work within a phase.
+**Pairs with:** `brainstorming` (phase 1) or `multi-agent-brainstorm` when the idea spans specialties; `market-analyst` (phase 2); `principal-engineering-core` + `architecture-review` (phase 3); `design`, plus the external `frontend-design` / `taste` and `brand-strategist` (phase 3.5); `product-ownership` (phases 4-6, per ticket); `orchestrating-agents` for any parallel work within a phase; `autonomous-workflow` to run the whole table unattended (it owns the gates' autonomy rules); `cross-verification` for the phase 1/2/3/3.5/6 panels; `deploy-readiness` (phase 6); `product-marketing-strategist` + `brand-strategist` (phase 7).
 
 ## Phases
 
 | Phase | Skill | Gate before next phase |
 |---|---|---|
-| 1. Idea | `brainstorming` (or `multi-agent-brainstorm` for multi-specialty ideas) — goal, users, constraints, 2-3 shapes | User picks a direction |
+| 1. Idea | `brainstorming` (or `multi-agent-brainstorm` for multi-specialty ideas, with its cross-critique round) — goal, users, constraints, 2-3 shapes | User picks a direction |
 | 2. Tools & cost | `market-analyst` per external tool/API/SaaS/library candidate; state the free-tier and cheapest-viable path explicitly, not just the "best" option | User confirms the stack and its cost profile |
-| 3. Architecture | `principal-engineering-core` for operating principles, `architecture-review` for structural shape (plus `database-design` if persistence is involved) | User confirms the shape before any ticket is drafted |
+| 3. Architecture | `principal-engineering-core` for operating principles, `architecture-review` for structural shape (plus `database-design` if persistence is involved); two `architect` agents with different lenses (override one to `model: sonnet`) + a `critic` (`cross-verification` Mode A) | User confirms the shape before any ticket is drafted |
 | 3.5. Design UI/UX (only if the project has a user-facing UI) | Propose it explicitly here, don't wait to be asked — see "Phase 3.5 in detail" below for the five steps it runs; the global CLAUDE.md rule "Never skip a Design UI/UX phase before development" states the failure mode this prevents | User picks **one** named direction out of several (or explicitly defers the phase, e.g. "ship default styling for now") before any UI-bearing ticket is drafted |
 | 4. Tickets | `product-ownership` — one ticket per independently shippable slice, referencing the phase 2/3/3.5 decisions instead of re-deriving them; the whole batch gets its own milestone (e.g. "MVP") per `product-ownership`'s milestone convention, instead of only naming the range in ticket text | Each ticket drafted and confirmed per `product-ownership`'s own gate |
 | 5. Implementation | `product-ownership`'s per-ticket loop (worktree → `writing-plans` if multi-step → direct execution / `test-driven-development` → `test-verification` → `requesting-code-review` → manual gate → `finishing-a-development-branch`) | Same ticket-level gates, unchanged |
-| 6. Deploy | Cheapest viable hosting path first (see cost rule); `security-review` before anything becomes publicly reachable (secrets, auth, exposed endpoints); manual verification on the real deploy target, not just locally | User confirms the live deploy |
+| 6. Deploy | `deploy-readiness` — cheapest viable hosting path first (see cost rule); `security-review` before anything becomes publicly reachable (secrets, auth, exposed endpoints); `release-auditor` + `security-auditor` + `verifier` panel; smoke test on the real deploy target, not just locally | User confirms go/no-go, then the live deploy |
+| 7. Launch | `product-marketing-strategist` (+ `brand-strategist`): positioning, landing copy, launch channels; `marketing-strategist` agent drafts 2+ variants, `critic` red-teams them (`cross-verification` Mode F) | User approves everything before it is published or sent |
 
 ## When the project's GitHub repo is created
 Whenever this skill creates the project's repository (or picks up a project whose repo it just created), turn on **Automatically delete head branches** in the same step, before the first ticket branch exists:
@@ -77,6 +82,8 @@ Where the project already has a component library, push it first: `/design-sync`
 Every phase that adds a tool, service, or hosting target restates: what it costs today, what it costs at realistic 10x scale, and whether a free/cheaper path exists that doesn't compromise the actual requirement — per `market-analyst`. Default recommendation is the cheapest option that meets the constraint, not the most capable one available.
 
 ## Check
+- A deploy without `deploy-readiness` (pinned SHA, rollback, smoke test on the live target)? Back up.
+- Launch copy published before the deploy was verified, or without the user's approval? Stop — launch is the last phase.
 - Idea phase skipped straight to code? Back up — requirements were never confirmed.
 - Phase 3.5 produced exactly one direction, or a description in prose instead of visuals? That's not a choice — back up and give the user something to compare.
 - Two "directions" that differ only in palette? One direction wearing two coats. Redo one of them with a different layout and type thesis.
