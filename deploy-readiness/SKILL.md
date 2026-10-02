@@ -1,7 +1,7 @@
 ---
 name: deploy-readiness
-description: Use when a project or change is about to be deployed or made publicly reachable — choosing the hosting target, preparing secrets and config, migrations and rollback, the go/no-go check, post-deploy smoke tests, and the recurring cost actually billed
-version: 1.1.0
+description: Use when a project or change is about to be deployed or made publicly reachable — choosing the hosting target, preparing secrets and config, migrations and rollback, the go/no-go check, post-deploy smoke tests, and the recurring cost actually billed — the deploy itself, not the earlier choice of stack or hosting (`market-analyst`)
+version: 1.1.2
 model: opus
 effort: high
 ---
@@ -12,7 +12,7 @@ effort: high
 
 Deploy is where an unverified assumption becomes an incident. This skill makes the last gate explicit: a pinned commit, a checked rollback, a smoke test on the real target, and a user go/no-go.
 
-**Pairs with:** `project-lifecycle` phase 6 (the entry), `security-review` (mandatory before anything is publicly reachable), `market-analyst` (hosting cost), `database-design` (migration rollout), `test-verification` (smoke tests are evidence, not claims), `cross-verification` Mode D (the panel for this gate), `finishing-a-development-branch` (merge before deploy), `product-marketing-strategist` (launch comes after a verified deploy).
+**Pairs with:** `project-lifecycle`'s Deploy phase (the entry), `security-review` (mandatory before anything is publicly reachable), `market-analyst` (hosting cost), `database-design` (migration rollout), `test-verification` (smoke tests are evidence, not claims), `cross-verification` Mode D (the panel for this gate), `finishing-a-development-branch` (merge before deploy), `product-marketing-strategist` (launch comes after a verified deploy).
 
 ## When this applies
 - First deploy of a project, a release to production, a migration that runs against live data, a change that opens a new public endpoint
@@ -24,10 +24,11 @@ Deploy is where an unverified assumption becomes an incident. This skill makes t
 3. **Config and secrets**: every variable listed per environment; none in the repo or history; the deploy target holds them. Document which variables a project needs (this also protects remote sessions, per the global `.mcp.json` rule).
 4. **Data**: migrations reversible or expand/contract; order of deploy vs migration stated; a backup or restore point taken before a migration that cannot be undone.
 5. **Rollback**: name the previous artifact and the exact command or button; confirm it is data-compatible. No rollback path means the deploy is a Level-3 decision for the user.
-6. **Audit**: dispatch `release-auditor` + `security-auditor` + `verifier` in parallel per `cross-verification` Mode D; resolve blockers; `critic` gives the go/no-go reading.
+6. **Audit**: dispatch `release-auditor` + `security-auditor` + `verifier` in parallel per `cross-verification` Mode D; resolve blockers; `critic` gives the go/no-go reading. At this point there is no live target yet: the `verifier` replays CI/staging checks, and the live smoke test happens at step 9.
 7. **User go/no-go**: present SHA, cost, blockers/follow-ups, rollback, smoke list, in one self-contained message. Deploying, tagging, DNS changes and spend need the user's explicit yes — standing approval for a ticket does not cover them.
-8. **Smoke test on the real target** (not only locally): run the list, record outputs (`## Test info` convention from `product-ownership` where a ticket exists). A failed smoke test triggers the rollback decision immediately.
-9. **After**: restate the recurring cost actually billed vs the estimate; confirm error reporting and logs are live; check the public-facing basics before launch — analytics/measurement in place, privacy policy and terms where personal data is collected (GDPR for EU users), cookie consent if tracking, an observation window and alert threshold after the deploy, and the store-submission path for a mobile app — then hand to launch (`product-marketing-strategist`) only now.
+8. **Deploy the pinned SHA** (main session; provider credentials come from the environment's secrets or the user — `read_documentation` topic `environment.secrets` in a remote session — never from the repo). Take the pre-deploy restore point first.
+9. **Smoke test on the real target** (not only locally): run the list, record outputs (`## Test info` convention from `product-ownership` where a ticket exists). A failed smoke test triggers the rollback decision immediately.
+10. **After**: restate the recurring cost actually billed vs the estimate; confirm error reporting and logs are live; check the public-facing basics before launch — analytics/measurement in place, privacy policy and terms where personal data is collected (GDPR for EU users), cookie consent if tracking, an observation window and alert threshold after the deploy, and the store-submission path for a mobile app — then hand to launch (`product-marketing-strategist`) only now.
 
 ## Common mistakes
 | Mistake | Fix |

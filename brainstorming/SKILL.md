@@ -1,7 +1,7 @@
 ---
 name: brainstorming
-description: Use when starting new creative work with fuzzy requirements — a new feature, product idea, app, or UI — before any implementation plan or code exists, to surface intent, constraints, and tradeoffs rather than jumping straight to a solution shape
-version: 1.2.0
+description: Use when starting new creative work with fuzzy requirements — a new feature, product idea, app, or UI — before any implementation plan or code exists — including a request for several visual/UI directions to compare (use `design`, per `project-lifecycle` phase 3.5), to surface intent, constraints, and tradeoffs rather than jumping straight to a solution shape
+version: 1.2.1
 model: opus
 effort: high
 ---

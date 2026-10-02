@@ -1,7 +1,7 @@
 ---
 name: requesting-code-review
-description: Use before merging or completing any non-trivial feature or fix, to decide whether a review pass is warranted and request one, rather than moving straight from tests passing to merge
-version: 1.2.0
+description: Use before merging or completing any non-trivial feature or fix, to decide whether a review pass is warranted and request one, rather than moving straight from tests passing to merge (a change touching a trust boundary also gets `security-review`)
+version: 1.2.1
 model: opus
 effort: high
 ---

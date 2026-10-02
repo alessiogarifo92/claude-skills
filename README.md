@@ -6,7 +6,7 @@ Private skills, agents and global rules for Claude Code. Goal: run a project fro
 
 | You want to… | Invoke |
 |---|---|
-| Build a whole app / run a backlog end to end, even unattended | `autonomous-workflow` (enters `project-lifecycle` for a new project) |
+| Build a whole app / run a backlog end to end, even unattended | `project-lifecycle` first for a new project, then `autonomous-workflow` to run it unattended |
 | Turn a chosen-but-vague plan into a well-specified ticket | `ticket-interrogation`, then `product-ownership` |
 | Work one ticket | `product-ownership` |
 | Decide something high-stakes with independent agents compared against each other | `cross-verification` |
@@ -43,14 +43,14 @@ Policy: **opus** where judgment is expensive and no test catches the error (arch
 | Skill | Version | Run on | Effort |
 |---|---|---|---|
 | `api-design` | 1.0.1 | sonnet | high |
-| `architecture-review` | 1.1.0 | opus | high |
-| `autonomous-workflow` | 1.2.0 | opus | high |
-| `brainstorming` | 1.2.0 | opus | high |
+| `architecture-review` | 1.1.1 | opus | high |
+| `autonomous-workflow` | 1.3.0 | opus | high |
+| `brainstorming` | 1.2.1 | opus | high |
 | `brand-strategist` | 1.1.0 | opus | medium |
-| `cross-verification` | 1.1.0 | opus | high |
+| `cross-verification` | 1.1.2 | opus | high |
 | `database-design` | 1.2.0 | opus | high |
 | `debugging-workflow` | 1.0.3 | sonnet | high |
-| `deploy-readiness` | 1.1.0 | opus | high |
+| `deploy-readiness` | 1.1.2 | opus | high |
 | `direct-execution` | 1.4.0 | main | medium |
 | `docs-and-specs` | 1.0.1 | sonnet | medium |
 | `executing-plans` | 1.0.1 | sonnet | medium |
@@ -58,23 +58,23 @@ Policy: **opus** where judgment is expensive and no test catches the error (arch
 | `go-backend` | 1.0.1 | sonnet | high |
 | `handling-sudo-and-missing-tools` | 1.0.1 | haiku | low |
 | `laravel-architecture` | 1.3.1 | sonnet | high |
-| `market-analyst` | 1.0.1 | sonnet | medium |
-| `multi-agent-brainstorm` | 1.3.0 | opus | high |
-| `orchestrating-agents` | 2.2.0 | opus | high |
+| `market-analyst` | 1.0.2 | sonnet | medium |
+| `multi-agent-brainstorm` | 1.3.1 | opus | high |
+| `orchestrating-agents` | 2.3.0 | opus | high |
 | `principal-engineering-core` | 1.2.0 | opus | high |
 | `product-marketing-strategist` | 1.1.0 | opus | medium |
-| `product-ownership` | 1.20.0 | sonnet | medium |
-| `project-lifecycle` | 1.9.0 | opus | high |
+| `product-ownership` | 1.21.0 | sonnet | medium |
+| `project-lifecycle` | 1.10.0 | opus | high |
 | `python-backend` | 1.0.1 | sonnet | high |
 | `receiving-code-review` | 1.1.0 | opus | medium |
 | `refactoring-strategy` | 1.0.1 | sonnet | high |
-| `requesting-code-review` | 1.2.0 | opus | high |
+| `requesting-code-review` | 1.2.1 | opus | high |
 | `security-review` | 1.1.0 | opus | high |
 | `sql-performance` | 1.0.1 | sonnet | high |
 | `subagent-driven-development` | 1.2.0 | opus | medium |
 | `test-driven-development` | 1.0.1 | sonnet | medium |
 | `test-verification` | 1.4.1 | sonnet | medium |
-| `ticket-interrogation` | 1.3.0 | opus | high |
+| `ticket-interrogation` | 1.4.0 | opus | high |
 | `vue-frontend` | 1.0.1 | sonnet | high |
 | `worktree-manager` | 1.5.2 | haiku | low |
 | `writing-plans` | 1.2.0 | opus | high |

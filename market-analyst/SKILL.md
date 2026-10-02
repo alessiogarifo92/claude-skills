@@ -1,7 +1,7 @@
 ---
 name: market-analyst
-description: Use when choosing or adding a third-party tool, API, SaaS, library, font, dataset, model, or other external asset to a project, when estimating recurring or usage-based costs of a stack, or when auditing existing dependencies for license compatibility, copyright obligations, and unwanted costs
-version: 1.0.1
+description: Use when choosing or adding a third-party tool, API, SaaS, library, font, dataset, model, or other external asset to a project, when estimating recurring or usage-based costs of a stack, or when auditing existing dependencies for license compatibility, copyright obligations, and unwanted costs, or choosing a database, hosting or other infrastructure service by cost
+version: 1.0.2
 ---
 
 # Market Analyst

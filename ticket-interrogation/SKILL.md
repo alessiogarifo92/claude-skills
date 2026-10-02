@@ -1,7 +1,7 @@
 ---
 name: ticket-interrogation
 description: Use when the user asks to interrogate, stress-test, pressure-test, poke holes in, sanity-check or "grill" a plan, design, approach or architecture, is about to start building something non-trivial while a direction is already chosen but its decisions are still open, or asks for help turning a rough idea into a well-specified ticket — not when the direction itself is still undecided, which is `brainstorming`
-version: 1.3.0
+version: 1.4.0
 model: opus
 effort: high
 ---
@@ -26,7 +26,7 @@ Two phases: interview, then attack. The interview collects decisions. The attack
 
 ## Before anything: figure out the stack yourself
 
-The project may be in any language or framework. **Never ask the user what the stack is** — read the repo. Look at dependency manifests, config files, directory layout, test setup, CI config, and a couple of recent commits.
+The project may be in any language or framework. **Never ask the user what the stack is** — read the repo (in a greenfield project with no code yet, read the confirmed stage 2-3 decisions in `docs/decisions.md` or the project docs instead). Look at dependency manifests, config files, directory layout, test setup, CI config, and a couple of recent commits.
 
 Then phrase every subsequent question in that project's own vocabulary. If the project calls them "handlers", say handlers. If it calls them "resources", say resources. Generic framework-agnostic phrasing is a fallback, not the goal.
 
@@ -146,6 +146,13 @@ Write the output in the language the user has been using in the conversation (th
 These headings are this repo's default, not a contract: `product-ownership` may reshape them to match a repo whose issues are structured differently, as its own convention rule requires. What must survive that reshaping is the content, not the heading names.
 
 Then invoke `product-ownership` to publish it. The output stops here: creating the issue on GitHub, choosing its labels and wiring its relationships is that skill's job, including its confirm-before-create gate — but handing the body over is *this* skill's last step, not someone else's problem.
+
+## Under autopilot (`autonomous-workflow` stage 4)
+Autopilot replaces many small questions with one decision brief per gate, so one-question-per-turn is relaxed here and only here:
+- Anything derivable from the confirmed idea/stack/architecture/design decisions becomes a **proposed default** in the ticket; confirming a default does not count against the question budget.
+- Only decisions that genuinely belong to the user go into the stage-4 brief, as **one batched set** (at most 4 questions in a single AskUserQuestion call), across all tickets of the batch rather than ticket by ticket.
+- The attack phase still runs, on the defaults too; findings that change a default are listed in the brief.
+- If the user is unreachable, park the batch with the brief complete and move on to tickets that need no decision; never leave an interview half-finished mid-state.
 
 ## Common mistakes
 
