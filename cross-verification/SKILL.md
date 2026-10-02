@@ -18,7 +18,7 @@ Use the stakes ladder — never "to be safe" on linear work:
 | Level | Examples | Treatment |
 |---|---|---|
 | 0 trivial, easy to undo | rename, typo, one-line fix, test addition | none — `direct-execution` |
-| 1 normal ticket | scoped feature or bug with tests | verification gate only (`verifier` or the narrowest re-run) |
+| 1 normal ticket | scoped feature or bug with tests | verification gate only: one narrowest re-run (via `test-runner`) and a single `reviewer`; no `verifier`, no panel |
 | 2 non-trivial or costly to reverse | multi-file change, new dependency, public API, UI direction, copy for a public page | one independent check: `reviewer` or `critic`, or a blind second run |
 | 3 high-stakes | architecture and stack choice, auth/payments/PII, data migration, deploy, public launch, anything that spends money | full panel, below |
 
@@ -29,7 +29,7 @@ Pick the mode by what is being decided. Every mode follows the same skeleton: **
 
 | Mode | Use for | Panel (one message, parallel `Agent` calls) | Model mix |
 |---|---|---|---|
-| A. Competing proposals | idea shape, stack, architecture, UI direction, naming, plan | 2-3 proposers with the **identical** brief but different lens or model: `architect`, `researcher` (cost/tooling, via `market-analyst`), `general-purpose` (UI/UX), `marketing-strategist` for positioning → then `critic` over all outputs | at least one opus and one sonnet, so errors correlate less |
+| A. Competing proposals | idea shape, stack, architecture, UI direction, naming, plan | 2-3 proposers with the **identical** brief but different lens or model: `architect`, `researcher` (cost/tooling, via `market-analyst`), `general-purpose` (UI/UX), `marketing-strategist` for positioning → then `critic` over all outputs | different lens **or** model per panelist, ideally both an opus and a sonnet, so errors correlate less (pass `model:` explicitly — `general-purpose` inherits the session model) |
 | B. Blind re-derivation | a result that gates the next phase: root cause, test counts, research claim, benchmark | the author's agent + `verifier` who is given the **claim and the check, not the author's reasoning** | sonnet + sonnet (verifier reproduces, does not review) |
 | C. Review panel | a non-trivial diff before merge | `reviewer` (correctness) ‖ `security-auditor` (if a trust boundary is touched) ‖ `architect` (if structure moves) → `critic` dedupes, ranks, drops what has no failure scenario | opus panel |
 | D. Release gate | deploy, public launch | `release-auditor` ‖ `security-auditor` ‖ `verifier` replaying the smoke tests → `critic` on go/no-go | sonnet + opus |
@@ -49,6 +49,7 @@ Pick the mode by what is being decided. Every mode follows the same skeleton: **
 7. **Record the outcome** where the next phase can reach it (ticket comment or project docs): options considered, the deciding evidence, the rejected objections and why. This is what stops phase N+1 from re-litigating.
 
 ## Cost control
+- Total concurrency is capped by `autonomous-workflow`'s global limits (4 agents at once).
 - Panelists are read-only except Mode E; parallel runs cost tokens, not risk — but stakes decide whether they are worth it, per the ladder.
 - Give panelists the minimum context (problem statement + the files that matter), not the whole conversation: independence and cost both depend on it.
 - Prefer one `critic` over N pairwise critiques.

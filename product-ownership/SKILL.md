@@ -96,7 +96,7 @@ A step that only exists as a phrase in a skill, disconnected from the action tha
 ## Manual user check — the gate before any merge or push
 Automated tests passing is necessary but NOT sufficient to merge or push. After implementation and tests, and before any `git push`, branch merge, or PR merge:
 
-1. Make the change live and reachable in the browser: dev stack running (`docker compose up -d` in this repo — frontend at http://localhost:3000, API docs at http://localhost:8010/docs) with the change active. Walk the page yourself first with the `playwright` MCP server — navigate, perform the action, read the console — to confirm the handoff isn't broken before you hand it over.
+1. Make the change live and reachable in the browser: the project's dev stack running (its documented run command and URLs — project `CLAUDE.md`, the `run` skill, or project memory; never assume another project's ports) with the change active. Walk the page yourself first with the `playwright` MCP server — navigate, perform the action, read the console — to confirm the handoff isn't broken before you hand it over.
 2. Tell the user exactly what to check manually, in the three-part split `test-verification` defines: what you already verified in the browser (so they don't repeat it), what needs their eyes (absolute URL, the action, a falsifiable expected result), and what you could not verify and why.
 3. Stop and wait for their explicit confirmation that it works. If they report a problem, fix it and repeat this gate from step 1.
 

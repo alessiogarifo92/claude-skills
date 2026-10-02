@@ -6,7 +6,7 @@ version: 1.0.0
 
 # Deploy Readiness
 
-**Run on:** sonnet · effort high — go/no-go and hosting choice stay in the main session; the audit runs on `release-auditor`.
+**Run on:** opus · effort high — the Level-3 go/no-go and hosting choice stay in the main session; the audit runs on `release-auditor` (sonnet).
 
 Deploy is where an unverified assumption becomes an incident. This skill makes the last gate explicit: a pinned commit, a checked rollback, a smoke test on the real target, and a user go/no-go.
 
@@ -25,7 +25,7 @@ Deploy is where an unverified assumption becomes an incident. This skill makes t
 6. **Audit**: dispatch `release-auditor` + `security-auditor` + `verifier` in parallel per `cross-verification` Mode D; resolve blockers; `critic` gives the go/no-go reading.
 7. **User go/no-go**: present SHA, cost, blockers/follow-ups, rollback, smoke list, in one self-contained message. Deploying, tagging, DNS changes and spend need the user's explicit yes — standing approval for a ticket does not cover them.
 8. **Smoke test on the real target** (not only locally): run the list, record outputs (`## Test info` convention from `product-ownership` where a ticket exists). A failed smoke test triggers the rollback decision immediately.
-9. **After**: restate the recurring cost actually billed vs the estimate; confirm error reporting and logs are live; hand to launch (`product-marketing-strategist`) only now.
+9. **After**: restate the recurring cost actually billed vs the estimate; confirm error reporting and logs are live; check the public-facing basics before launch — analytics/measurement in place, privacy policy and terms where personal data is collected (GDPR for EU users), cookie consent if tracking, an observation window and alert threshold after the deploy, and the store-submission path for a mobile app — then hand to launch (`product-marketing-strategist`) only now.
 
 ## Common mistakes
 | Mistake | Fix |
