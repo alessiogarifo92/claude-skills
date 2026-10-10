@@ -1,7 +1,7 @@
 ---
 name: test-verification
 description: Use when deciding what to run to verify a code change - choosing the narrowest meaningful set of tests, lint, type checks, or manual smoke checks for backend, frontend, database, or API changes - and before claiming any change is done, fixed, or passing
-version: 1.4.1
+version: 1.5.0
 ---
 
 # Test Verification
@@ -52,6 +52,17 @@ When the change has a browser-observable surface, drive a real browser with the 
   - If two tickets are in progress at once, don't run two parallel environments — verify one, get confirmation, then swap the same environment over to the other and verify that one. Same port, same real data, one at a time.
 - Read the console on every page you touch. A correct-looking render with a red console is not a pass.
 - Know the limit. Playwright proves the page loads, the element exists, the action fires, the state changes, nothing errored. It cannot prove the result looks right, the copy reads well, or the data is plausible. Those belong to the user — they are the reason the handoff below exists, not a gap to paper over.
+
+## Local verification is the push gate; CI is the second net
+Every push (topic branch included) is preceded by the full local run of the same checks CI would run — tests with coverage, lint/format, typecheck, build, and the e2e/browser suite — with the output read in this session. A project carries one entry point for it (e.g. `npm run verify`, `make verify`) that the CI workflow also calls, so local and CI can never drift apart. Never push "to let CI tell me".
+
+**When GitHub Actions cannot run because the monthly minutes (or the spending limit) are used up** — private repos have a finite free quota; public repos get unlimited minutes on the standard GitHub-hosted runners, so check the repo's visibility first (`gh api repos/<owner>/<repo> --jq .private`) — the job fails before any step runs, with an annotation like *"The job was not started because recent account payments have failed or your spending limit needs to be increased"* / *"...account is locked due to a billing issue"*, or the run sits `queued` with a billing notice. That is not a code failure and not a flake:
+1. Confirm it is billing: the annotation/run log names billing or minutes, and no test step started. Anything else stays a real CI failure.
+2. Run the workflow's jobs locally, step for step — the same `verify` entry point, plus any extra job the workflow defines (the matrix entries that matter, the build of each package). Use `act` only if Docker is available; otherwise run the commands directly. Never edit, skip, or disable the workflow to make the red go away.
+3. Record the evidence where reviewers look: one comment on the PR (or ticket, if no PR) naming the blocked check, the commands run locally, and their pass/fail counts and commit SHA. That comment replaces the missing CI evidence; without it the push does not happen.
+4. Tell the user once that Actions is out of minutes and when the quota resets (start of the billing month), or that raising the spending limit is their call — never change billing yourself.
+5. Merge to the default branch stays behind the manual user gate exactly as before; local evidence substitutes for CI, never for the user's check.
+- **Why:** Daily-smile started as a private repo, where the free Actions quota is limited; the user asked that an exhausted quota never become either a blocker or an excuse to push untested — everything is still checked and tested before every push, just without spending GitHub minutes.
 
 ## Mobile + browser: verify both interfaces when a project ships both
 When a project ships both a browser/web frontend and a mobile app (native or Expo/React Native) against the same backend, a ticket touching shared behavior (API, auth, shared business logic, shared UI components) is verified on **both** interfaces before handoff — not just whichever one the change happened to be written in. The two clients often reach the backend through different paths (web via same-origin fetch, mobile via an explicit base URL), so a change can pass on one and silently regress the other.
