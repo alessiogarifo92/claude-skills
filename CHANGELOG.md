@@ -12,6 +12,10 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-10-10
+
+- test-verification 1.5.0: nuova sezione "Local verification is the push gate; CI is the second net" — prima di ogni push si esegue in locale lo stesso entry point `verify` che usa la CI; se GitHub Actions non parte per minuti mensili/spending limit esauriti (repo privato), si eseguono i job in locale, si registra l'evidenza in un commento sulla PR/ticket e non si disabilita mai il workflow.
+
 ## 2026-10-03
 
 - Test del workflow su un progetto reale (app Pomodoro statica, dall'idea al deploy su GitHub Pages, sessione remota) — correzioni dai limiti emersi: worktree-manager 1.6.0 (`worktree.sh` usa solo REST `gh api`, perché GraphQL è bloccato dal proxy delle sessioni remote; nuovo `start <issue> [slug] --base <branch>` per partire da un branch di integrazione), product-ownership 1.22.0 (tabella MCP corretta: label, milestone, dipendenze e sub-issue funzionano via `gh api` REST, solo le impostazioni del repo restano un passo UI; gate batch opt-in realizzato con un branch di integrazione e una sola PR finale verso il default), deploy-readiness 1.2.0 (GitHub Pages gratuito solo su repo pubblico = gate per l'utente; workflow di deploy con job test come prerequisito, niente symlink, `persist-credentials: false`; origine `*.github.io` condivisa), cross-verification 1.1.5 (red flag: un finding del critic va riprodotto prima di cambiare il piano), autonomous-workflow 1.4.2 (sessione remota: REST `gh api` e polling CI per SHA, `merge_pull_request` vuole lo SHA completo).
