@@ -1,7 +1,7 @@
 ---
 name: autonomous-workflow
 description: Use when the user hands over an end-to-end goal (an app idea, a whole feature set, "take it from here", "vai in autonomia") or asks you to run the workflow unattended — conducts every stage from idea through marketing and deploy by routing to the right skill, agent, model and cross-verification level, and says exactly where it may proceed alone and where it must stop
-version: 1.4.2
+version: 1.5.0
 model: opus
 effort: high
 ---
@@ -22,11 +22,13 @@ The conductor. It does not replace any skill's judgment: it sequences them, keep
 For a brand-new project, invoke `project-lifecycle` first (its gates and Phase 3.5 text must be in context); this skill then conducts the phases it defines.
 
 ## Step 0 — Preflight (every session, before stage 1)
-1. Bootstrap present? In a remote session, `alessiogarifo92/claude-skills` must be attached (`add_repo`, clone, `register_repo_root`) and installed (`bash <clone>/scripts/install.sh`; if a skill is still missing from the Skill list, Read its `SKILL.md` from the clone); if it failed, say so in visible text.
+1. Bootstrap present **and current**? In a remote session, `alessiogarifo92/claude-skills` must be attached (`add_repo`, clone, `register_repo_root`) and installed (`bash <clone>/scripts/install.sh`; if a skill is still missing from the Skill list, Read its `SKILL.md` from the clone); if it failed, say so in visible text. A clone that already exists is not proof it is current: `git -C <clone> fetch origin main` and compare with `HEAD` (the project's SessionStart hook does this and prints the result: read that line). Behind → fast-forward it (or rebase a working branch) and re-run `install.sh` before any work, and state the skills commit in visible text. Repeat the check at every new ticket or stage in a long session, not only at its start.
+   - **Why:** on ProjectAmsterdam (2026-10-12) a container clone made earlier sat on a branch behind `origin/main`, so a whole MVP was run without `test-verification` 1.5.0 (local `verify` when Actions minutes run out); the rule existed on GitHub, the session just never loaded it.
 2. Project `CLAUDE.md` has the bootstrap section (global rule) — add it if missing. A brand-new project has no repo yet: until stage 1.5 creates one, keep decisions in the conversation and the task list, then write them to `docs/decisions.md`.
 3. Tools actually available: `gh` or the GitHub MCP, Playwright, Context7, Docker; a missing `mcp__*` tool means read `.mcp.json` and check env before concluding anything. Ask before any sudo/install (`handling-sudo-and-missing-tools`).
-4. Open work: `gh issue list --label "in progress"` and `git worktree list` — never touch another session's locked worktree.
-5. Write the stage list as tasks (`TaskCreate`/`TodoWrite` if available, else a state section in the project docs or the epic issue) so progress survives context compaction.
+4. Repo visibility: `gh api repos/<owner>/<repo> --jq .private` (or the hook's line). Private means finite Actions minutes: plan on local `verify` as the push gate and on the `test-verification` fallback when CI does not start; public means a CI job that does not start is a real problem to investigate.
+5. Open work: `gh issue list --label "in progress"` and `git worktree list` — never touch another session's locked worktree.
+6. Write the stage list as tasks (`TaskCreate`/`TodoWrite` if available, else a state section in the project docs or the epic issue) so progress survives context compaction.
 
 ## Stage map
 `A` = may proceed alone · `G` = hard gate, stop and prepare one self-contained decision brief · Level = `cross-verification` stakes level.

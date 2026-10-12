@@ -12,6 +12,21 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-10-12
+
+- Le skill devono essere sempre aggiornate, e la visibilità del repo deve essere sempre nota. Dopo ProjectAmsterdam: una copia delle skill rimasta indietro rispetto a `origin/main` ha fatto girare un intero MVP senza `test-verification` 1.5.0.
+  - `templates/session-start-hook.sh` riscritto. A ogni avvio di sessione:
+    - porta avanti la copia delle skill (solo se pulita e senza commit propri);
+    - riesegue `install.sh`;
+    - stampa il commit delle skill e se è indietro rispetto a origin;
+    - stampa la visibilità del repo del progetto (privato = minuti Actions limitati);
+    - stampa le skill di ingresso.
+  - autonomous-workflow 1.5.0: lo Step 0 controlla che le skill siano aggiornate (anche a ogni nuovo ticket o stadio) e che la visibilità del repo sia nota.
+  - project-lifecycle 1.11.0: l'hook e `.claude/settings.json` vanno nel primo commit del progetto, e la visibilità va scritta in `CLAUDE.md`.
+  - test-verification 1.6.0: controllare la visibilità diventa un passo esplicito, all'avvio della sessione e prima del primo push.
+  - Template di bootstrap: aggiornare la copia se esiste già, aggiunta la riga "Repo visibility".
+  - `CLAUDE.md`: punto "Stale is as bad as missing".
+
 ## 2026-10-10
 
 - test-verification 1.5.0: nuova sezione "Local verification is the push gate; CI is the second net" — prima di ogni push si esegue in locale lo stesso entry point `verify` che usa la CI; se GitHub Actions non parte per minuti mensili/spending limit esauriti (repo privato), si eseguono i job in locale, si registra l'evidenza in un commento sulla PR/ticket e non si disabilita mai il workflow.

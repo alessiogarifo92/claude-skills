@@ -44,7 +44,7 @@ Policy: **opus** where judgment is expensive and no test catches the error (arch
 |---|---|---|---|
 | `api-design` | 1.0.1 | sonnet | high |
 | `architecture-review` | 1.1.1 | opus | high |
-| `autonomous-workflow` | 1.4.2 | opus | high |
+| `autonomous-workflow` | 1.5.0 | opus | high |
 | `brainstorming` | 1.2.1 | opus | high |
 | `brand-strategist` | 1.1.0 | opus | medium |
 | `cross-verification` | 1.1.5 | opus | high |
@@ -64,7 +64,7 @@ Policy: **opus** where judgment is expensive and no test catches the error (arch
 | `principal-engineering-core` | 1.2.0 | opus | high |
 | `product-marketing-strategist` | 1.1.0 | opus | medium |
 | `product-ownership` | 1.22.0 | sonnet | medium |
-| `project-lifecycle` | 1.10.1 | opus | high |
+| `project-lifecycle` | 1.11.0 | opus | high |
 | `python-backend` | 1.0.1 | sonnet | high |
 | `receiving-code-review` | 1.1.0 | opus | medium |
 | `refactoring-strategy` | 1.0.1 | sonnet | high |
@@ -73,7 +73,7 @@ Policy: **opus** where judgment is expensive and no test catches the error (arch
 | `sql-performance` | 1.0.1 | sonnet | high |
 | `subagent-driven-development` | 1.2.0 | opus | medium |
 | `test-driven-development` | 1.0.1 | sonnet | medium |
-| `test-verification` | 1.4.1 | sonnet | medium |
+| `test-verification` | 1.6.0 | sonnet | medium |
 | `ticket-interrogation` | 1.4.2 | opus | high |
 | `vue-frontend` | 1.0.1 | sonnet | high |
 | `worktree-manager` | 1.6.0 | haiku | low |

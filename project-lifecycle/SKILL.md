@@ -1,7 +1,7 @@
 ---
 name: project-lifecycle
 description: Use when starting a new application or project from scratch, or evaluating one end to end — from initial idea through tool/stack and cost decisions, architecture, breaking the work into tickets, implementation, and deploy — with the user steering each phase (when unattended, `autonomous-workflow` conducts it) — not for a single scoped ticket already in flight
-version: 1.10.1
+version: 1.11.0
 model: opus
 effort: high
 ---
@@ -35,6 +35,8 @@ Whenever this skill creates the project's repository (or picks up a project whos
 gh repo edit <owner>/<repo> --delete-branch-on-merge
 ```
 
+- **Commit the skills SessionStart hook in the first commit too**: copy `templates/session-start-hook.sh` to `.claude/session-start-hook.sh` and register it in `.claude/settings.json` (the JSON is in the script's header). Every later session, local or remote, then starts by fast-forwarding the skills clone, re-running `install.sh`, and printing the skills commit, whether it is behind, the repo's visibility (private = finite Actions minutes) and the entry skills. It is the deterministic half of the bootstrap: it does not depend on the session remembering to check.
+- **Record the repo's visibility** (`gh api repos/<owner>/<repo> --jq .private`) in the project `CLAUDE.md` "Repo visibility" line; `test-verification` uses it to decide how to treat a CI job that never starts.
 - **Commit the project `CLAUDE.md` in the first commit**, built from `templates/project-CLAUDE-bootstrap.md` (the attach-the-skills-repo section plus the "Run / preview" field). A project created without it runs every later remote session with none of these rules.
 - GitHub has no account- or org-wide default for it, and template repos copy files, not settings: it must be set per repo, at creation, or it silently stays off.
 - In a remote session without `gh` (the GitHub MCP server has no repo-settings tool), hand the user the one-click path instead — *Settings → General → Pull Requests → Automatically delete head branches* — and don't consider repo setup done until they confirm it.
@@ -95,6 +97,7 @@ Every phase that adds a tool, service, or hosting target restates: what it costs
 - A tool/service adopted without a `market-analyst` verdict? Get one before it lands in a ticket.
 - More than one ticket drafted before phase 3's architecture is confirmed? Architecture decisions ripple into every ticket — confirm shape first.
 - Tickets don't reference the phase 2/3 decisions? They'll re-derive and drift from what was actually decided.
+- Repo created without the skills SessionStart hook (`.claude/session-start-hook.sh` + `.claude/settings.json`) or without its visibility recorded in `CLAUDE.md`? Add both now: without the hook, a stale skills clone goes unnoticed.
 - Repo created without `--delete-branch-on-merge`? Turn it on now, before merged branches start piling up — see "When the project's GitHub repo is created".
 - Laravel project scaffolded without Laravel Boost? Install it before the first ticket, per `laravel-architecture`'s "Ground the design in the running app" — tickets written against source files instead of the running app start drifting from phase 3's decisions immediately.
 - About to make something publicly reachable without a `security-review` pass over secrets/auth/exposed endpoints? Do it before the deploy, not after the first incident.
