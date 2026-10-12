@@ -1,7 +1,7 @@
 ---
 name: test-verification
 description: Use when deciding what to run to verify a code change - choosing the narrowest meaningful set of tests, lint, type checks, or manual smoke checks for backend, frontend, database, or API changes - and before claiming any change is done, fixed, or passing
-version: 1.5.0
+version: 1.6.0
 ---
 
 # Test Verification
@@ -56,7 +56,12 @@ When the change has a browser-observable surface, drive a real browser with the 
 ## Local verification is the push gate; CI is the second net
 Every push (topic branch included) is preceded by the full local run of the same checks CI would run — tests with coverage, lint/format, typecheck, build, and the e2e/browser suite — with the output read in this session. A project carries one entry point for it (e.g. `npm run verify`, `make verify`) that the CI workflow also calls, so local and CI can never drift apart. Never push "to let CI tell me".
 
-**When GitHub Actions cannot run because the monthly minutes (or the spending limit) are used up** — private repos have a finite free quota; public repos get unlimited minutes on the standard GitHub-hosted runners, so check the repo's visibility first (`gh api repos/<owner>/<repo> --jq .private`) — the job fails before any step runs, with an annotation like *"The job was not started because recent account payments have failed or your spending limit needs to be increased"* / *"...account is locked due to a billing issue"*, or the run sits `queued` with a billing notice. That is not a code failure and not a flake:
+**Know the repo's visibility before relying on CI — every session, every repo.** Run `gh api repos/<owner>/<repo> --jq .private` (REST works through the remote-session proxy; `gh repo view` does not) at session start, or read the line the project's SessionStart hook prints, and again before the first push of a session. It decides the CI budget:
+- `true` (private): GitHub Actions minutes are finite. Local `verify` is the push gate as always, and a CI job that never starts is most likely the quota or spending limit: go straight to the steps below instead of waiting on it.
+- `false` (public): standard GitHub-hosted runners have unlimited minutes, so a job that does not start is not a minutes problem: investigate it as a real failure.
+- Visibility can change (a repo made public to get free Pages or unlimited CI): re-check it rather than trusting an earlier answer, and keep the project `CLAUDE.md` "Repo visibility" line current.
+
+**When GitHub Actions cannot run because the monthly minutes (or the spending limit) are used up** — the job fails before any step runs, with an annotation like *"The job was not started because recent account payments have failed or your spending limit needs to be increased"* / *"...account is locked due to a billing issue"*, or the run sits `queued` with a billing notice. That is not a code failure and not a flake:
 1. Confirm it is billing: the annotation/run log names billing or minutes, and no test step started. Anything else stays a real CI failure.
 2. Run the workflow's jobs locally, step for step — the same `verify` entry point, plus any extra job the workflow defines (the matrix entries that matter, the build of each package). Use `act` only if Docker is available; otherwise run the commands directly. Never edit, skip, or disable the workflow to make the red go away.
 3. Record the evidence where reviewers look: one comment on the PR (or ticket, if no PR) naming the blocked check, the commands run locally, and their pass/fail counts and commit SHA. That comment replaces the missing CI evidence; without it the push does not happen.
