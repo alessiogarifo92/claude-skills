@@ -14,6 +14,7 @@ modifica alla skill.
 
 ## 2026-10-12
 
+- autonomous-workflow 1.6.0: una sessione fermata dal limite di utilizzo non riparte da sola al reset, e un trigger che scatta durante il limite va perso. Durante il lavoro in autonomia (non quando si aspetta un gate dell'utente) si tiene quindi un `send_later` di controllo a circa 60 minuti, riarmato a ogni passo. Dopo ProjectAmsterdam: lavoro rimasto fermo per ore dopo il reset delle 19:10 finché l'utente non è rientrato.
 - Le skill devono essere sempre aggiornate, e la visibilità del repo deve essere sempre nota. Dopo ProjectAmsterdam: una copia delle skill rimasta indietro rispetto a `origin/main` ha fatto girare un intero MVP senza `test-verification` 1.5.0.
   - `templates/session-start-hook.sh` riscritto. A ogni avvio di sessione:
     - porta avanti la copia delle skill (solo se pulita e senza commit propri);
