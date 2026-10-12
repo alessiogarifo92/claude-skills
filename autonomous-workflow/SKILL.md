@@ -1,7 +1,7 @@
 ---
 name: autonomous-workflow
 description: Use when the user hands over an end-to-end goal (an app idea, a whole feature set, "take it from here", "vai in autonomia") or asks you to run the workflow unattended — conducts every stage from idea through marketing and deploy by routing to the right skill, agent, model and cross-verification level, and says exactly where it may proceed alone and where it must stop
-version: 1.5.0
+version: 1.6.0
 model: opus
 effort: high
 ---
@@ -77,6 +77,7 @@ Parallelism: independent work inside a stage (research per tool, tickets with no
 - Test/CI fails: root-cause per `debugging-workflow`, fix, re-run; never skip, disable or loosen a test to get green.
 - Same fix fails twice: stop guessing — dispatch `quick-debugger` or a blind `verifier` for a second view; third failure → report to the user with evidence.
 - Agent `blocked` or off-scope (git commits, extra files): treat as a violation, discard or review the diff, re-dispatch with a tighter brief.
+- Usage limit ("You've hit your session limit, resets …"): the turn stops and nothing resumes it when the limit resets — a scheduled trigger that fires during the limit is not delivered until the user comes back. So while unattended work is actually in progress (implementing, verifying, driving a PR to green — not while parked on a user gate), keep one `send_later` heartbeat armed about 60 minutes ahead, re-armed at each milestone and each time it fires, whose message says where to resume (ticket, branch, next step). One lands within an hour after any reset; cancel it when the work parks on a gate or finishes. Without `send_later`, tell the user once to write "continua" after the reset time.
 - Context getting long: write state (stage, decisions, open gates, next action) into tasks and the ticket before it compacts.
 - Remote session: there is no `~/.claude` and often no `gh`. Run `scripts/install.sh` from the attached clone first; if agents are not picked up in the running session, dispatch `general-purpose` with an explicit `model` and paste the agent file's body into the brief, tell it to load that agent's frontmatter `skills:` with the Skill tool first, and restate its read-only / no-git limits (the fallback does not inherit them). Use the GitHub MCP equivalents (`issue_write`, `sub_issue_write`, `list_issues`, `merge_pull_request` — it needs the full 40-char head SHA) where `gh` is missing; `gh api` REST also works through the proxy (labels, milestones, dependencies, sub-issues, workflow-run polling) while GraphQL (`gh issue/pr/repo ...`) is blocked, and only repo-settings writes (public, delete-branch-on-merge, Pages source) are handed to the user. Poll CI on the exact SHA with `gh api repos/{owner}/{repo}/actions/runs?head_sha=<sha>`. The browser manual gate needs a reachable preview URL; without one, park it as "needs local check" on the ticket with the exact commands. External design skills (`design`, `taste`, `frontend-design`) may be absent: use the Artifact quickstart for design, and give the `critic` exported screenshots or tokens, not a canvas link.
 - Remote session without a tool you need: `read_documentation` for the setup, tell the user the exact setting; do not improvise around a missing connector.
