@@ -14,6 +14,8 @@ modifica alla skill.
 
 ## 2026-10-13
 
+- `templates/session-start-hook.sh`: la copia committata in un progetto (`<progetto>/.claude/`) esce in silenzio quando l'hook utente del Setup script è registrato e trova una clone, così la sessione riceve una sola riga di stato invece di due. Lanciato dall'hook utente (da `templates/`), in locale o in un ambiente senza Setup script, funziona come prima.
+
 - `templates/cloud-setup-script.sh`: clona una propria copia di claude-skills in `~/.claude-skills-repo` (il repo è pubblico) e l'hook a livello utente la usa quando claude-skills non è allegato; installa anche le skill di design; rilanciato, sostituisce la vecchia voce dell'hook invece di lasciarla. Dopo la prima sessione con lo script: in una sessione con solo Daily-smile l'hook utente stampava `claude-skills: NOT ATTACHED` mentre l'hook del progetto aveva già clonato e installato tutto.
 
 - SessionStart hook automatico in ogni sessione con claude-skills allegato, senza doverlo chiedere. Dopo Daily-smile: sessione con due repo, hook mai committato nel progetto, skill e agent non installati finché l'utente non l'ha chiesto.
