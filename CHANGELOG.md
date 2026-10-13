@@ -12,6 +12,16 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-10-13
+
+- Skill di design esterne valutate dopo un reel (Emil Kowalski, Impeccable, Taste, Figma MCP, Playwright). Taste, Playwright e Figma MCP erano già coperti; aggiunte le due mancanti, non copiate nella repo (Impeccable ha 40 file di riferimento e un binario, si aggiornano upstream) ma installate a commit fissati e collegate alle fasi in cui servono.
+  - `scripts/install-design-skills.sh` (nuovo): collega `impeccable` (pbakaus, Apache-2.0) e un sottoinsieme di `emilkowalski/skills` (MIT: `emil-design-eng`, `animate`, `animate-expo`, `animation-performance`, `review-animations`, `break-ui`, `mobile-native`) in `~/.claude/skills`, a commit fissati. Lo lancia anche il SessionStart hook, così funziona nelle sessioni remote.
+  - `impeccable` sostituisce `frontend-design` (che estende): plugin `frontend-design` disattivato in `settings.json`, per non avere due skill di design che scattano sulla stessa richiesta.
+  - project-lifecycle 1.12.0: fase 3.5 — greenfield con `impeccable init` (`PRODUCT.md` seminato da `docs/decisions.md`) e `shape`, brand esistente con `impeccable document`; ogni direzione porta anche i token di movimento (regole di `emil-design-eng`); la direzione scelta si registra in `DESIGN.md`.
+  - test-verification 1.7.0: nuovo "Design quality pass" per ogni ticket che cambia la UI, in un solo giro limitato: `impeccable audit`/`critique`, `break-ui`, `review-animations`, `mobile-native`, `animate-expo`. Copre il limite dichiarato di Playwright ("non prova che sembri giusto") prima del controllo manuale dell'utente.
+  - autonomous-workflow 1.7.0: stadi 3.5 e 6 citano le nuove skill; nota remota aggiornata.
+  - brand-strategist 1.1.1, vue-frontend 1.0.2: riferimenti aggiornati.
+
 ## 2026-10-12
 
 - autonomous-workflow 1.6.0: una sessione fermata dal limite di utilizzo non riparte da sola al reset, e un trigger che scatta durante il limite va perso. Durante il lavoro in autonomia (non quando si aspetta un gate dell'utente) si tiene quindi un `send_later` di controllo a circa 60 minuti, riarmato a ogni passo. Dopo ProjectAmsterdam: lavoro rimasto fermo per ore dopo il reset delle 19:10 finché l'utente non è rientrato.

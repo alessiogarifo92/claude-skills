@@ -1,7 +1,7 @@
 ---
 name: vue-frontend
 description: Use when writing or reviewing Vue components - composables, state ownership, props/emits design, accessibility, or loading/empty/error UI states
-version: 1.0.1
+version: 1.0.2
 ---
 
 # Vue Frontend
@@ -10,7 +10,7 @@ version: 1.0.1
 
 Design Vue code for maintainability, predictable state, and good UX.
 
-**Pairs with:** security-review for auth-sensitive UI flows or anywhere raw HTML is rendered.
+**Pairs with:** security-review for auth-sensitive UI flows or anywhere raw HTML is rendered; the project's `DESIGN.md` (phase 3.5) for tokens, and `test-verification`'s design quality pass (`impeccable`, `break-ui`, `review-animations` — their examples are React, the rules carry over to Vue `<Transition>`) before handoff.
 
 ## Core rules
 - Components should have one clear responsibility.

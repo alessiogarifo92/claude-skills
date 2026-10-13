@@ -1,7 +1,7 @@
 ---
 name: test-verification
 description: Use when deciding what to run to verify a code change - choosing the narrowest meaningful set of tests, lint, type checks, or manual smoke checks for backend, frontend, database, or API changes - and before claiming any change is done, fixed, or passing
-version: 1.6.0
+version: 1.7.0
 ---
 
 # Test Verification
@@ -38,7 +38,7 @@ Select the narrowest meaningful verification set first, then expand if justified
 
 ## By change type
 - backend logic: focused tests around changed behavior
-- frontend UI: render, interaction, loading/error states, responsive behavior
+- frontend UI: render, interaction, loading/error states, responsive behavior, then the design quality pass below
 - migrations: migrate up/down plus affected data paths — a destructive reset/seed against a shared DB checks no other ticket is `in progress` first (global CLAUDE.md, "Never wipe shared DB data while another ticket is in progress")
 - APIs: contract shape, status codes, validation errors
 - performance-sensitive code: targeted benchmarks or query plans when relevant
@@ -52,6 +52,21 @@ When the change has a browser-observable surface, drive a real browser with the 
   - If two tickets are in progress at once, don't run two parallel environments — verify one, get confirmation, then swap the same environment over to the other and verify that one. Same port, same real data, one at a time.
 - Read the console on every page you touch. A correct-looking render with a red console is not a pass.
 - Know the limit. Playwright proves the page loads, the element exists, the action fires, the state changes, nothing errored. It cannot prove the result looks right, the copy reads well, or the data is plausible. Those belong to the user — they are the reason the handoff below exists, not a gap to paper over.
+
+## Design quality pass (tickets that change UI)
+Playwright proves the UI works; this pass catches what makes it look generated or feel cheap, before the user spends a manual check on it. Run it after the browser walkthrough, against the running page and the changed files, in **one bounded round**: collect findings, fix them in one batch, re-check once, stop. Open-ended self-polish burns budget and is the user's gate anyway.
+
+| Run | When | What it catches |
+|---|---|---|
+| `/impeccable audit <target>` (+ `critique` on a new screen) | every UI-changing ticket | its deterministic detector (no LLM, 59 rules: Inter everywhere, purple gradients, cards in cards, gray-on-color text, icon tile above every heading) plus a11y, contrast, responsive; drift from the project's `DESIGN.md` |
+| `break-ui` | a new list, card, table, form or profile | worst-case data: long names, unbreakable emails, zero/huge counts, missing fields, non-Latin text — what real data does to it |
+| `review-animations` (`emil-design-eng` rules; it is user-invocable only, so Read `~/.claude/skills/review-animations/SKILL.md` and follow it) | the diff adds or changes motion | `transition: all`, durations over ~300 ms, `ease-in` on entering UI, scale from 0, animated keyboard actions, no `prefers-reduced-motion` |
+| `mobile-native` | the web UI is used on phones | 100vh bug, inputs zooming the page, sticky hover, tap highlight, content under the notch |
+| `animate-expo` | Expo / React Native motion | JS-thread animations, gesture hand-off, haptics |
+
+- Fix what the pass finds inside the ticket's scope; anything wider (a token change, a redesign) goes back to the user as a proposal, never silently into this ticket — `DESIGN.md` was a phase-3.5 decision.
+- List what was run and what was fixed in the `## Test info` comment, so the user's check starts from a cleaner page and knows what was already looked at.
+- If the skills are missing (`ls ~/.claude/skills/impeccable`), run `scripts/install-design-skills.sh` from the skills clone; if it cannot fetch (offline), say so in the handoff and skip the pass visibly — never report it as run.
 
 ## Local verification is the push gate; CI is the second net
 Every push (topic branch included) is preceded by the full local run of the same checks CI would run — tests with coverage, lint/format, typecheck, build, and the e2e/browser suite — with the output read in this session. A project carries one entry point for it (e.g. `npm run verify`, `make verify`) that the CI workflow also calls, so local and CI can never drift apart. Never push "to let CI tell me".
