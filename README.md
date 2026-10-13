@@ -27,7 +27,7 @@ Private skills, agents and global rules for Claude Code. Goal: run a project fro
 
 - Local: `scripts/install.sh` (symlinks skills, agents, `CLAUDE.md` into `~/.claude`; never overwrites real files), then `scripts/install-design-skills.sh`. `settings.json` is merged by hand.
 - Remote session: paste `templates/project-CLAUDE-bootstrap.md` into the project's `CLAUDE.md`. Each project also commits `.claude/session-start-hook.sh` (from `templates/`), which updates and installs the skills at every session start.
-- Cloud environment (once, by the user): paste `templates/cloud-setup-script.sh` into the environment's Setup script (claude.ai → environment menu → Edit). It registers the same hook at user level, so it runs in every session of that environment, including multi-repo ones where a project's own `.claude/settings.json` is not loaded, and creates `~/.claude/agents` before the session starts so agents are detected.
+- Cloud environment (once, by the user): paste `templates/cloud-setup-script.sh` into the environment's Setup script (claude.ai → environment menu → Edit). It clones its own copy into `~/.claude-skills-repo` and registers the same hook at user level, so it runs in every session of that environment, with or without claude-skills attached, including multi-repo ones where a project's own `.claude/settings.json` is not loaded, and creates `~/.claude/agents` before the session starts so agents are detected.
 
 ## How the workflow runs
 
