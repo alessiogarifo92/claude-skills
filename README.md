@@ -19,13 +19,15 @@ Private skills, agents and global rules for Claude Code. Goal: run a project fro
 - `<skill>/SKILL.md` — one skill per folder (frontmatter: name, description = trigger, semver version; body starts with a `Run on` line).
 - `agents/*.md` — subagents (frontmatter: model, effort, tools, preloaded skills).
 - `templates/project-CLAUDE-bootstrap.md` — section every project's `CLAUDE.md` must carry so remote sessions attach this repo.
+- `templates/session-start-hook.sh` — SessionStart hook every project commits; `templates/cloud-setup-script.sh` — cloud environment setup script registering it at user level.
 - `scripts/validate.py` — consistency check (CI runs it); `scripts/install.sh` — link into `~/.claude`; `scripts/install-design-skills.sh` — link the external design skills (`impeccable`, a subset of Emil Kowalski's) at pinned commits.
 - `CHANGELOG.md` — one line per skill change, same commit as the change.
 
 ## Setup
 
 - Local: `scripts/install.sh` (symlinks skills, agents, `CLAUDE.md` into `~/.claude`; never overwrites real files), then `scripts/install-design-skills.sh`. `settings.json` is merged by hand.
-- Remote session: paste `templates/project-CLAUDE-bootstrap.md` into the project's `CLAUDE.md`.
+- Remote session: paste `templates/project-CLAUDE-bootstrap.md` into the project's `CLAUDE.md`. Each project also commits `.claude/session-start-hook.sh` (from `templates/`), which updates and installs the skills at every session start.
+- Cloud environment (once, by the user): paste `templates/cloud-setup-script.sh` into the environment's Setup script (claude.ai → environment menu → Edit). It registers the same hook at user level, so it runs in every session of that environment, including multi-repo ones where a project's own `.claude/settings.json` is not loaded, and creates `~/.claude/agents` before the session starts so agents are detected.
 
 ## How the workflow runs
 
