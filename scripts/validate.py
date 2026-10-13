@@ -12,7 +12,8 @@ AGENT_MODELS = {"opus", "sonnet", "haiku", "inherit"}
 EFFORTS = {"low", "medium", "high", "xhigh", "max"}
 SEMVER = re.compile(r"^\d+\.\d+\.\d+$")
 # names legitimately referenced that are not directories of this repo
-EXTERNAL = {"design", "design-sync", "frontend-design", "taste", "code-review", "laravel-boost",
+EXTERNAL = {"design", "design-sync", "frontend-design", "taste", "impeccable", "emil-design-eng",
+            "animate", "animate-expo", "animation-performance", "review-animations", "break-ui", "mobile-native", "code-review", "laravel-boost",
             "general-purpose", "playwright", "context7", "claude-api"}
 errors, warnings = [], []
 

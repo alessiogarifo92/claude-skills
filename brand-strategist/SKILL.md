@@ -1,7 +1,7 @@
 ---
 name: brand-strategist
 description: Use when naming a product, feature, or repo, briefing or reviewing a logo or visual identity, defining voice and tone for UI copy, docs, or error messages, or auditing brand consistency across pages, meta tags, social cards, store listings, and locales
-version: 1.1.0
+version: 1.1.1
 model: opus
 effort: medium
 ---
@@ -18,7 +18,7 @@ Own the durable identity of a software product: name, visual direction, voice, a
 - One visual language per product: logo, favicon, backgrounds, and accents should read as a single system, not separate decorations.
 - One voice everywhere: UI copy, empty states, errors, docs, and README speak the same way — and consistently across every locale the app ships.
 - Distinctiveness beats description: a name or mark that's merely accurate but interchangeable with competitors' fails.
-- Strategy here, execution elsewhere: define the brief (values, mood, constraints); leave pixel work to design skills like frontend-design.
+- Strategy here, execution elsewhere: define the brief (values, mood, constraints); leave pixel work to design skills like `impeccable` (which records the result in the project's `DESIGN.md`).
 
 ## Check
 - Naming: pronounceable, spellable, distinct in the niche, no domain/trademark collisions, coherent with sibling products (brand architecture)

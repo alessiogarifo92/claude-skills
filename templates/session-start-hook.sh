@@ -38,6 +38,7 @@ if [ -n "$dir" ]; then
     else status="BEHIND origin/main by $behind commit(s) on branch '$branch': update it (git -C $dir pull --ff-only, or rebase the working branch) before relying on any skill"; fi
   fi
   bash "$dir/scripts/install.sh" >/dev/null 2>&1 || status="$status; install.sh FAILED"
+  t bash "$dir/scripts/install-design-skills.sh" >/dev/null 2>&1 || status="$status; design skills (impeccable, emil) not installed"
   echo "claude-skills: $(git -C "$dir" log -1 --format='%h %cs') in $dir, $status."
 fi
 
