@@ -14,6 +14,8 @@ modifica alla skill.
 
 ## 2026-10-13
 
+- `templates/cloud-setup-script.sh`: clona una propria copia di claude-skills in `~/.claude-skills-repo` (il repo è pubblico) e l'hook a livello utente la usa quando claude-skills non è allegato; installa anche le skill di design; rilanciato, sostituisce la vecchia voce dell'hook invece di lasciarla. Dopo la prima sessione con lo script: in una sessione con solo Daily-smile l'hook utente stampava `claude-skills: NOT ATTACHED` mentre l'hook del progetto aveva già clonato e installato tutto.
+
 - SessionStart hook automatico in ogni sessione con claude-skills allegato, senza doverlo chiedere. Dopo Daily-smile: sessione con due repo, hook mai committato nel progetto, skill e agent non installati finché l'utente non l'ha chiesto.
   - `templates/cloud-setup-script.sh` (nuovo): da incollare una volta nel Setup script dell'ambiente cloud. Registra l'hook in `~/.claude/settings.json` (vale anche quando la cartella principale della sessione non è il progetto, caso delle sessioni multi-repo) e crea `~/.claude/agents` prima dell'avvio, così gli agent vengono rilevati.
   - `.claude/settings.json` (nuovo): l'hook gira anche quando la cartella principale è questa repo.

@@ -3,16 +3,26 @@
 # It runs once per container, before Claude Code starts, whatever repos the session has.
 # Project hooks (`<project>/.claude/settings.json`) only load for the session's primary directory, so in a
 # multi-repo session they may not run at all; this registers the SessionStart hook at user level instead,
-# so every session that has claude-skills attached updates and installs it before the first turn.
-# Best effort: never fails the container.
+# so every session updates and installs the skills before the first turn, with or without claude-skills attached.
+# Best effort: never fails the container. Safe to re-run: re-pasting a newer version replaces the old hook entry.
+t() { timeout 60 "$@"; }
 mkdir -p "$HOME/.claude/skills" "$HOME/.claude/agents"   # agents/ must exist at session start to be detected
-cmd='for f in /home/user/claude-skills/templates/session-start-hook.sh "$HOME/claude-skills/templates/session-start-hook.sh"; do [ -f "$f" ] && exec bash "$f"; done; echo "claude-skills: NOT ATTACHED. Attach it (add_repo) and run scripts/install.sh before any work, and say so in visible text."'
+
+# A clone of our own, so sessions without claude-skills attached still get it (the repo is public).
+own="$HOME/.claude-skills-repo"
+[ -d "$own/.git" ] || t git clone -q https://github.com/alessiogarifo92/claude-skills.git "$own" 2>/dev/null || true
+
+# The hook runs whichever copy exists, preferring an attached one; session-start-hook.sh itself picks the
+# same clone (same search order), fast-forwards it and re-runs install.sh.
+cmd='for f in /home/user/claude-skills/templates/session-start-hook.sh "$HOME/claude-skills/templates/session-start-hook.sh" "$HOME/.claude-skills-repo/templates/session-start-hook.sh"; do [ -f "$f" ] && exec bash "$f"; done; echo "claude-skills: NOT INSTALLED (no clone found). Attach it (add_repo) and run scripts/install.sh before any work, and say so in visible text."'
 s="$HOME/.claude/settings.json"
 [ -s "$s" ] || echo '{}' > "$s"
-if command -v jq >/dev/null 2>&1 && ! grep -q 'session-start-hook.sh' "$s"; then
-  jq --arg c "$cmd" '.hooks.SessionStart += [{"hooks": [{"type": "command", "command": $c}]}]' "$s" > "$s.tmp" && mv "$s.tmp" "$s"
+if command -v jq >/dev/null 2>&1; then
+  jq --arg c "$cmd" '
+    .hooks.SessionStart = ([.hooks.SessionStart[]? | select(([.hooks[]?.command] | map(contains("session-start-hook.sh")) | any) | not)]
+                           + [{"hooks": [{"type": "command", "command": $c}]}])' "$s" > "$s.tmp" && mv "$s.tmp" "$s"
 fi
-for d in /home/user/claude-skills "$HOME/claude-skills"; do
-  [ -f "$d/scripts/install.sh" ] && { bash "$d/scripts/install.sh" >/dev/null 2>&1; break; }
+for d in /home/user/claude-skills "$HOME/claude-skills" "$own"; do
+  [ -f "$d/scripts/install.sh" ] && { bash "$d/scripts/install.sh" >/dev/null 2>&1; t bash "$d/scripts/install-design-skills.sh" >/dev/null 2>&1; break; }
 done
 exit 0
