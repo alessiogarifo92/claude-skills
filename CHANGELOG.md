@@ -14,6 +14,11 @@ modifica alla skill.
 
 ## 2026-10-13
 
+- SessionStart hook automatico in ogni sessione con claude-skills allegato, senza doverlo chiedere. Dopo Daily-smile: sessione con due repo, hook mai committato nel progetto, skill e agent non installati finché l'utente non l'ha chiesto.
+  - `templates/cloud-setup-script.sh` (nuovo): da incollare una volta nel Setup script dell'ambiente cloud. Registra l'hook in `~/.claude/settings.json` (vale anche quando la cartella principale della sessione non è il progetto, caso delle sessioni multi-repo) e crea `~/.claude/agents` prima dell'avvio, così gli agent vengono rilevati.
+  - `.claude/settings.json` (nuovo): l'hook gira anche quando la cartella principale è questa repo.
+  - `CLAUDE.md` e template di bootstrap: se il progetto non ha l'hook, si aggiunge e si committa sul branch di lavoro senza chiedere.
+
 - Skill di design esterne valutate dopo un reel (Emil Kowalski, Impeccable, Taste, Figma MCP, Playwright). Taste, Playwright e Figma MCP erano già coperti; aggiunte le due mancanti, non copiate nella repo (Impeccable ha 40 file di riferimento e un binario, si aggiornano upstream) ma installate a commit fissati e collegate alle fasi in cui servono.
   - `scripts/install-design-skills.sh` (nuovo): collega `impeccable` (pbakaus, Apache-2.0) e un sottoinsieme di `emilkowalski/skills` (MIT: `emil-design-eng`, `animate`, `animate-expo`, `animation-performance`, `review-animations`, `break-ui`, `mobile-native`) in `~/.claude/skills`, a commit fissati. Lo lancia anche il SessionStart hook, così funziona nelle sessioni remote.
   - `impeccable` sostituisce `frontend-design` (che estende): plugin `frontend-design` disattivato in `settings.json`, per non avere due skill di design che scattano sulla stessa richiesta.
