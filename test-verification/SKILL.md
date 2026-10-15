@@ -1,7 +1,7 @@
 ---
 name: test-verification
-description: Use when deciding what to run to verify a code change - choosing the narrowest meaningful set of tests, lint, type checks, or manual smoke checks for backend, frontend, database, or API changes - and before claiming any change is done, fixed, or passing
-version: 1.7.0
+description: Use when deciding what to run to verify a code change - choosing the narrowest meaningful set of tests, lint, type checks, or manual smoke checks for backend, frontend, mobile app, database, or API changes - and before claiming any change is done, fixed, or passing
+version: 1.8.0
 ---
 
 # Test Verification
@@ -92,6 +92,14 @@ When a project ships both a browser/web frontend and a mobile app (native or Exp
 - Mobile side: test against the LAN IP, not `localhost` — a physical device or emulator cannot reach the dev machine's `localhost`. Get the current LAN IP and confirm the mobile app's API base URL / dev server is actually reachable at `http://<lan-ip>:<port>` from the device — don't just assume it matches what works on `localhost`.
 - Both must be confirmed working before the ticket is handed off as verified. If you can't drive the mobile client yourself (no device/emulator available), say so explicitly in "Not verified, and why" below, and add the mobile-over-LAN check as one of the user's manual steps rather than silently skipping it.
 - **Why:** `localhost` vs. LAN is a distinct failure class — code that works over `localhost` in a browser can fail over LAN on mobile due to CORS, IP allow-lists, insecure-origin/HTTPS restrictions, or a hardcoded base URL, and neither a code review nor a browser-only Playwright pass catches that.
+
+## Mobile UI automation: Maestro is the mobile Playwright
+For a mobile client, the automated UI check is a **Maestro** flow (YAML, one set of flows for Android and iOS) — the counterpart of the Playwright pass above, with the same evidence rule: a flow you ran and its screenshots, not a description of what the screen should do.
+- **Driving it from the session:** the MCP server ships in the Maestro CLI (`maestro mcp`; register it with `claude mcp add maestro -- maestro mcp`). It lists devices, inspects the screen, runs flows and takes screenshots. Missing CLI → `handling-sudo-and-missing-tools` before installing.
+- **Where each platform can run:** Android needs an emulator (KVM) or a device; the iOS simulator needs macOS. A remote/cloud session has neither (`/dev/kvm` absent, Linux), so there the flows run in CI — Android on a Linux runner with an emulator, iOS on a macOS runner — or on Maestro Cloud (paid). Say which ran where in the `## Test info`; a platform no flow ran on goes under "Not verified, and why", never implied.
+- **Coverage, honestly:** 100% is a unit-test target (business logic, the API — per the global unit-test rule). For UI, cover the critical flows (login, the core task, payment/permissions) on both platforms, not every screen.
+- **Before a store release** (not per ticket): one pass on real devices in a device cloud (BrowserStack, or WebdriverIO/Appium on a device cloud) for what simulators hide — keyboard covering inputs, safe area/notch, permission prompts, push notifications. Choosing and paying for one is `market-analyst` + a user spend gate.
+- **CI budget:** macOS runners on a private repo burn the included minutes about 10x faster than Linux; on a public repo standard runners are free. Run iOS flows on the release branch or nightly rather than every push on a private repo, and check visibility first (section above).
 
 ## Manual handoff — telling the user what to test
 Your browser check does not replace the user's; it produces the checklist for it. Never hand over a vague "please have a look". Split the handoff into three parts:

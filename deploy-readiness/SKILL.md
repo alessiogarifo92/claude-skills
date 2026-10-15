@@ -1,7 +1,7 @@
 ---
 name: deploy-readiness
 description: Use when a project or change is about to be deployed or made publicly reachable — choosing the hosting target, preparing secrets and config, migrations and rollback, the go/no-go check, post-deploy smoke tests, and the recurring cost actually billed — the deploy itself, not the earlier choice of stack or hosting (`market-analyst`)
-version: 1.2.0
+version: 1.3.0
 model: opus
 effort: high
 ---
@@ -22,6 +22,7 @@ Deploy is where an unverified assumption becomes an incident. This skill makes t
 1. **Pin the release**: full commit SHA of default branch, CI green on that SHA, changelog/ticket list.
 2. **Choose the target** the cheapest viable way (`market-analyst`): state the cost today and at 10x, free tier limits, and what happens when they are exceeded. The user confirms the target and its cost before anything is provisioned.
 2b. **Static hosting on GitHub Pages**: the free plan serves only **public** repos, so a private repo means going public (a hard gate: the user decides, and the repo must be audited first: secrets in history, `CLAUDE.md`/docs visible) or paying. Deploy from a Pages workflow that stages only the files the browser needs (never publish the repo root), gates the `deploy` job on a `test` job (`needs:`), refuses symlinks in the staged dir (`upload-pages-artifact` dereferences them), sets `persist-credentials: false` on checkout and `concurrency: pages`. The deploy workflow only exists after the merge that adds it, so pin and re-verify *that* SHA; the Pages source (Settings → Pages → GitHub Actions) is a UI step for the user; github.io may be unreachable from a remote session, so hand the live smoke test (curl list + browser) to the user. A shared `<owner>.github.io` origin shares localStorage and notification permission across that owner's sites: namespace storage keys and record it as an accepted risk.
+2c. **Mobile app (iOS without a Mac)**: an iOS binary can only be built and signed on macOS, so the build is a cloud step — EAS Build for Expo/React Native (free plan: a small monthly quota of iOS builds in a slow queue), a macOS GitHub Actions runner (≈10x minutes on a private repo) or Codemagic for Flutter/native/Capacitor, a rented Mac (MacStadium, AWS EC2 Mac) only when none fits. Signing needs an Apple Developer account (paid, the user's) and its credentials stored in the build service, never the repo. Pin the build to the release SHA, ship to TestFlight / Play internal testing first, run `test-verification`'s Maestro flows and the pre-release real-device pass on that build, and only then submit to the stores — the submission is a Level-3 publish, the user's yes.
 3. **Config and secrets**: every variable listed per environment; none in the repo or history; the deploy target holds them. Document which variables a project needs (this also protects remote sessions, per the global `.mcp.json` rule).
 4. **Data**: migrations reversible or expand/contract; order of deploy vs migration stated; a backup or restore point taken before a migration that cannot be undone.
 5. **Rollback**: name the previous artifact and the exact command or button; confirm it is data-compatible. No rollback path means the deploy is a Level-3 decision for the user.

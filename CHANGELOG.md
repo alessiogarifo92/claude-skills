@@ -12,6 +12,11 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-10-15
+
+- test-verification 1.8.0: nuova sezione "Mobile UI automation": Maestro come equivalente mobile di Playwright (MCP `maestro mcp`), dove gira ogni piattaforma (in una sessione cloud niente emulatore né simulatore iOS: i flow vanno in CI o su Maestro Cloud), copertura 100% solo per gli unit test e flussi critici per la UI, passaggio su device reali (BrowserStack) prima di un rilascio sugli store, costo dei runner macOS sui repo privati.
+- deploy-readiness 1.3.0: passo 2c per le app mobile: la build iOS richiede macOS, quindi EAS Build / runner macOS / Codemagic; firma con l'account Apple Developer dell'utente; TestFlight e Play internal testing prima della pubblicazione sugli store, che è un gate dell'utente.
+
 ## 2026-10-13
 
 - `templates/session-start-hook.sh`: la copia committata in un progetto (`<progetto>/.claude/`) esce in silenzio quando l'hook utente del Setup script è registrato e trova una clone, così la sessione riceve una sola riga di stato invece di due. Lanciato dall'hook utente (da `templates/`), in locale o in un ambiente senza Setup script, funziona come prima.
