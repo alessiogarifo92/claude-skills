@@ -1,7 +1,7 @@
 ---
 name: worktree-manager
 description: Use when actual code work (not research/drafting) is about to start on a GitHub issue in any repo, when checking which worktrees/sessions are active, or after a branch merges — creates/lists/cleans per-ticket git worktrees so parallel Claude Code sessions never write to the same branch. Same convention across every project.
-version: 1.6.0
+version: 1.7.0
 ---
 
 **Run on:** haiku · effort low — mechanical script wrapper; `github-ops` can run it.
@@ -39,6 +39,8 @@ A ticket whose deliverable is a report posted as an issue comment (no repo commi
 
 ```bash
 gh issue edit <issue> --add-label "in progress"
+# remote session (gh issue ... is GraphQL, the proxy answers 403) — the same REST call worktree.sh makes:
+gh api -X POST "repos/{owner}/{repo}/issues/<issue>/labels" -f 'labels[]=in progress'
 ```
 
 If the research later turns into (or produces) something that gets committed — a `docs/` file, a code change — that's the point code work begins, and `start` applies from there, same as any other ticket.
@@ -46,7 +48,7 @@ If the research later turns into (or produces) something that gets committed —
 ## Safety model
 
 - `cleanup` never touches a **locked** worktree, even if its branch looks merged — a fresh branch with no commits of its own also counts as "merged", and yanking it would destroy another session's workspace. Unlocking is the explicit handoff step.
-- A branch only counts as "merged" if it's a literal git ancestor of `main`, **or** `gh` reports a merged PR with that branch as head — the second check exists because a squash or rebase merge (GitHub's default for this project's repos) produces a brand-new commit on `main`, so the original branch is never an ancestor even though its content is fully there. Without this fallback, `cleanup` silently does nothing on every squash-merged ticket — it reports no error, so the gap is easy to miss (this happened for real on DamianoGuideSite ticket #7: `cleanup` claimed success while the worktree and branch were still sitting there, locked, until it was noticed and fixed by hand).
+- A branch only counts as "merged" if it's a literal git ancestor of `main`, **or** `gh` reports a merged PR whose head SHA **is the branch's current tip** — a commit added after that PR merged is unmerged work, so the branch survives (before 1.7.0 any merged PR on the branch name was enough, and `-D` destroyed such commits) — the second check exists because a squash or rebase merge (GitHub's default for this project's repos) produces a brand-new commit on `main`, so the original branch is never an ancestor even though its content is fully there. Without this fallback, `cleanup` silently does nothing on every squash-merged ticket — it reports no error, so the gap is easy to miss (this happened for real on DamianoGuideSite ticket #7: `cleanup` claimed success while the worktree and branch were still sitting there, locked, until it was noticed and fixed by hand).
 - Deletion still favors the safe path: `git branch -d` (never `-D`) whenever the branch is a real ancestor. Only when it isn't — and a merged GitHub PR independently confirmed the merge — does `cleanup` force-delete with `-D`; a bare local heuristic never triggers `-D` on its own.
 - Unmerged branches (no ancestor relationship and no merged PR found) are never deleted; dirty worktrees are skipped with a warning.
 - `--dry-run` prints what would happen without changing anything.
@@ -54,6 +56,6 @@ If the research later turns into (or produces) something that gets committed —
 ## Per-repo requirements
 
 The script assumes:
-- `main` as the default branch (hardcoded `DEFAULT_BRANCH` in the script — if a repo uses something else, pass that repo's branch name isn't currently parameterized; flag it if this comes up so the script can read it from `git symbolic-ref`/`gh repo view` instead of assuming).
+- The default branch is read from `origin/HEAD` (`git remote set-head origin --auto` fixes a clone where it is missing), falling back to `main`; `WORKTREE_DEFAULT_BRANCH=<name>` overrides both. The primary checkout should sit on that branch, since the safe `git branch -d` measures merges against `HEAD`.
 - `gh` authenticated against the repo in question (for slug derivation and labeling).
 - A committed `.gitignore` the script can append `.claude/worktrees/` to (it does this automatically on first `start` in a repo and prints a reminder to commit it).

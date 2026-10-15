@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/templates/session-start-hook.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/templates/session-start-hook.sh\" --project"
           }
         ]
       }

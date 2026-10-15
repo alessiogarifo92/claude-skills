@@ -1,7 +1,7 @@
 ---
 name: autonomous-workflow
 description: Use when the user hands over an end-to-end goal (an app idea, a whole feature set, "take it from here", "vai in autonomia") or asks you to run the workflow unattended — conducts every stage from idea through marketing and deploy by routing to the right skill, agent, model and cross-verification level, and says exactly where it may proceed alone and where it must stop
-version: 1.8.0
+version: 1.8.1
 model: opus
 effort: high
 ---
@@ -27,7 +27,7 @@ For a brand-new project, invoke `project-lifecycle` first (its gates and Phase 3
 2. Project `CLAUDE.md` has the bootstrap section (global rule) — add it if missing. A brand-new project has no repo yet: until stage 1.5 creates one, keep decisions in the conversation and the task list, then write them to `docs/decisions.md`.
 3. Tools actually available: `gh` or the GitHub MCP, Playwright, Context7, Docker; a missing `mcp__*` tool means read `.mcp.json` and check env before concluding anything. Ask before any sudo/install (`handling-sudo-and-missing-tools`).
 4. Repo visibility: `gh api repos/<owner>/<repo> --jq .private` (or the hook's line). Private means finite Actions minutes: plan on local `verify` as the push gate and on the `test-verification` fallback when CI does not start; public means a CI job that does not start is a real problem to investigate.
-5. Open work: `gh issue list --label "in progress"` and `git worktree list` — never touch another session's locked worktree.
+5. Open work: `gh issue list --label "in progress"` (remote: `gh api "repos/{owner}/{repo}/issues?labels=in%20progress"`, or MCP `list_issues`) and `git worktree list` — never touch another session's locked worktree.
 6. Write the stage list as tasks (`TaskCreate`/`TodoWrite` if available, else a state section in the project docs or the epic issue) so progress survives context compaction.
 
 ## Stage map

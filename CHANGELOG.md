@@ -12,6 +12,16 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-10-15 (audit)
+
+Correzioni emerse dall'audit completo di workflow e skill (bug riprodotti prima di correggerli).
+
+- worktree-manager 1.7.0: `cleanup` considerava "mergiato" un branch con una qualsiasi PR mergiata sullo stesso nome e lo cancellava con `-D`, distruggendo i commit aggiunti dopo il merge (riprodotto): ora conta solo se la punta del branch è l'head SHA della PR mergiata. Il branch di default si legge da `origin/HEAD` (fallback `main`, override `WORKTREE_DEFAULT_BRANCH`) invece di essere fisso a `main`. Comando REST per etichettare un ticket di ricerca in remoto. Tre test nuovi in `worktree_test.sh`.
+- autonomous-workflow 1.8.1: il controllo del lavoro aperto nel preflight ha l'equivalente REST/MCP (`gh issue list` è GraphQL, 403 in remoto).
+- product-ownership 1.24.1: controllo repo privata via `gh api ... --jq .private` invece di `gh repo view` (GraphQL); il rimando alla regola "always surface test credentials", rimossa da CLAUDE.md, ora punta alla sezione di `test-verification` che la contiene.
+- CLAUDE.md: equivalenti REST per controllo `in progress`, etichetta e chiusura ticket in sessione remota.
+- templates/session-start-hook.sh: nel repo delle skill l'hook girava due volte (entry utente + entry di progetto sullo stesso file) e stampava lo stato due volte; l'entry di progetto passa `--project` e tace quando c'è quella utente.
+
 ## 2026-10-15 (seguito)
 
 Miglioramenti emersi dai test di scenario e dalla revisione della PR #36.
