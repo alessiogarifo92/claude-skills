@@ -6,6 +6,8 @@ version: 1.7.0
 
 **Run on:** haiku · effort low — mechanical script wrapper; `github-ops` can run it.
 
+**Pairs with:** `product-ownership` (pickup, labels, closing — invoke it too), `test-verification` (swapping the stack to the worktree for the manual check), `finishing-a-development-branch` (merge, then cleanup), `github-ops` agent (runs the script).
+
 Every Claude Code session that's about to write or modify code for a ticket gets its own worktree and branch. Never commit ticket work directly on the default branch in the primary checkout, and never reuse another session's worktree.
 
 `start` is a code-work trigger, not a ticket-pickup trigger. Don't call it the moment you pick up an issue — call it right before the first file edit. Research/investigation tickets (report lands as an issue comment, nothing committed) never need a worktree at all; see "Research tickets" below.
@@ -54,6 +56,8 @@ If the research later turns into (or produces) something that gets committed —
 - `--dry-run` prints what would happen without changing anything.
 
 ## Per-repo requirements
+
+If a repo genuinely can't use the script (no `gh` auth, an unusual branch layout), follow the convention by hand — same branch/path naming, same `git worktree lock --reason "issue #<n>"`, label applied — as the exception, never the default.
 
 The script assumes:
 - The default branch is read from `origin/HEAD` (`git remote set-head origin --auto` fixes a clone where it is missing), falling back to `main`; `WORKTREE_DEFAULT_BRANCH=<name>` overrides both. The primary checkout should sit on that branch, since the safe `git branch -d` measures merges against `HEAD`.

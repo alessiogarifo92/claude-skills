@@ -1,7 +1,7 @@
 ---
 name: orchestrating-agents
 description: Use when dispatching any subagent or coordinating multi-phase work (research → plan → implement → verify → deploy) — covers picking the model for the task, writing the dispatch brief, and verifying each agent's report before the next phase.
-version: 2.3.0
+version: 2.4.0
 model: opus
 effort: high
 ---
@@ -9,6 +9,8 @@ effort: high
 # Orchestrating Agents
 
 **Run on:** opus · effort high — delegation and verification decisions stay in the main session.
+
+**Pairs with:** `direct-execution` (decides *whether* to delegate; this skill decides *how*), `cross-verification` (blind panels and the critic), `autonomous-workflow` (the stage map that calls the agents), `subagent-driven-development` and `multi-agent-brainstorm` (parallel dispatch shapes).
 
 ## Overview
 
@@ -44,7 +46,7 @@ Escalate a sonnet agent to opus (via the `model` parameter) when its task turns 
 
 ## Dispatch brief — what the agent receives
 
-Goal in one sentence; exact scope boundaries (files/areas in scope, what NOT to touch); the spec or reproduction (decisions already made — an agent never decides for you); the verification commands to run; the reminder that git belongs to the orchestrator.
+Goal in one sentence; exact scope boundaries (files/areas in scope, what NOT to touch); the spec or reproduction (decisions already made — an agent never decides for you); the verification commands to run; the reminder that git belongs to the orchestrator. That reminder is also enforced: every agent but `github-ops` carries a PreToolUse hook (`scripts/agent-guard.sh`) that blocks git and GitHub writes, so a brief asking an agent to commit, push, merge or close an issue fails by design. Edits to agent files take effect in sessions started after them; a running session keeps the definitions it loaded.
 
 **Skills reach an agent only through its frontmatter or the brief.** A subagent does not inherit the main session's loaded skills. Two supported routes exist (verified against the Claude Code subagent docs):
 

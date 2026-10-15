@@ -1,7 +1,7 @@
 ---
 name: project-lifecycle
 description: Use when starting a new application or project from scratch, or evaluating one end to end, or adding a new platform (iOS, Android, an installable PWA) to an app that already ships — from initial idea through tool/stack and cost decisions, architecture, breaking the work into tickets, implementation, and deploy — with the user steering each phase (when unattended, `autonomous-workflow` conducts it) — not for a single scoped ticket already in flight
-version: 1.14.0
+version: 1.15.0
 model: opus
 effort: high
 ---
@@ -21,7 +21,7 @@ Owns the whole-project arc that sits above a single ticket: an idea becomes a va
 | 1. Idea | `brainstorming` (or `multi-agent-brainstorm` for multi-specialty ideas, with its cross-critique round) — goal, users, constraints, 2-3 shapes | User picks a direction |
 | 2. Tools & cost | `market-analyst` per external tool/API/SaaS/library candidate; state the free-tier and cheapest-viable path explicitly, not just the "best" option | User confirms the stack and its cost profile |
 | 3. Architecture | `principal-engineering-core` for operating principles, `architecture-review` for structural shape (plus `database-design` if persistence is involved); `architect` agents with different lenses (override one to `model: sonnet`) + a `critic` (`cross-verification` Mode A) when the architecture is a real risk; a small, no-spend project gets one `architect` + `critic` | User confirms the shape before any ticket is drafted |
-| 3.5. Design UI/UX (only if the project has a user-facing UI) | Propose it explicitly here, don't wait to be asked — see "Phase 3.5 in detail" below for the five steps it runs; the global CLAUDE.md rule "Never skip a Design UI/UX phase before development" states the failure mode this prevents | User picks **one** named direction out of several (or explicitly defers the phase, e.g. "ship default styling for now") before any UI-bearing ticket is drafted |
+| 3.5. Design UI/UX (only if the project has a user-facing UI) | Propose it explicitly here, don't wait to be asked — see "Phase 3.5 in detail" below for the five steps it runs; "Design gap found mid-build" below states the failure mode this prevents | User picks **one** named direction out of several (or explicitly defers the phase, e.g. "ship default styling for now") before any UI-bearing ticket is drafted |
 | R. Repo & CI (not a numbered phase: after phase 1, before phase 4) | the repo is created at the **end of phase 1** (confirmed in the phase-1 gate), with bootstrap `CLAUDE.md` and `docs/decisions.md`; CI and the manual-gate preview mechanism are set up before the first implementation ticket (`autonomous-workflow` stages 1.5 and 4.5) | User confirms repo creation; provider accounts are the user's |
 | 4. Tickets | `ticket-interrogation` first on any slice whose requirements are still fuzzy (it produces the ticket body), then `product-ownership` — one ticket per independently shippable slice, referencing the phase 2/3/3.5 decisions instead of re-deriving them; the whole batch gets its own milestone (e.g. "MVP") per `product-ownership`'s milestone convention, instead of only naming the range in ticket text | Each ticket drafted and confirmed per `product-ownership`'s own gate |
 | 5. Implementation | `product-ownership`'s per-ticket loop (worktree → `writing-plans` if multi-step → direct execution / `test-driven-development` → `test-verification` → `requesting-code-review` → manual gate → `finishing-a-development-branch`) | Same ticket-level gates, unchanged |
@@ -65,7 +65,7 @@ Read what already exists first: the project's own plan (`strategia-progetto.md` 
 | No real user-facing UI (internal tool, CLI, API-only) | Defer the phase explicitly and say so, per the gate. |
 
 ### Step 3 — Put at least three comparable directions on one canvas
-Use `design` (`/design`) — not prose, not frontend code. One canvas; each direction drawn on **the same** 2-3 screens from step 1; each carrying a name the user can point at.
+Use `design` (`/design`) — not prose, not frontend code. If `design` is not in the Skill list (it is not installed by this repo's scripts, and remote sessions often lack it), take the `Artifact` tool's quickstart with intent `design` and build the same canvas there; never fall back to prose. One canvas; each direction drawn on **the same** 2-3 screens from step 1; each carrying a name the user can point at.
 
 - Distinct means a different thesis, not a recolor: type pairing, layout density, and the hierarchy of the primary screen should each differ. If two directions survive swapping their palettes, they are one direction.
 - Label each direction on the canvas with its own tokens (palette hex, type roles, spacing scale), so picking a direction also picks what the tickets inherit.
@@ -88,6 +88,11 @@ The user names one direction. Then record it where phase 4 can reach it — the 
 Don't iterate blind in the terminal, and don't restart from an empty canvas. Hand a written brief to Claude Design and iterate visually there, then bring the chosen result back into phase 4. `design-brief-template.md` is that brief.
 
 Where the project already has a component library, push it first: `/design-sync` (the `DesignSync` tool) syncs a local library into a Claude Design **design-system** project one component at a time, so what gets prototyped there starts on-brand instead of generic — and the result comes back without a hand re-implementation.
+
+### Design gap found mid-build
+Any project whose own plan places a design phase before the build (here phase 3.5, or e.g. a "Design UI" phase in `strategia-progetto.md`) gets no theme/frontend/UI code until that phase has a concrete deliverable — a mockup, a style guide, or an explicit reference to build against. Before executing build tickets, check for it; if it is missing, stop and flag the gap instead of executing tickets that assume a design outcome that never happened.
+- If the user hands over a reference site, mockup or style direction mid-build, treat it as the missing phase-3.5 deliverable: record it in the project docs/memory and offer to open the design phase as its own ticket, rather than absorbing style changes ad hoc into unrelated build tickets.
+- **Why:** on DamianoGuideSite a narrow build plan correctly marked visual design out of scope, but the build started before the project's own Design UI phase produced anything; several tickets shipped against an unstyled default theme, found only when the user compared the result with the reference site they had in mind. The rework costs the same on ticket 1 or ticket 7 — catching it earlier is strictly better.
 
 ## Cost rule
 Every phase that adds a tool, service, or hosting target restates: what it costs today, what it costs at realistic 10x scale, and whether a free/cheaper path exists that doesn't compromise the actual requirement — per `market-analyst`. Default recommendation is the cheapest option that meets the constraint, not the most capable one available.

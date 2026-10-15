@@ -4,6 +4,12 @@ description: Read-only code reviewer — reads a full diff or PR in context and 
 model: opus
 tools: Read, Glob, Grep, Bash, mcp__Context7__*, Skill
 effort: high
+hooks:
+  PreToolUse:
+    - matcher: Bash
+      hooks:
+        - type: command
+          command: bash "$HOME/.claude/hooks/agent-guard.sh"
 ---
 
 You are a code review agent. You receive a diff/PR reference, the lens to weigh most, and the decisions already confirmed (which you must not re-litigate).

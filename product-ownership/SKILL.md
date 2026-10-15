@@ -1,12 +1,14 @@
 ---
 name: product-ownership
 description: Use when publishing or creating a GitHub issue/ticket whose content is already settled (if its own design decisions are still open, `ticket-interrogation` runs first and hands back the title and body), researching external sources needed to write one, deciding whether something is a bug/research/implementation ticket, starting or finishing implementation work on a ticket, about to push or merge a completed change, or cleaning up branches after a PR merges or a commit supersedes it
-version: 1.24.1
+version: 1.25.0
 ---
 
 # Product Ownership
 
 **Run on:** sonnet · effort medium — ticket hygiene and lifecycle; opus when drafting a ticket from a vague problem.
+
+**Pairs with:** `ticket-interrogation` (produces the body of a still-fuzzy ticket), `worktree-manager` (code-work pickup), `test-verification` (evidence and the handoff checklist), `finishing-a-development-branch` (integration choice after the gate), `project-lifecycle` and `autonomous-workflow` (the multi-ticket arc).
 
 Own the lifecycle of a work item end to end: from a raw problem report to a grounded ticket, through to the branch cleanup once the work has actually shipped. Grounding tickets in the real code/data is expected baseline behavior, not this skill's job — this skill is about the parts that get skipped without a deliberate habit: separating ticket types, confirming before publishing, reusing repo conventions, and closing the loop on branches.
 
@@ -105,7 +107,7 @@ Milestones and the dependency/epic relationships above are orthogonal, not subst
 ## Work-in-progress label
 Add an `in progress` label the moment a ticket is actually being worked (this includes research/drafting, not just code — see the pickup row in the table above for when a *worktree* also gets created, which is a narrower, later trigger). If the repo doesn't have that label yet (`gh label list`), create it first: `gh label create "in progress" --color fbca04 --description "Actively being worked on"`.
 
-Remove the label the moment the issue closes — GitHub does not strip labels on close automatically, so this is a manual step to do alongside `gh issue close`/the closing comment, never left dangling. This is unconditional: it applies to **every** closing path, not just the shipped-fix flow — a research ticket closed once its report lands, an issue closed as duplicate/wontfix/not-planned, and a superseded ticket (see "When work lands via a different path" below) all remove the label at close time exactly the same way a shipped fix does.
+Remove the label the moment the issue closes (remote session, where `gh issue ...` is GraphQL and gets a 403: close with MCP `issue_write` `state: closed` plus `state_reason`, and `gh api -X DELETE "repos/{owner}/{repo}/issues/<n>/labels/in%20progress"`) — GitHub does not strip labels on close automatically, so this is a manual step to do alongside `gh issue close`/the closing comment, never left dangling. This is unconditional: it applies to **every** closing path, not just the shipped-fix flow — a research ticket closed once its report lands, an issue closed as duplicate/wontfix/not-planned, and a superseded ticket (see "When work lands via a different path" below) all remove the label at close time exactly the same way a shipped fix does.
 
 A step that only exists as a phrase in a skill, disconnected from the action that triggers it, gets skipped under load — it happened on issue #34: the worktree was created and work landed without the label ever being applied. Don't rely on remembering to do this as a separate action each time: pickup tooling should apply the label as part of creating the worktree/branch, so labeling and pickup happen atomically. The global `worktree-manager` skill does exactly this — its `start <issue>` labels the issue automatically, and it's the same script across every repo, not something to reimplement per project. Where a repo's pickup instead goes through `github-ops` or something else that doesn't label automatically, treat "did I label it?" as a mandatory checkpoint immediately after `git worktree add`/branch creation, before writing any code — not a step to "get to."
 

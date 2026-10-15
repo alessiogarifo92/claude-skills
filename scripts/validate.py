@@ -15,6 +15,8 @@ SEMVER = re.compile(r"^\d+\.\d+\.\d+$")
 EXTERNAL = {"design", "design-sync", "frontend-design", "taste", "impeccable", "emil-design-eng",
             "animate", "animate-expo", "animation-performance", "review-animations", "break-ui", "mobile-native", "code-review", "laravel-boost",
             "general-purpose", "playwright", "context7", "claude-api"}
+# agents whose job is git/GitHub mechanics; every other agent carries the agent-guard hook
+GIT_AGENTS = {"github-ops"}
 errors, warnings = [], []
 
 
@@ -79,6 +81,9 @@ for f in sorted(glob.glob(os.path.join(ROOT, "agents", "*.md"))):
     for s in fm.get("skills", []) if isinstance(fm.get("skills"), list) else []:
         if s not in skills: err(f"{rel}: preloads unknown skill '{s}'")
     if "STATUS" not in body: err(f"{rel}: prompt lacks the STATUS report contract")
+    raw = open(f, encoding="utf-8").read().split("\n---\n", 1)[0]
+    if n not in GIT_AGENTS and "agent-guard.sh" not in raw:
+        err(f"{rel}: frontmatter lacks the PreToolUse agent-guard hook (git/GitHub writes are the main session's)")
     if re.search(r"\bgit (commit|push)\b", body) and "Never run git" not in body and "never post" not in body.lower() and "git write" not in body:
         warn(f"{rel}: mentions git commit/push without an explicit prohibition")
     agents[n] = dict(model=fm.get("model"), effort=fm.get("effort"), desc=fm.get("description", ""),
@@ -90,6 +95,10 @@ for n, d in skills.items():
         if line.startswith("**Pairs with:**"):
             for tok in re.findall(r"`([a-z0-9]+(?:-[a-z0-9]+)*)`", line):
                 if tok not in known: err(f"{n}: 'Pairs with' references unknown '{tok}'")
+
+for n, d in skills.items():
+    if not re.search(r"^\*\*Pairs with:\*\* ", d["body"], re.M):
+        err(f"{n}: missing '**Pairs with:**' line (writing-skills format)")
 
 # every skill must be routed to: mentioned by some other skill, the README or CLAUDE.md
 corpus = {n: d["body"] for n, d in skills.items()}

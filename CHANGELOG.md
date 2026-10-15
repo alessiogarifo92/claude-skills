@@ -14,13 +14,19 @@ modifica alla skill.
 
 ## 2026-10-15 (audit)
 
-Correzioni emerse dall'audit completo di workflow e skill (bug riprodotti prima di correggerli).
+Audit completo di workflow, skill, agent e script (report: `docs/reports/2026-10-15-audit-workflow-skills.md`); ogni bug riprodotto prima della correzione.
 
-- worktree-manager 1.7.0: `cleanup` considerava "mergiato" un branch con una qualsiasi PR mergiata sullo stesso nome e lo cancellava con `-D`, distruggendo i commit aggiunti dopo il merge (riprodotto): ora conta solo se la punta del branch è l'head SHA della PR mergiata. Il branch di default si legge da `origin/HEAD` (fallback `main`, override `WORKTREE_DEFAULT_BRANCH`) invece di essere fisso a `main`. Comando REST per etichettare un ticket di ricerca in remoto. Tre test nuovi in `worktree_test.sh`.
-- autonomous-workflow 1.8.1: il controllo del lavoro aperto nel preflight ha l'equivalente REST/MCP (`gh issue list` è GraphQL, 403 in remoto).
-- product-ownership 1.24.1: controllo repo privata via `gh api ... --jq .private` invece di `gh repo view` (GraphQL); il rimando alla regola "always surface test credentials", rimossa da CLAUDE.md, ora punta alla sezione di `test-verification` che la contiene.
-- CLAUDE.md: equivalenti REST per controllo `in progress`, etichetta e chiusura ticket in sessione remota.
-- templates/session-start-hook.sh: nel repo delle skill l'hook girava due volte (entry utente + entry di progetto sullo stesso file) e stampava lo stato due volte; l'entry di progetto passa `--project` e tace quando c'è quella utente.
+- worktree-manager 1.7.0: `cleanup` considerava "mergiato" un branch con una qualsiasi PR mergiata sullo stesso nome e lo cancellava con `-D`, distruggendo i commit aggiunti dopo il merge (riprodotto): ora conta solo se la punta del branch è l'head SHA della PR mergiata. Branch di default letto da `origin/HEAD` (fallback `main`, override `WORKTREE_DEFAULT_BRANCH`). Comando REST per etichettare in remoto; fallback manuale e riga `Pairs with` spostati qui da CLAUDE.md. Tre test nuovi.
+- autonomous-workflow 1.8.1: equivalente REST/MCP del controllo `in progress` nel preflight; `review-animations` si legge da file (non è invocabile dal modello).
+- product-ownership 1.25.0: repo privata via `gh api ... --jq .private` (non `gh repo view`, GraphQL); chiusura ed etichetta in remoto (spostato da CLAUDE.md); rimando corretto alla regola sulle credenziali di test; riga `Pairs with`.
+- test-verification 1.10.0: nuova sezione "Unit layer: mandatory on every implementation ticket", spostata da CLAUDE.md.
+- project-lifecycle 1.15.0: "Design gap found mid-build" spostato da CLAUDE.md; se `design` manca, canvas con il quickstart `Artifact` (intent `design`), mai prosa.
+- api-design 1.0.2, brand-strategist 1.1.2, docs-and-specs 1.0.2, handling-sudo-and-missing-tools 1.0.2, market-analyst 1.0.3, product-marketing-strategist 1.1.1: aggiunta la riga `Pairs with` richiesta dal formato (ora `validate.py` la impone).
+- orchestrating-agents 2.4.0: il divieto di git per gli agent è imposto dall'hook `agent-guard`; le modifiche agli agent valgono dalle sessioni successive; riga `Pairs with`.
+- CLAUDE.md: da ~25 KB a ~13 KB. Restano le regole trasversali e i trigger; i dettagli di fase stanno nelle skill indicate. Nuova sezione "GitHub from a remote session: REST, not GraphQL"; fallback per `/design`.
+- Agent: hook `PreToolUse` (`scripts/agent-guard.sh`, collegato da `install.sh` in `~/.claude/hooks/`) su tutti tranne `github-ops`: blocca git e GitHub in scrittura, che erano vietati solo nel prompt. Verificato con una sessione headless: il subagent viene bloccato. Vale dalle sessioni avviate dopo l'installazione. `github-ops` ha `sub_issue_write`, `get_file_contents`, `actions_list`, `actions_get`; `github-ops` e `researcher` sanno che `gh issue/pr` è GraphQL (403) in remoto.
+- templates: l'hook di avvio non stampa più lo stato due volte nel repo delle skill (`--project`); `cloud-setup-script.sh` registra l'hook con `python3` se `jq` manca o fallisce, e lo dice se non può.
+- CI: `shellcheck`, `agent-guard_test.sh`, `scripts_test.sh` (install, hook di avvio, setup cloud); `validate.py` impone hook guard e `Pairs with`.
 
 ## 2026-10-15 (seguito)
 

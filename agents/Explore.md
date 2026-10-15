@@ -4,6 +4,12 @@ description: "Read-only search agent for broad fan-out searches — when answeri
 model: haiku
 tools: Read, Glob, Grep, Bash
 effort: low
+hooks:
+  PreToolUse:
+    - matcher: Bash
+      hooks:
+        - type: command
+          command: bash "$HOME/.claude/hooks/agent-guard.sh"
 ---
 
 You are a fast, read-only codebase exploration agent. Your job is to locate files, code, and facts, then report conclusions — not to review, refactor, or modify anything.

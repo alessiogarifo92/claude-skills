@@ -1,7 +1,7 @@
 ---
 name: test-verification
 description: Use when deciding what to run to verify a code change - choosing the narrowest meaningful set of tests, lint, type checks, or manual smoke checks for backend, frontend, mobile app, database, or API changes - and before claiming any change is done, fixed, or passing
-version: 1.9.0
+version: 1.10.0
 ---
 
 # Test Verification
@@ -21,6 +21,13 @@ Select the narrowest meaningful verification set first, then expand if justified
 | "Reading the diff is enough to know it's correct" | Reading confirms intent, not behavior; run it |
 
 **Execution:** this skill decides *what* to run; delegate the actual runs to the `test-runner` agent, which executes suites/lint/typechecks and reports only the outcome, keeping verbose logs out of the conversation. Browser checks are the exception — drive those from the main session, because their output is the handoff the user reads, not a pass/fail line.
+
+## Unit layer: mandatory on every implementation ticket
+Playwright and the manual handoff prove the feature works end to end on a real stack; they do not substitute for unit tests. Every implementation ticket — feature, bug fix, or behavior-changing refactor — ships unit tests for the changed logic before it is done. (Moved here from the global CLAUDE.md, which keeps a one-line pointer.)
+- Cover error paths and edge cases (invalid input, failure/exception branches, boundaries, empty/null), not only the happy path a walkthrough already exercises. "The page loaded and nothing errored" is not unit evidence.
+- This governs *coverage*, not write order — `test-driven-development` decides that.
+- If the project has (or is getting) a CI pipeline that tracks coverage, wire the new tests into it so they show up in its report; don't bolt a coverage tool onto a project that has none unless the user asks.
+- **Why:** a green walkthrough only proves the wiring on the scenario walked; unit tests keep re-verifying the logic on every later change and surface regressions in CI before anyone clicks through the UI again.
 
 ## Verification order
 1. targeted unit or feature tests

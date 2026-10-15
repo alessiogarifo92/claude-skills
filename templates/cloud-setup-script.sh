@@ -17,10 +17,20 @@ own="$HOME/.claude-skills-repo"
 cmd='for f in /home/user/claude-skills/templates/session-start-hook.sh "$HOME/claude-skills/templates/session-start-hook.sh" "$HOME/.claude-skills-repo/templates/session-start-hook.sh"; do [ -f "$f" ] && exec bash "$f"; done; echo "claude-skills: NOT INSTALLED (no clone found). Attach it (add_repo) and run scripts/install.sh before any work, and say so in visible text."'
 s="$HOME/.claude/settings.json"
 [ -s "$s" ] || echo '{}' > "$s"
-if command -v jq >/dev/null 2>&1; then
-  jq --arg c "$cmd" '
+# Replace any earlier session-start-hook entry with this one, keep every other hook: jq, else python3.
+if ! { command -v jq >/dev/null 2>&1 && jq --arg c "$cmd" '
     .hooks.SessionStart = ([.hooks.SessionStart[]? | select(([.hooks[]?.command] | map(contains("session-start-hook.sh")) | any) | not)]
-                           + [{"hooks": [{"type": "command", "command": $c}]}])' "$s" > "$s.tmp" && mv "$s.tmp" "$s"
+                           + [{"hooks": [{"type": "command", "command": $c}]}])' "$s" > "$s.tmp" && mv "$s.tmp" "$s"; }; then
+  rm -f "$s.tmp"
+  python3 - "$s" "$cmd" <<'PY' 2>/dev/null || echo "claude-skills setup: could not register the SessionStart hook (no jq, no python3): sessions will not auto-update the skills" >&2
+import json, sys
+path, cmd = sys.argv[1], sys.argv[2]
+cfg = json.load(open(path))
+hooks = cfg.setdefault("hooks", {})
+keep = [e for e in hooks.get("SessionStart", []) if not any("session-start-hook.sh" in h.get("command", "") for h in e.get("hooks", []))]
+hooks["SessionStart"] = keep + [{"hooks": [{"type": "command", "command": cmd}]}]
+json.dump(cfg, open(path, "w"), indent=2)
+PY
 fi
 for d in /home/user/claude-skills "$HOME/claude-skills" "$own"; do
   [ -f "$d/scripts/install.sh" ] && { bash "$d/scripts/install.sh" >/dev/null 2>&1; t bash "$d/scripts/install-design-skills.sh" >/dev/null 2>&1; break; }

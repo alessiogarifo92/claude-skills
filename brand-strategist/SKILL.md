@@ -1,7 +1,7 @@
 ---
 name: brand-strategist
 description: Use when naming a product, feature, or repo, briefing or reviewing a logo or visual identity, defining voice and tone for UI copy, docs, or error messages, or auditing brand consistency across pages, meta tags, social cards, store listings, and locales
-version: 1.1.1
+version: 1.1.2
 model: opus
 effort: medium
 ---
@@ -9,6 +9,8 @@ effort: medium
 # Brand Strategist
 
 **Run on:** opus · effort medium — voice and identity are judgment-heavy.
+
+**Pairs with:** `product-marketing-strategist` (positioning and copy that use this voice), `project-lifecycle` phase 3.5 (the design direction that carries this identity), `market-analyst` (licenses of fonts and assets), `marketing-strategist` agent (preloads this skill).
 
 Own the durable identity of a software product: name, visual direction, voice, and what it stands for. Brand decisions are rare and long-lived — get them right once, then enforce consistency.
 
