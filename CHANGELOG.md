@@ -12,6 +12,16 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-10-15
+
+Mobile e PWA, dopo un confronto con un elenco di skill consigliate (Superpowers, document skills, frontend-design e skill-creator erano già coperti). Provato con due scenari ciechi (PWA con push, app Expo da pubblicare su iOS senza Mac) e una revisione `critic`.
+
+- test-verification 1.9.0 (1.8.0 nello stesso giorno): sezione "Mobile UI automation": Maestro per le app native (solo simulatore iOS: niente iPhone fisici né `.ipa` di TestFlight), MCP solo in scope locale, i flow non eseguibili in una sessione cloud sono l'unica eccezione dichiarata al gate di verifica locale, costo dei runner macOS. Sezione "Installable web apps (PWA)": ogni sito installabile deve funzionare su Android e iOS senza che l'utente lo chieda (manifest con `id` e icone per entrambi, niente `beforeinstallprompt` su iOS, storage separato da Safari, push solo da app installata, aggiornamento del service worker, safe area); cosa Playwright non può verificare (installazione, `display-mode: standalone`, push reale; service worker solo su Chromium) va sempre nella lista per i device reali; se l'utente rinuncia a una piattaforma per un ticket, si registra.
+- deploy-readiness 1.4.0 (1.3.0 nello stesso giorno): passo 2c per le app mobile: build iOS in cloud (EAS, runner macOS, Codemagic), account Apple creato dall'utente, Maestro su build per simulatore dello stesso SHA, passaggio su device reali con TestFlight (device cloud solo se manca un iPhone, con gate di spesa), pubblicazione sugli store come gate dell'utente. Lo smoke test di una PWA include l'installazione dall'URL live su Android e iPhone.
+- project-lifecycle 1.13.0: "Target platforms are a phase 1-2 decision": PWA su Android e iOS di default con i limiti di iOS nel brief di fase 1/2; per le app native i costi ricorrenti (Apple, Google Play, build, CI macOS) in fase 2 invece che al deploy.
+- product-ownership 1.23.0: al pickup, controllo piattaforme: progetto mobile o PWA → leggere subito le sezioni di `test-verification` e nominare tutte le piattaforme nei criteri di accettazione (prima la regola PWA arrivava solo in verifica, a codice scritto).
+- autonomous-workflow 1.8.0: lo stage 4.5 (ticket 0) decide dove girano i controlli UI Android/iOS e con quale costo.
+
 ## 2026-10-13
 
 - `templates/session-start-hook.sh`: la copia committata in un progetto (`<progetto>/.claude/`) esce in silenzio quando l'hook utente del Setup script è registrato e trova una clone, così la sessione riceve una sola riga di stato invece di due. Lanciato dall'hook utente (da `templates/`), in locale o in un ambiente senza Setup script, funziona come prima.

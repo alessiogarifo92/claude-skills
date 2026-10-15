@@ -46,13 +46,13 @@ Policy: **opus** where judgment is expensive and no test catches the error (arch
 |---|---|---|---|
 | `api-design` | 1.0.1 | sonnet | high |
 | `architecture-review` | 1.1.1 | opus | high |
-| `autonomous-workflow` | 1.7.0 | opus | high |
+| `autonomous-workflow` | 1.8.0 | opus | high |
 | `brainstorming` | 1.2.1 | opus | high |
 | `brand-strategist` | 1.1.1 | opus | medium |
 | `cross-verification` | 1.1.5 | opus | high |
 | `database-design` | 1.2.0 | opus | high |
 | `debugging-workflow` | 1.0.3 | sonnet | high |
-| `deploy-readiness` | 1.2.0 | opus | high |
+| `deploy-readiness` | 1.4.0 | opus | high |
 | `direct-execution` | 1.4.0 | main | medium |
 | `docs-and-specs` | 1.0.1 | sonnet | medium |
 | `executing-plans` | 1.0.1 | sonnet | medium |
@@ -65,8 +65,8 @@ Policy: **opus** where judgment is expensive and no test catches the error (arch
 | `orchestrating-agents` | 2.3.0 | opus | high |
 | `principal-engineering-core` | 1.2.0 | opus | high |
 | `product-marketing-strategist` | 1.1.0 | opus | medium |
-| `product-ownership` | 1.22.0 | sonnet | medium |
-| `project-lifecycle` | 1.12.0 | opus | high |
+| `product-ownership` | 1.23.0 | sonnet | medium |
+| `project-lifecycle` | 1.13.0 | opus | high |
 | `python-backend` | 1.0.1 | sonnet | high |
 | `receiving-code-review` | 1.1.0 | opus | medium |
 | `refactoring-strategy` | 1.0.1 | sonnet | high |
@@ -75,7 +75,7 @@ Policy: **opus** where judgment is expensive and no test catches the error (arch
 | `sql-performance` | 1.0.1 | sonnet | high |
 | `subagent-driven-development` | 1.2.0 | opus | medium |
 | `test-driven-development` | 1.0.1 | sonnet | medium |
-| `test-verification` | 1.7.0 | sonnet | medium |
+| `test-verification` | 1.9.0 | sonnet | medium |
 | `ticket-interrogation` | 1.4.2 | opus | high |
 | `vue-frontend` | 1.0.2 | sonnet | high |
 | `worktree-manager` | 1.6.0 | haiku | low |
