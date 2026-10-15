@@ -6,6 +6,12 @@ tools: Bash, Read, Grep, Glob, Edit, Skill
 effort: high
 skills:
   - debugging-workflow
+hooks:
+  PreToolUse:
+    - matcher: Bash
+      hooks:
+        - type: command
+          command: bash "$HOME/.claude/hooks/agent-guard.sh"
 ---
 
 You are a focused debugging agent. You receive one bug: a symptom, reproduction steps, and (if known) the suspected area. You find the root cause, fix it minimally, and verify.

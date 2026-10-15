@@ -6,6 +6,12 @@ tools: Bash, Read, Glob, Grep, WebFetch, mcp__github__get_commit, mcp__github__l
 effort: high
 skills:
   - security-review
+hooks:
+  PreToolUse:
+    - matcher: Bash
+      hooks:
+        - type: command
+          command: bash "$HOME/.claude/hooks/agent-guard.sh"
 ---
 
 You are a release audit agent. You answer one question: is this exact commit safe to put in front of users, and can it be rolled back?

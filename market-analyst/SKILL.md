@@ -1,12 +1,14 @@
 ---
 name: market-analyst
 description: Use when choosing or adding a third-party tool, API, SaaS, library, font, dataset, model, or other external asset to a project, when estimating recurring or usage-based costs of a stack, or when auditing existing dependencies for license compatibility, copyright obligations, and unwanted costs, or choosing a database, hosting or other infrastructure service by cost
-version: 1.0.2
+version: 1.0.3
 ---
 
 # Market Analyst
 
 **Run on:** sonnet · effort medium — research synthesis (via `researcher`); opus for a final stack recommendation.
+
+**Pairs with:** `project-lifecycle` phase 2 (stack and cost gate), `deploy-readiness` (the hosting cost actually billed), `researcher` agent (gathers current pricing and ToS), `requesting-code-review` (the dependency lens on a diff), `brand-strategist` (font and asset licenses).
 
 Own the market level of the project: every tool, API, SaaS, library, or asset that enters the stack is a purchase decision — even when it's free. This skill runs due diligence on two axes before the choice hardens into a ticket: what it will actually cost, and what its license or terms actually allow. The goal is no surprise invoices and no legal exposure discovered after shipping.
 

@@ -20,6 +20,8 @@ Private skills, agents and global rules for Claude Code. Goal: run a project fro
 - `agents/*.md` — subagents (frontmatter: model, effort, tools, preloaded skills).
 - `templates/project-CLAUDE-bootstrap.md` — section every project's `CLAUDE.md` must carry so remote sessions attach this repo.
 - `templates/session-start-hook.sh` — SessionStart hook every project commits; `templates/cloud-setup-script.sh` — cloud environment setup script registering it at user level.
+- `scripts/agent-guard.sh` — PreToolUse hook every agent but `github-ops` carries (linked to `~/.claude/hooks/` by `install.sh`): blocks git and GitHub writes, which belong to the main session. Agent and hook changes apply to sessions started after `install.sh`.
+- Tests (CI runs them all, plus `shellcheck`): `worktree-manager/scripts/worktree_test.sh`, `scripts/agent-guard_test.sh`, `scripts/scripts_test.sh` (install, SessionStart hook, cloud setup).
 - `scripts/validate.py` — consistency check (CI runs it); `scripts/install.sh` — link into `~/.claude`; `scripts/install-design-skills.sh` — link the external design skills (`impeccable`, a subset of Emil Kowalski's) at pinned commits.
 - `CHANGELOG.md` — one line per skill change, same commit as the change.
 
@@ -44,29 +46,29 @@ Policy: **opus** where judgment is expensive and no test catches the error (arch
 <!-- matrix:begin -->
 | Skill | Version | Run on | Effort |
 |---|---|---|---|
-| `api-design` | 1.0.1 | sonnet | high |
+| `api-design` | 1.0.2 | sonnet | high |
 | `architecture-review` | 1.1.1 | opus | high |
-| `autonomous-workflow` | 1.8.0 | opus | high |
+| `autonomous-workflow` | 1.8.1 | opus | high |
 | `brainstorming` | 1.2.1 | opus | high |
-| `brand-strategist` | 1.1.1 | opus | medium |
+| `brand-strategist` | 1.1.2 | opus | medium |
 | `cross-verification` | 1.1.5 | opus | high |
 | `database-design` | 1.2.0 | opus | high |
 | `debugging-workflow` | 1.0.3 | sonnet | high |
 | `deploy-readiness` | 1.5.0 | opus | high |
 | `direct-execution` | 1.4.0 | main | medium |
-| `docs-and-specs` | 1.0.1 | sonnet | medium |
+| `docs-and-specs` | 1.0.2 | sonnet | medium |
 | `executing-plans` | 1.0.1 | sonnet | medium |
 | `finishing-a-development-branch` | 1.2.0 | sonnet | low |
 | `go-backend` | 1.0.1 | sonnet | high |
-| `handling-sudo-and-missing-tools` | 1.0.1 | haiku | low |
+| `handling-sudo-and-missing-tools` | 1.0.2 | haiku | low |
 | `laravel-architecture` | 1.3.1 | sonnet | high |
-| `market-analyst` | 1.0.2 | sonnet | medium |
+| `market-analyst` | 1.0.3 | sonnet | medium |
 | `multi-agent-brainstorm` | 1.3.1 | opus | high |
-| `orchestrating-agents` | 2.3.0 | opus | high |
+| `orchestrating-agents` | 2.4.0 | opus | high |
 | `principal-engineering-core` | 1.2.0 | opus | high |
-| `product-marketing-strategist` | 1.1.0 | opus | medium |
-| `product-ownership` | 1.24.0 | sonnet | medium |
-| `project-lifecycle` | 1.14.0 | opus | high |
+| `product-marketing-strategist` | 1.1.1 | opus | medium |
+| `product-ownership` | 1.25.0 | sonnet | medium |
+| `project-lifecycle` | 1.15.0 | opus | high |
 | `python-backend` | 1.0.1 | sonnet | high |
 | `receiving-code-review` | 1.1.0 | opus | medium |
 | `refactoring-strategy` | 1.0.1 | sonnet | high |
@@ -75,10 +77,10 @@ Policy: **opus** where judgment is expensive and no test catches the error (arch
 | `sql-performance` | 1.0.1 | sonnet | high |
 | `subagent-driven-development` | 1.2.0 | opus | medium |
 | `test-driven-development` | 1.0.1 | sonnet | medium |
-| `test-verification` | 1.9.0 | sonnet | medium |
+| `test-verification` | 1.10.0 | sonnet | medium |
 | `ticket-interrogation` | 1.4.2 | opus | high |
 | `vue-frontend` | 1.0.2 | sonnet | high |
-| `worktree-manager` | 1.6.0 | haiku | low |
+| `worktree-manager` | 1.7.0 | haiku | low |
 | `writing-plans` | 1.2.0 | opus | high |
 | `writing-skills` | 1.6.0 | opus | medium |
 

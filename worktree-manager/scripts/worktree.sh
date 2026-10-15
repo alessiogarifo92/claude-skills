@@ -23,7 +23,9 @@ COMMON="$(git rev-parse --git-common-dir 2>/dev/null)" || die "not in a git repo
 COMMON="$(cd "$COMMON" && pwd -P)"
 ROOT="$(dirname "$COMMON")"
 WT_DIR="$ROOT/.claude/worktrees"
-DEFAULT_BRANCH="main"
+# origin's default branch (origin/HEAD), else "main"; WORKTREE_DEFAULT_BRANCH overrides both.
+DEFAULT_BRANCH="${WORKTREE_DEFAULT_BRANCH:-$(git -C "$ROOT" symbolic-ref --short -q refs/remotes/origin/HEAD 2>/dev/null | sed 's#^origin/##' || true)}"
+DEFAULT_BRANCH="${DEFAULT_BRANCH:-main}"
 
 ensure_ignored() {
   grep -qxF '.claude/worktrees/' "$ROOT/.gitignore" 2>/dev/null || {
@@ -71,13 +73,16 @@ lock_reason() { # lock_reason <path> — prints the lock reason, empty if unlock
 # content is fully in there. For that case, fall back to asking GitHub whether a
 # PR with this branch as head was merged — any gh failure (no remote, not
 # authenticated, no such PR) just means "not merged this way", not an abort.
+# Only the exact commit GitHub merged counts: the branch tip must equal a merged
+# PR's head SHA. A commit added after that PR merged is unmerged work, and the
+# -D below would otherwise destroy it.
 is_branch_merged() {
-  local branch="$1"
-  git -C "$ROOT" merge-base --is-ancestor "$branch" "$DEFAULT_BRANCH" && return 0
-  local merged_pr
-  merged_pr="$(cd "$ROOT" && gh api "repos/{owner}/{repo}/pulls?state=closed&head={owner}:$branch" \
-    --jq '[.[]|select(.merged_at != null)][0].number // empty' 2>/dev/null)" || return 1
-  [[ -n "$merged_pr" ]]
+  local branch="$1" tip merged_heads
+  git -C "$ROOT" merge-base --is-ancestor "$branch" "$DEFAULT_BRANCH" 2>/dev/null && return 0
+  tip="$(git -C "$ROOT" rev-parse -q --verify "refs/heads/$branch")" || return 1
+  merged_heads="$(cd "$ROOT" && gh api "repos/{owner}/{repo}/pulls?state=closed&head={owner}:$branch" \
+    --jq '.[]|select(.merged_at != null)|.head.sha' 2>/dev/null)" || return 1
+  grep -qxF "$tip" <<<"$merged_heads"
 }
 
 # delete_branch_if_merged <branch> — assumes is_branch_merged already returned

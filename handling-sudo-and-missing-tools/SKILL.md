@@ -1,12 +1,14 @@
 ---
 name: handling-sudo-and-missing-tools
 description: Use when a command needs sudo/root, fails with "permission denied", or a required tool is missing from the environment or a container (command not found — e.g. wget, curl, an apt/apk package) — BEFORE attempting installation or privilege escalation.
-version: 1.0.1
+version: 1.0.2
 ---
 
 # Sudo and Missing Tools: Ask First
 
 **Run on:** haiku · effort low — a short ask-first rule.
+
+**Pairs with:** `autonomous-workflow` (its preflight checks tool availability), `test-verification` (Playwright WebKit, Maestro and similar installs go through this rule).
 
 ## The Rule
 

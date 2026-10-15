@@ -103,14 +103,27 @@ SQUASH_BRANCH="worktree-55-squash"
 echo squash-content > s.txt && git add s.txt && git commit -qm "squash merge simulate (not an ancestor)"
 git worktree unlock .claude/worktrees/squash
 
+SQUASH_HEAD="$(git rev-parse "$SQUASH_BRANCH")"
+
+# A branch whose PR was squash-merged, then got one more commit: the merged PR's head
+# is no longer the tip, so that last commit is unmerged work and must not be force-deleted.
+LATE_BRANCH="worktree-56-late"
+"$SCRIPT" start 56 late >/dev/null
+( cd .claude/worktrees/late && echo late > l.txt && git add l.txt && git commit -qm late-work )
+LATE_HEAD="$(git rev-parse "$LATE_BRANCH")"
+echo late > l.txt && git add l.txt && git commit -qm "squash merge of late (not an ancestor)"
+( cd .claude/worktrees/late && echo more > m.txt && git add m.txt && git commit -qm "work after the PR merged" )
+git worktree unlock .claude/worktrees/late
+
 REAL_GH="$(command -v gh || true)"
 FAKE_GH_DIR="$TMP/fakebin"
 mkdir -p "$FAKE_GH_DIR"
 cat > "$FAKE_GH_DIR/gh" <<EOF
 #!/usr/bin/env bash
 if [[ "\$1" == "api" && "\$2" == repos/*/pulls\?* ]]; then
-  # the script asks REST for closed PRs of this head branch and extracts the merged one's number
-  if [[ "\$2" == *"head={owner}:$SQUASH_BRANCH"* ]]; then echo 999; exit 0; fi
+  # the script asks REST for closed PRs of this head branch and extracts the merged ones' head SHAs
+  if [[ "\$2" == *"head={owner}:$SQUASH_BRANCH"* ]]; then echo "$SQUASH_HEAD"; exit 0; fi
+  if [[ "\$2" == *"head={owner}:$LATE_BRANCH"* ]]; then echo "$LATE_HEAD"; exit 0; fi
   exit 0
 fi
 exec "$REAL_GH" "\$@"
@@ -125,5 +138,14 @@ check "squash-merged worktree survives cleanup without gh PR confirmation" test 
 PATH="$FAKE_GH_DIR:$PATH" "$SCRIPT" cleanup >/dev/null
 check "squash-merged worktree removed once gh confirms a merged PR" test ! -d .claude/worktrees/squash
 check "squash-merged branch force-deleted" bash -c "! git show-ref -q refs/heads/$SQUASH_BRANCH"
+check "branch with commits after its merged PR survives cleanup" git show-ref -q "refs/heads/$LATE_BRANCH"
+check "its worktree survives too" test -d .claude/worktrees/late
+
+# The default branch comes from origin/HEAD when there is one.
+git init -q -b trunk "$TMP/other" && git -C "$TMP/other" -c user.email=t@t -c user.name=t commit -q --allow-empty -m init
+git remote add origin "$TMP/other" && git fetch -q origin && git remote set-head origin trunk >/dev/null
+git switch -q -c trunk origin/trunk && git branch -q worktree-77-ontrunk trunk  # primary checkout on the default branch
+"$SCRIPT" cleanup >/dev/null 2>&1
+check "cleanup measures merges against origin's default branch" bash -c "! git show-ref -q refs/heads/worktree-77-ontrunk"
 
 exit $FAIL

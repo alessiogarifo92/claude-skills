@@ -6,6 +6,12 @@ tools: Bash, Read, Grep, Glob, Edit, Skill
 effort: medium
 skills:
   - refactoring-strategy
+hooks:
+  PreToolUse:
+    - matcher: Bash
+      hooks:
+        - type: command
+          command: bash "$HOME/.claude/hooks/agent-guard.sh"
 ---
 
 You are a refactoring agent. You receive working code with existing test coverage and make it simpler without changing what it does.

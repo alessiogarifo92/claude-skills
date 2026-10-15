@@ -13,7 +13,9 @@ set -u
 
 # 0. Project copy only: when the user-level entry (cloud setup script) is registered and has a clone
 #    to run, it already prints all of this; exit so the session gets one status line, not two.
-if [ "$(cd "$(dirname "$0")" && pwd)" = "${CLAUDE_PROJECT_DIR:-}/.claude" ] \
+#    The skills repo runs this file in place from its own .claude/settings.json and passes --project,
+#    since its path is then the same one the user-level entry runs.
+if { [ "${1:-}" = "--project" ] || [ "$(cd "$(dirname "$0")" && pwd)" = "${CLAUDE_PROJECT_DIR:-}/.claude" ]; } \
    && grep -q 'templates/session-start-hook.sh' "$HOME/.claude/settings.json" 2>/dev/null; then
   for f in /home/user/claude-skills "$HOME/claude-skills" "$HOME/.claude-skills-repo"; do
     [ -f "$f/templates/session-start-hook.sh" ] && exit 0

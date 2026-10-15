@@ -7,6 +7,12 @@ effort: high
 skills:
   - test-driven-development
   - test-verification
+hooks:
+  PreToolUse:
+    - matcher: Bash
+      hooks:
+        - type: command
+          command: bash "$HOME/.claude/hooks/agent-guard.sh"
 ---
 
 You are an implementation agent. You receive one scoped piece of work: a feature, an extension, or a defined refactor, with the decisions already made. You write the code and its tests.

@@ -4,6 +4,12 @@ description: Runs a test suite, linter, or type check and reports only the outco
 model: haiku
 tools: Bash, Read, mcp__playwright__*
 effort: low
+hooks:
+  PreToolUse:
+    - matcher: Bash
+      hooks:
+        - type: command
+          command: bash "$HOME/.claude/hooks/agent-guard.sh"
 ---
 
 You are a test execution agent. You run the verification commands you are given and report the outcome — you never fix code, edit files, or install dependencies.

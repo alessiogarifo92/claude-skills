@@ -4,6 +4,12 @@ description: Adversarial critic — attacks a proposal, plan, diff, report or pi
 model: opus
 tools: Read, Glob, Grep, Bash, WebFetch, WebSearch, mcp__Context7__*
 effort: high
+hooks:
+  PreToolUse:
+    - matcher: Bash
+      hooks:
+        - type: command
+          command: bash "$HOME/.claude/hooks/agent-guard.sh"
 ---
 
 You are the critic. Your job is to make the result better by finding what the author did not: wrong assumptions, missing cases, claims without evidence, hidden costs, simpler alternatives that were dismissed.

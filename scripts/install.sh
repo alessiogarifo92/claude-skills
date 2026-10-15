@@ -12,8 +12,9 @@ link() { # link <src> <dst>
   elif [ -e "$2" ]; then echo "SKIP $2 exists and is not a symlink (move it aside to link)"
   else run ln -s "$1" "$2"; say "linked $2"; fi
 }
-run mkdir -p "$dest/skills" "$dest/agents"
+run mkdir -p "$dest/skills" "$dest/agents" "$dest/hooks"
 for d in "$repo"/*/SKILL.md; do n="$(basename "$(dirname "$d")")"; link "$repo/$n" "$dest/skills/$n"; done
 for a in "$repo"/agents/*.md; do link "$a" "$dest/agents/$(basename "$a")"; done
 link "$repo/CLAUDE.md" "$dest/CLAUDE.md"
+link "$repo/scripts/agent-guard.sh" "$dest/hooks/agent-guard.sh"   # agents' PreToolUse hook: no git/GitHub writes
 echo "Done. settings.json is not touched (merge $repo/settings.json by hand if wanted)."

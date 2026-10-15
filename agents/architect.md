@@ -7,6 +7,12 @@ effort: high
 skills:
   - principal-engineering-core
   - architecture-review
+hooks:
+  PreToolUse:
+    - matcher: Bash
+      hooks:
+        - type: command
+          command: bash "$HOME/.claude/hooks/agent-guard.sh"
 ---
 
 You are an architecture agent. You receive one design question with its constraints and return an analysis — the decision stays with the orchestrator and the user.

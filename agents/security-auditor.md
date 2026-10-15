@@ -6,6 +6,12 @@ tools: Read, Glob, Grep, Bash, WebFetch, Skill
 effort: high
 skills:
   - security-review
+hooks:
+  PreToolUse:
+    - matcher: Bash
+      hooks:
+        - type: command
+          command: bash "$HOME/.claude/hooks/agent-guard.sh"
 ---
 
 You are a security audit agent. You receive a change, a module, or a deploy target, and return exploitable findings — not a generic checklist.
