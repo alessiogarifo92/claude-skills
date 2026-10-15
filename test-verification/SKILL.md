@@ -1,7 +1,7 @@
 ---
 name: test-verification
 description: Use when deciding what to run to verify a code change - choosing the narrowest meaningful set of tests, lint, type checks, or manual smoke checks for backend, frontend, mobile app, database, or API changes - and before claiming any change is done, fixed, or passing
-version: 1.8.0
+version: 1.9.0
 ---
 
 # Test Verification
@@ -94,12 +94,24 @@ When a project ships both a browser/web frontend and a mobile app (native or Exp
 - **Why:** `localhost` vs. LAN is a distinct failure class — code that works over `localhost` in a browser can fail over LAN on mobile due to CORS, IP allow-lists, insecure-origin/HTTPS restrictions, or a hardcoded base URL, and neither a code review nor a browser-only Playwright pass catches that.
 
 ## Mobile UI automation: Maestro is the mobile Playwright
-For a mobile client, the automated UI check is a **Maestro** flow (YAML, one set of flows for Android and iOS) — the counterpart of the Playwright pass above, with the same evidence rule: a flow you ran and its screenshots, not a description of what the screen should do.
+For a native mobile client (Expo/React Native, Flutter, native, or a web app wrapped with Capacitor), the automated UI check is a **Maestro** flow; a PWA is a web app and is covered by the next section instead. The Maestro flow is (YAML, one set of flows for Android and iOS) — the counterpart of the Playwright pass above, with the same evidence rule: a flow you ran and its screenshots, not a description of what the screen should do.
 - **Driving it from the session:** the MCP server ships in the Maestro CLI (`maestro mcp`; register it with `claude mcp add maestro -- maestro mcp`). It lists devices, inspects the screen, runs flows and takes screenshots. Missing CLI → `handling-sudo-and-missing-tools` before installing.
 - **Where each platform can run:** Android needs an emulator (KVM) or a device; the iOS simulator needs macOS. A remote/cloud session has neither (`/dev/kvm` absent, Linux), so there the flows run in CI — Android on a Linux runner with an emulator, iOS on a macOS runner — or on Maestro Cloud (paid). Say which ran where in the `## Test info`; a platform no flow ran on goes under "Not verified, and why", never implied.
 - **Coverage, honestly:** 100% is a unit-test target (business logic, the API — per the global unit-test rule). For UI, cover the critical flows (login, the core task, payment/permissions) on both platforms, not every screen.
 - **Before a store release** (not per ticket): one pass on real devices in a device cloud (BrowserStack, or WebdriverIO/Appium on a device cloud) for what simulators hide — keyboard covering inputs, safe area/notch, permission prompts, push notifications. Choosing and paying for one is `market-analyst` + a user spend gate.
 - **CI budget:** macOS runners on a private repo burn the included minutes about 10x faster than Linux; on a public repo standard runners are free. Run iOS flows on the release branch or nightly rather than every push on a private repo, and check visibility first (section above).
+
+## Installable web apps (PWA): Android and iOS, always
+Any site that can be installed as a PWA (it has a web manifest and a service worker) must work on **both Android (Chrome) and iOS (Safari)**, installed and in the browser — by default, without the user asking. A ticket that touches the manifest, the service worker, install, offline, storage, push or the app shell is not verified until both platforms are covered.
+- **Build it for both, not only for Chrome:**
+  - Manifest: `name`, `short_name`, `start_url`, `scope`, `display: standalone`, `theme_color`/`background_color`, icons 192 and 512 plus a `maskable` one for Android; also `<link rel="apple-touch-icon">` (180×180) for iOS.
+  - Install: iOS has no `beforeinstallprompt`, so an install button that relies on it shows nothing there. Show iOS users a short "Share → Add to Home Screen" hint instead, and hide it when already installed (`display-mode: standalone`).
+  - Storage and login: on iOS an installed PWA does not share cookies/storage with Safari, so a user logged in in Safari is logged out in the installed app — the login flow must work inside the installed app. Safari may also evict the data of a site not used for a while: never keep the only copy of user data in `localStorage`/IndexedDB.
+  - Push: on iOS web push works only for an app added to the Home Screen (iOS 16.4+) and the permission must be asked from a user tap; feature-detect it and explain the install step instead of failing silently. Background Sync and similar APIs are missing on iOS: feature-detect and degrade.
+  - Service worker updates: a new deploy must reach installed users — a versioned cache plus an update path (prompt or reload), checked by deploying twice.
+  - Layout: `viewport-fit=cover` with `env(safe-area-inset-*)` for the notch and home indicator in standalone mode; run `mobile-native` from the design pass.
+- **Verify on both:** Playwright with an Android device profile on Chromium (manifest, service worker, offline via `context.setOffline`, installability) and an iPhone profile on WebKit (layout, standalone CSS, the iOS install hint). WebKit in Playwright only approximates iOS Safari, so the handoff always carries a short real-device list for the user: install on an Android phone and on an iPhone, open from the icon, log in, go offline, receive a push if the app uses push. If no real iPhone check happened, it goes under "Not verified, and why" — never folded into "verified".
+- **Why:** the user wants every installable site to work on Android and Apple alike without having to ask for it each time; the iOS differences (no install prompt, separate storage, push only once installed) are exactly what a Chrome-only check misses.
 
 ## Manual handoff — telling the user what to test
 Your browser check does not replace the user's; it produces the checklist for it. Never hand over a vague "please have a look". Split the handoff into three parts:

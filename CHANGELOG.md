@@ -14,6 +14,9 @@ modifica alla skill.
 
 ## 2026-10-15
 
+- test-verification 1.9.0: nuova sezione "Installable web apps (PWA)": ogni sito installabile come PWA deve funzionare su Android e iOS senza che l'utente lo chieda (manifest e icone per entrambi, niente `beforeinstallprompt` su iOS, storage separato da Safari, push solo da app installata, aggiornamento del service worker, safe area); verifica con Playwright Chromium + WebKit e lista per i device reali. La sezione Maestro ora chiarisce che vale per le app native, non per le PWA.
+- project-lifecycle 1.13.0: una PWA installabile ha Android e iOS come piattaforme di default dalla fase di architettura, e i ticket li citano entrambi nei criteri di accettazione.
+- deploy-readiness 1.4.0: lo smoke test di una PWA include l'installazione dall'URL live su Android e iPhone e l'aggiornamento di una copia già installata.
 - test-verification 1.8.0: nuova sezione "Mobile UI automation": Maestro come equivalente mobile di Playwright (MCP `maestro mcp`), dove gira ogni piattaforma (in una sessione cloud niente emulatore né simulatore iOS: i flow vanno in CI o su Maestro Cloud), copertura 100% solo per gli unit test e flussi critici per la UI, passaggio su device reali (BrowserStack) prima di un rilascio sugli store, costo dei runner macOS sui repo privati.
 - deploy-readiness 1.3.0: passo 2c per le app mobile: la build iOS richiede macOS, quindi EAS Build / runner macOS / Codemagic; firma con l'account Apple Developer dell'utente; TestFlight e Play internal testing prima della pubblicazione sugli store, che è un gate dell'utente.
 

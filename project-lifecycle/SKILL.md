@@ -1,7 +1,7 @@
 ---
 name: project-lifecycle
 description: Use when starting a new application or project from scratch, or evaluating one end to end — from initial idea through tool/stack and cost decisions, architecture, breaking the work into tickets, implementation, and deploy — with the user steering each phase (when unattended, `autonomous-workflow` conducts it) — not for a single scoped ticket already in flight
-version: 1.12.0
+version: 1.13.0
 model: opus
 effort: high
 ---
@@ -27,6 +27,9 @@ Owns the whole-project arc that sits above a single ticket: an idea becomes a va
 | 5. Implementation | `product-ownership`'s per-ticket loop (worktree → `writing-plans` if multi-step → direct execution / `test-driven-development` → `test-verification` → `requesting-code-review` → manual gate → `finishing-a-development-branch`) | Same ticket-level gates, unchanged |
 | 6. Deploy | `deploy-readiness` — cheapest viable hosting path first (see cost rule); `security-review` before anything becomes publicly reachable (secrets, auth, exposed endpoints); `release-auditor` + `security-auditor` + `verifier` panel; smoke test on the real deploy target, not just locally | User confirms go/no-go, then the live deploy |
 | 7. Launch (only if a public launch was asked for) | `product-marketing-strategist` (+ `brand-strategist`): positioning, landing copy, launch channels; `marketing-strategist` agent drafts 2+ variants, `critic` red-teams them (`cross-verification` Mode F) | User approves everything before it is published or sent |
+
+## Installable web apps (PWA) target Android and iOS by default
+When a project is, or becomes, an installable PWA, Android **and** iOS are both target platforms from phase 3 onward, without waiting for the user to say so: the architecture accounts for the iOS limits (no install prompt, storage separate from Safari, push only once installed), and every PWA-related ticket names both platforms in its acceptance criteria. The concrete checks are in `test-verification`'s "Installable web apps (PWA)" section.
 
 ## When the project's GitHub repo is created
 Whenever this skill creates the project's repository (or picks up a project whose repo it just created), turn on **Automatically delete head branches** in the same step, before the first ticket branch exists:
