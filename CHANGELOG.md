@@ -12,6 +12,15 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-10-15 (seguito)
+
+Miglioramenti emersi dai test di scenario e dalla revisione della PR #36.
+
+- writing-skills 1.6.0: ogni dato volatile (prezzi, quote, moltiplicatori, versioni di OS/browser) scritto in una skill porta "as of YYYY-MM" e la fonte, e si ricontrolla al momento della decisione invece di citarlo come attuale.
+- project-lifecycle 1.14.0: aggiungere una piattaforma a un'app già pubblicata ("ora anche iOS") non è un ticket: si rientra nelle fasi 2 e 3 solo per quella piattaforma, poi i ticket. Descrizione e Boundary aggiornati perché la skill venga caricata in quel caso.
+- product-ownership 1.24.0: in una sessione remota un'app mobile non raggiunge né il dev server né l'API del container: anteprima per PR con `eas update` su un'API raggiungibile (preview/staging), tunnel solo se la rete lo consente, altrimenti gate parcheggiato con la piattaforma da provare.
+- deploy-readiness 1.5.0: le iscrizioni push e i token dei dispositivi sono dati personali: nella privacy policy, cancellati alla disiscrizione o chiusura dell'account, mai loggati per intero.
+
 ## 2026-10-15
 
 Mobile e PWA, dopo un confronto con un elenco di skill consigliate (Superpowers, document skills, frontend-design e skill-creator erano già coperti). Provato con due scenari ciechi (PWA con push, app Expo da pubblicare su iOS senza Mac) e una revisione `critic`.
