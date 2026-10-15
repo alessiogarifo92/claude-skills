@@ -1,7 +1,7 @@
 ---
 name: product-ownership
 description: Use when publishing or creating a GitHub issue/ticket whose content is already settled (if its own design decisions are still open, `ticket-interrogation` runs first and hands back the title and body), researching external sources needed to write one, deciding whether something is a bug/research/implementation ticket, starting or finishing implementation work on a ticket, about to push or merge a completed change, or cleaning up branches after a PR merges or a commit supersedes it
-version: 1.23.0
+version: 1.24.0
 ---
 
 # Product Ownership
@@ -133,6 +133,7 @@ The gate stays per ticket by default; these rules keep it from freezing an auton
 - **Remote session**: the container's `localhost` is not reachable by the user, so the gate needs a way for them to see the change. Take the first rung that exists:
   1. **The project's declared preview** (project `CLAUDE.md` field "Run / preview"): a per-PR preview deploy (Vercel/Netlify/Cloudflare Pages style, free tier first) — post its URL in the handoff. This is chosen once per project at repo bootstrap (`autonomous-workflow` stage 4.5), not per ticket.
   2. **A tunnel from the container**, only if the environment's network policy allows it (`read_documentation` topic `environment.network`); the URL lives as long as the session, so say so.
+  - **A mobile client** (Expo/React Native) has the same problem twice: the user's phone cannot reach the container's dev server **or** its API. The preview rung for it is a per-PR over-the-air update (for Expo: `eas update --auto` on the PR's branch, which gives a QR code; it opens in a development build — Expo Go cannot load updates that set `runtimeVersion` or need custom native code) pointed at a reachable API — the backend's own preview or staging URL, never the container's `localhost`. The Expo account and its `EXPO_TOKEN` are the user's, stored in the environment's secrets; a project that predates this setup gets it as a ticket-0-style setup ticket (preview mechanism, staging API and its cost confirmed by the user) the first time it is needed, recorded in the project `CLAUDE.md` "Run / preview" field. `expo start --tunnel` is rung 2 and needs the same network-policy check. With neither, rung 3 applies, and the parked gate names the platform still to check on a real phone.
   3. **Recorded evidence plus a parked gate**: drive the running app in the container with Playwright (Chromium is preinstalled; a script works when the MCP is absent), commit the screenshots per the Test info convention, and mark the gate **parked: needs local check** with the exact local commands. Carry on with every independent ticket; nothing parked merges until the user confirms.
 
 ### Recording the check: "Test info" section on the ticket

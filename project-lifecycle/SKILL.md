@@ -1,7 +1,7 @@
 ---
 name: project-lifecycle
-description: Use when starting a new application or project from scratch, or evaluating one end to end — from initial idea through tool/stack and cost decisions, architecture, breaking the work into tickets, implementation, and deploy — with the user steering each phase (when unattended, `autonomous-workflow` conducts it) — not for a single scoped ticket already in flight
-version: 1.13.0
+description: Use when starting a new application or project from scratch, or evaluating one end to end, or adding a new platform (iOS, Android, an installable PWA) to an app that already ships — from initial idea through tool/stack and cost decisions, architecture, breaking the work into tickets, implementation, and deploy — with the user steering each phase (when unattended, `autonomous-workflow` conducts it) — not for a single scoped ticket already in flight
+version: 1.14.0
 model: opus
 effort: high
 ---
@@ -31,6 +31,7 @@ Owns the whole-project arc that sits above a single ticket: an idea becomes a va
 ## Target platforms are a phase 1-2 decision
 Which platforms the app runs on (web, installable PWA, native/Expo, store-distributed) is settled in the phase-1 brief and costed in phase 2, not discovered at deploy:
 - **Installable PWA:** Android **and** iOS are both targets by default, without waiting for the user to say so. The iOS limits (no install prompt, storage separate from Safari, web push only once installed on the Home Screen) go into the phase-1/2 brief, because they can decide PWA vs a wrapped/native app — e.g. when push notifications are core. Every PWA-related ticket names both platforms in its acceptance criteria; the checks are in `test-verification`'s "Installable web apps (PWA)" section.
+- **Adding a platform later** ("now on iOS too") is not a ticket: re-enter phase 2 for that platform's costs and accounts and phase 3 for what changes in the architecture (build pipeline, push, auth on the new client), confirm both with the user, then draft its tickets in phase 4 — the phases already done for the other platforms are not repeated. Phase 3.5 reuses the existing `DESIGN.md`; only the platform's own conventions (iOS navigation and gestures, safe areas, system dialogs) are checked against it, as a proposal to the user if anything must change. Where the new platform's UI checks run (CI runner, EAS) is part of the phase-2 cost and its first ticket.
 - **Native / store apps:** phase 2 states the recurring costs up front per the cost rule — Apple Developer Program (yearly), Google Play (one-off), the cloud build service quota, macOS CI minutes, an optional device cloud — and which devices the user owns for the real-device pass. The build and store path is `deploy-readiness` 2c; where the UI flows run in CI is decided in ticket 0 (`autonomous-workflow` stage 4.5).
 
 ## When the project's GitHub repo is created
@@ -111,4 +112,4 @@ Every phase that adds a tool, service, or hosting target restates: what it costs
 - Recurring cost of the deployed stack never restated at deploy time? Phase 2's estimate was for the plan; confirm what's actually being billed now.
 
 ## Boundary
-This skill sequences *which skill runs when* for a whole project; it doesn't replace any of their internal judgment. A single ticket in an already-running project never needs this — start directly at `product-ownership`.
+This skill sequences *which skill runs when* for a whole project; it doesn't replace any of their internal judgment. A single ticket in an already-running project never needs this — start directly at `product-ownership`; adding a whole platform to a running project does (see "Target platforms").
