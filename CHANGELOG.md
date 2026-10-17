@@ -12,6 +12,14 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-10-17
+
+Idee prese dal confronto con gstack, compound-engineering (Every) e il plugin ufficiale `ralph-loop`, riscritte dentro le regole di questa repo invece di installare i pacchetti.
+
+- Nuovo hook `scripts/careful-guard.sh` (PreToolUse, Bash, sessione principale): force-push, `git reset --hard`, `git clean -f`, `git branch -D`, `stash drop/clear`, `rm -r` fuori da build/cache/temp, reset/wipe di DB (`migrate:fresh`, `db:wipe`, `prisma migrate reset`, `DROP`/`TRUNCATE` da un client SQL…), `docker compose down -v`, `volume rm/prune`, `gh repo delete` rispondono `ask`: prompt forzato anche in auto mode (in `-p` è negato e Claude legge il motivo). Mai blocco secco, mai approvazione. Verificato end-to-end con una sessione headless: `git reset --hard` fermato anche con Bash pre-autorizzato. 70 test (`careful-guard_test.sh`, in CI); `install.sh` lo collega, `cloud-setup-script.sh` lo registra a livello utente (sostituendo una voce precedente, jq o python3), `settings.json` ha la voce da unire a mano.
+- product-ownership 1.26.0: "Capture the lesson before closing (compound step)" — alla chiusura, una lezione riusabile va nel posto giusto (skill → CLAUDE.md → memoria di progetto), proposta allo stesso punto di stop del gate manuale e committata in `claude-skills` solo col sì dell'utente; riga nel Check e nella tabella delle fasi.
+- autonomous-workflow 1.9.0: retro di progetto allo stage 11 (lezioni dei ticket + pattern ricorrenti, un solo batch di modifiche alle skill); i comandi distruttivi sono intercettati anche da `careful-guard`; `ralph-loop` solo per obiettivi verificabili da un comando, con `--max-iterations` e mai attorno a un gate.
+
 ## 2026-10-15 (audit)
 
 Audit completo di workflow, skill, agent e script (report: `docs/reports/2026-10-15-audit-workflow-skills.md`); ogni bug riprodotto prima della correzione.

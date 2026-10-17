@@ -21,7 +21,8 @@ Private skills, agents and global rules for Claude Code. Goal: run a project fro
 - `templates/project-CLAUDE-bootstrap.md` — section every project's `CLAUDE.md` must carry so remote sessions attach this repo.
 - `templates/session-start-hook.sh` — SessionStart hook every project commits; `templates/cloud-setup-script.sh` — cloud environment setup script registering it at user level.
 - `scripts/agent-guard.sh` — PreToolUse hook every agent but `github-ops` carries (linked to `~/.claude/hooks/` by `install.sh`): blocks git and GitHub writes, which belong to the main session. Agent and hook changes apply to sessions started after `install.sh`.
-- Tests (CI runs them all, plus `shellcheck`): `worktree-manager/scripts/worktree_test.sh`, `scripts/agent-guard_test.sh`, `scripts/scripts_test.sh` (install, SessionStart hook, cloud setup).
+- `scripts/careful-guard.sh` — PreToolUse hook (Bash) for the main session, linked by `install.sh` and registered at user level by `templates/cloud-setup-script.sh` (locally: the `hooks.PreToolUse` entry in `settings.json`, merged by hand): force-push, `reset --hard`, recursive deletes outside build/cache/temp dirs, DB wipes and Docker volume removal answer `ask`, which forces a confirmation prompt even in auto mode. `CAREFUL_GUARD_OFF=1` turns it off.
+- Tests (CI runs them all, plus `shellcheck`): `worktree-manager/scripts/worktree_test.sh`, `scripts/agent-guard_test.sh`, `scripts/careful-guard_test.sh`, `scripts/scripts_test.sh` (install, SessionStart hook, cloud setup).
 - `scripts/validate.py` — consistency check (CI runs it); `scripts/install.sh` — link into `~/.claude`; `scripts/install-design-skills.sh` — link the external design skills (`impeccable`, a subset of Emil Kowalski's) at pinned commits.
 - `CHANGELOG.md` — one line per skill change, same commit as the change.
 
@@ -48,7 +49,7 @@ Policy: **opus** where judgment is expensive and no test catches the error (arch
 |---|---|---|---|
 | `api-design` | 1.0.2 | sonnet | high |
 | `architecture-review` | 1.1.1 | opus | high |
-| `autonomous-workflow` | 1.8.1 | opus | high |
+| `autonomous-workflow` | 1.9.0 | opus | high |
 | `brainstorming` | 1.2.1 | opus | high |
 | `brand-strategist` | 1.1.2 | opus | medium |
 | `cross-verification` | 1.1.5 | opus | high |
@@ -67,7 +68,7 @@ Policy: **opus** where judgment is expensive and no test catches the error (arch
 | `orchestrating-agents` | 2.4.0 | opus | high |
 | `principal-engineering-core` | 1.2.0 | opus | high |
 | `product-marketing-strategist` | 1.1.1 | opus | medium |
-| `product-ownership` | 1.25.0 | sonnet | medium |
+| `product-ownership` | 1.26.0 | sonnet | medium |
 | `project-lifecycle` | 1.15.0 | opus | high |
 | `python-backend` | 1.0.1 | sonnet | high |
 | `receiving-code-review` | 1.1.0 | opus | medium |

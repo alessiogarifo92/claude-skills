@@ -17,4 +17,5 @@ for d in "$repo"/*/SKILL.md; do n="$(basename "$(dirname "$d")")"; link "$repo/$
 for a in "$repo"/agents/*.md; do link "$a" "$dest/agents/$(basename "$a")"; done
 link "$repo/CLAUDE.md" "$dest/CLAUDE.md"
 link "$repo/scripts/agent-guard.sh" "$dest/hooks/agent-guard.sh"   # agents' PreToolUse hook: no git/GitHub writes
+link "$repo/scripts/careful-guard.sh" "$dest/hooks/careful-guard.sh"   # main session's PreToolUse hook: destructive commands ask
 echo "Done. settings.json is not touched (merge $repo/settings.json by hand if wanted)."
