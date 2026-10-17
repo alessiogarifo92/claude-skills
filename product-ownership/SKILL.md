@@ -1,7 +1,7 @@
 ---
 name: product-ownership
 description: Use when publishing or creating a GitHub issue/ticket whose content is already settled (if its own design decisions are still open, `ticket-interrogation` runs first and hands back the title and body), researching external sources needed to write one, deciding whether something is a bug/research/implementation ticket, starting or finishing implementation work on a ticket, about to push or merge a completed change, or cleaning up branches after a PR merges or a commit supersedes it
-version: 1.25.0
+version: 1.26.0
 ---
 
 # Product Ownership
@@ -24,7 +24,7 @@ Own the lifecycle of a work item end to end: from a raw problem report to a grou
 | 4. Implementation | **Direct execution in the main session by default** (`direct-execution`) + `test-driven-development`, plus the relevant domain skill; `subagent-driven-development`/`executing-plans` only for genuinely independent parallel workstreams or plans spanning sessions; a research ticket delivers a report instead (see Ticket types) | `implementer` / `quick-debugger` / `refactor-optimizer` for one whole scoped piece, per `orchestrating-agents`; `researcher` writes the report on research tickets |
 | 5. Verification | `test-verification` picks the checks and enforces evidence before "done" | `test-runner` runs suites/lint/typecheck and reports only the outcome; `verifier` re-derives a gating claim blind |
 | 6. Review | `requesting-code-review` (the discipline of asking before merging) runs the review panel for the diff (the `code-review` plugin if the user prefers it); add the `architecture-review` / `security-review` lens when the change touches structure or trust boundaries, the `market-analyst` lens for new external dependencies, and `receiving-code-review` when feedback comes back | level-gated per `cross-verification`: `reviewer` alone at L1, `reviewer` + the relevant lens at L2, full Mode C with `critic` at L3 |
-| 7. Closing | manual user gate (below) → `finishing-a-development-branch` (merge/PR/rebase options) → this skill: close issue, remove label, branch cleanup, skill version bumps | `deploy-readiness` when the merge deploys; `github-ops` for the mechanical follow-through once you've decided what to run: merge/push, `gh issue close`/label removal, local+remote branch and worktree cleanup |
+| 7. Closing | manual user gate (below) → `finishing-a-development-branch` (merge/PR/rebase options) → this skill: lesson capture (compound step), close issue, remove label, branch cleanup, skill version bumps | `deploy-readiness` when the merge deploys; `github-ops` for the mechanical follow-through once you've decided what to run: merge/push, `gh issue close`/label removal, local+remote branch and worktree cleanup |
 
 Every agent dispatch in any phase follows `orchestrating-agents`: the model matches the task (haiku mechanical, sonnet code/research/verification, opus for the judgment agents `architect`, `reviewer`, `security-auditor`, `critic`, `marketing-strategist`), the agent reports in the STATUS/CHANGES/EVIDENCE/FINDINGS/OPEN structure, and the orchestrator verifies the report before the next phase starts.
 
@@ -164,6 +164,14 @@ Once the fix is committed and pushed to the default branch (after tests pass **a
 
 This is pre-authorized as standard practice for the ticket-implementation workflow described in this skill — it doesn't extend to other GitHub actions (merging PRs, force-pushing, etc.), which still default to asking first.
 
+## Capture the lesson before closing (compound step)
+Every closed ticket is a chance to make the next one cheaper. Before the closing comment, ask one question: did this ticket surface something the next session would otherwise relearn? Candidates: a correction the user had to make, the same mistake made twice, a workaround for a platform quirk, a convention discovered in the code, a check that caught (or would have caught) the bug.
+
+- **Nothing reusable** (the usual case for a small ticket): skip it, say nothing. Never invent a lesson to fill the step.
+- **Something reusable**: place it with the global "Where a new rule/lesson goes" order (skill → `CLAUDE.md` → project memory). A project fact goes into project memory or the project's `CLAUDE.md` on the ticket's own branch. A universal rule becomes a drafted edit to the owning skill in `claude-skills` (version bump + `CHANGELOG.md` line, per "Skill versioning"), with a one-line **Why** naming the ticket.
+- **Batch it with the gate, don't add a stop.** The drafted skill edit is shown at the same stop point as the manual gate and closing text (anti-friction rules above); it is committed to `claude-skills` only on the user's yes, on its own branch, never mixed into the project PR.
+- A lesson that keeps coming back despite an existing rule is a data problem first: look for the counter-example the sessions are copying (`writing-skills`, "A rule that keeps being violated").
+
 ## When work lands via a different path than expected
 If a PR gets superseded (e.g. you push a direct commit instead of merging its branch), close **both** the issue and the PR, and reference what actually shipped it (commit SHA or PR number) in the closing comment — don't leave either dangling as if nothing happened. Remove the `in progress` label from the issue as part of closing it here too, same as any other close.
 
@@ -190,6 +198,7 @@ Every skill in this repo carries a semver `version` in its `SKILL.md` frontmatte
 - Ticket created from a Notion todo → was the source checkbox checked off with a reference to the new ticket?
 - Fix pushed to the default branch → did you close the issue right away, without waiting to be asked?
 - Closing an issue → was the `in progress` label removed?
+- Closing a ticket → did it surface a reusable lesson? If yes, is it drafted in the right place (skill / `CLAUDE.md` / project memory) and shown at the closing stop point?
 - Just merged/superseded a branch → does `git branch -a` show only the default branch, locally and remotely, when you're done?
 - Modified a skill → did you bump its frontmatter `version` and add the `CHANGELOG.md` line in the same commit?
 - Added or renamed a repo skill or agent → is the "End-to-end workflow and handoffs" section still correct? Update it in the same commit.

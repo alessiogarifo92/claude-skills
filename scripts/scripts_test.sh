@@ -20,6 +20,7 @@ check "install links a skill" test "$(readlink "$H/skills/test-verification")" =
 check "install links agents" test -L "$H/agents/reviewer.md"
 check "install links CLAUDE.md" test "$(readlink "$H/CLAUDE.md")" = "$ROOT/CLAUDE.md"
 check "install links the agent guard hook" test "$(readlink "$H/hooks/agent-guard.sh")" = "$ROOT/scripts/agent-guard.sh"
+check "install links the careful guard hook" test "$(readlink "$H/hooks/careful-guard.sh")" = "$ROOT/scripts/careful-guard.sh"
 check "install never overwrites a real file" grep -qx mine "$H/skills/api-design"
 check "install reports the skipped file" grep -q "SKIP $H/skills/api-design" "$TMP/i1.out"
 CLAUDE_HOME="$H" bash "$ROOT/scripts/install.sh" > "$TMP/i2.out"
@@ -58,7 +59,9 @@ setup_home() { # setup_home <dir>: a HOME with its own clone in place (no networ
   cat > "$1/.claude/settings.json" <<'JSON'
 {"theme": "dark", "hooks": {"SessionStart": [
   {"hooks": [{"type": "command", "command": "echo unrelated"}]},
-  {"hooks": [{"type": "command", "command": "bash /old/templates/session-start-hook.sh"}]}]}}
+  {"hooks": [{"type": "command", "command": "bash /old/templates/session-start-hook.sh"}]}],
+ "PreToolUse": [{"matcher": "Bash", "hooks": [{"type": "command", "command": "bash /old/careful-guard.sh"}]},
+  {"matcher": "Edit", "hooks": [{"type": "command", "command": "echo other-pre"}]}]}}
 JSON
 }
 assert_settings() { # assert_settings <home> <label>
@@ -70,6 +73,11 @@ assert c['theme']=='dark' and 'echo unrelated' in cmds"
   check "$2: exactly one session-start-hook entry, the new one" python3 -c "
 import json; c=json.load(open('$s')); cmds=[h['command'] for e in c['hooks']['SessionStart'] for h in e['hooks']]
 s=[x for x in cmds if 'session-start-hook.sh' in x]; assert len(s)==1 and '/old/' not in s[0]"
+  check "$2: exactly one careful-guard entry, on Bash, the new one" python3 -c "
+import json; c=json.load(open('$s')); e=[e for e in c['hooks']['PreToolUse'] if any('careful-guard.sh' in h['command'] for h in e['hooks'])]
+assert len(e)==1 and e[0]['matcher']=='Bash' and '/old/' not in e[0]['hooks'][0]['command']"
+  check "$2: unrelated PreToolUse hook kept" python3 -c "
+import json; c=json.load(open('$s')); assert any(h['command']=='echo other-pre' for e in c['hooks']['PreToolUse'] for h in e['hooks'])"
 }
 run_setup() { HOME="$1" PATH="$2" bash "$ROOT/templates/cloud-setup-script.sh" >/dev/null 2>&1; }
 if command -v jq >/dev/null 2>&1; then

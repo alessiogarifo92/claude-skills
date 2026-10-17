@@ -14,4 +14,5 @@ jobs:
         run: shellcheck -S warning scripts/*.sh templates/*.sh worktree-manager/scripts/*.sh
       - run: bash worktree-manager/scripts/worktree_test.sh
       - run: bash scripts/agent-guard_test.sh
+      - run: bash scripts/careful-guard_test.sh
       - run: bash scripts/scripts_test.sh
