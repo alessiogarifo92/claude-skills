@@ -12,6 +12,10 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-10-19
+
+- templates/session-start-hook.sh: se `careful-guard` non è registrato in `~/.claude/settings.json`, lo dice a ogni sessione, con il passo da fare (in locale unire `hooks.PreToolUse` da `settings.json`; nel cloud re-incollare lo script di setup), così il passo manuale non si dimentica. Test in `scripts_test.sh`.
+
 ## 2026-10-17
 
 Idee prese dal confronto con gstack, compound-engineering (Every) e il plugin ufficiale `ralph-loop`, riscritte dentro le regole di questa repo invece di installare i pacchetti.
