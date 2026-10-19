@@ -5,7 +5,8 @@
 # multi-repo session they may not run at all; this registers the SessionStart hook at user level instead,
 # so every session updates and installs the skills before the first turn, with or without claude-skills attached.
 # Best effort: never fails the container. Safe to re-run: re-pasting a newer version replaces the old hook entry.
-# It also registers scripts/careful-guard.sh (PreToolUse, Bash): destructive commands ask for confirmation even in auto mode.
+# It also registers scripts/careful-guard.sh (PreToolUse, Bash): destructive commands ask for confirmation even in auto mode,
+# and sets promptSuggestionEnabled: true (prompt suggestions stay on in every cloud session).
 t() { timeout 60 "$@"; }
 mkdir -p "$HOME/.claude/skills" "$HOME/.claude/agents"   # agents/ must exist at session start to be detected
 
@@ -24,7 +25,8 @@ if ! { command -v jq >/dev/null 2>&1 && jq --arg c "$cmd" --arg g "$guard" '
     .hooks.SessionStart = ([.hooks.SessionStart[]? | select(([.hooks[]?.command] | map(contains("session-start-hook.sh")) | any) | not)]
                            + [{"hooks": [{"type": "command", "command": $c}]}])
     | .hooks.PreToolUse = ([.hooks.PreToolUse[]? | select(([.hooks[]?.command] | map(contains("careful-guard.sh")) | any) | not)]
-                           + [{"matcher": "Bash", "hooks": [{"type": "command", "command": $g}]}])' "$s" > "$s.tmp" && mv "$s.tmp" "$s"; }; then
+                           + [{"matcher": "Bash", "hooks": [{"type": "command", "command": $g}]}])
+    | .promptSuggestionEnabled = true' "$s" > "$s.tmp" && mv "$s.tmp" "$s"; }; then
   rm -f "$s.tmp"
   python3 - "$s" "$cmd" "$guard" <<'PY' 2>/dev/null || echo "claude-skills setup: could not register the SessionStart and careful-guard hooks (no jq, no python3): sessions will not auto-update the skills" >&2
 import json, sys
@@ -35,6 +37,7 @@ def keep(event, marker):
     return [e for e in hooks.get(event, []) if not any(marker in h.get("command", "") for h in e.get("hooks", []))]
 hooks["SessionStart"] = keep("SessionStart", "session-start-hook.sh") + [{"hooks": [{"type": "command", "command": cmd}]}]
 hooks["PreToolUse"] = keep("PreToolUse", "careful-guard.sh") + [{"matcher": "Bash", "hooks": [{"type": "command", "command": guard}]}]
+cfg["promptSuggestionEnabled"] = True
 json.dump(cfg, open(path, "w"), indent=2)
 PY
 fi
