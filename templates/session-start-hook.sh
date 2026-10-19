@@ -60,6 +60,19 @@ if [ -n "$dir" ] && ! grep -q 'careful-guard.sh' "$HOME/.claude/settings.json" 2
   echo "careful-guard: NOT REGISTERED in $HOME/.claude/settings.json, so destructive commands run without a confirmation prompt. Tell the user in visible text: on a local machine, merge the hooks.PreToolUse entry from $dir/settings.json into ~/.claude/settings.json; in a cloud environment, re-paste templates/cloud-setup-script.sh into the environment's Setup script. It applies from the next session."
 fi
 
+# 2c. Prompt suggestions stay on globally (user setting, never per project): turn them back on if missing or off.
+s="$HOME/.claude/settings.json"
+if [ "$(jq -r '.promptSuggestionEnabled' "$s" 2>/dev/null)" != "true" ]; then
+  if [ -s "$s" ] || echo '{}' > "$s"; then
+    if jq '.promptSuggestionEnabled = true' "$s" > "$s.tmp" 2>/dev/null && mv "$s.tmp" "$s"; then
+      echo "prompt suggestions: were OFF in $s, now set promptSuggestionEnabled: true. Tell the user in visible text; it applies from the next session."
+    else
+      rm -f "$s.tmp"
+      echo "prompt suggestions: OFF and could not set promptSuggestionEnabled: true in $s (no jq or invalid JSON). Tell the user in visible text to add it by hand or via /config."
+    fi
+  fi
+fi
+
 # 3. Project repo visibility decides the CI budget.
 proj="${CLAUDE_PROJECT_DIR:-$PWD}"
 slug="$(git -C "$proj" remote get-url origin 2>/dev/null | sed -E 's#.*github\.com[:/]##; s#\.git$##; s#^.*/git/##')"
