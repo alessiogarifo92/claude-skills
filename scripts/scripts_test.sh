@@ -42,6 +42,10 @@ out="$(hook)"
 check "hook fast-forwards a clean clone" test "$(git -C "$C" rev-parse HEAD)" = "$(git -C "$O" rev-parse HEAD)"
 check "hook reports up to date" grep -q "up to date with origin/main" <<<"$out"
 check "hook prints the entry skills line" grep -q "^skills entry:" <<<"$out"
+check "hook warns when careful-guard is not registered" grep -q "^careful-guard: NOT REGISTERED" <<<"$out"
+mkdir -p "$HH/.claude" && echo '{"hooks":{"PreToolUse":[{"matcher":"Bash","hooks":[{"command":"bash ~/.claude/hooks/careful-guard.sh"}]}]}}' > "$HH/.claude/settings.json"
+check "hook is silent about careful-guard once registered" bash -c "! grep -q 'careful-guard' <<<\"\$(HOME='$HH' SKILLS_REPO_DIR='$C' CLAUDE_PROJECT_DIR='$TMP/noproject' HOOK_TIMEOUT=2 DESIGN_SKILLS_DIR='$TMP/design' bash '$ROOT/templates/session-start-hook.sh' 2>/dev/null)\""
+rm -f "$HH/.claude/settings.json"
 gitc -C "$C" commit -q --allow-empty -m local-work
 gitc -C "$O" commit -q --allow-empty -m three
 out="$(hook)"

@@ -54,6 +54,12 @@ if [ -n "$dir" ]; then
   echo "claude-skills: $(git -C "$dir" log -1 --format='%h %cs') in $dir, $status."
 fi
 
+# 2b. The main session's destructive-command guard is registered by hand on a local machine (install.sh never
+#     touches settings.json; the cloud setup script registers it). Say so every session until it is.
+if [ -n "$dir" ] && ! grep -q 'careful-guard.sh' "$HOME/.claude/settings.json" 2>/dev/null; then
+  echo "careful-guard: NOT REGISTERED in $HOME/.claude/settings.json, so destructive commands run without a confirmation prompt. Tell the user in visible text: on a local machine, merge the hooks.PreToolUse entry from $dir/settings.json into ~/.claude/settings.json; in a cloud environment, re-paste templates/cloud-setup-script.sh into the environment's Setup script. It applies from the next session."
+fi
+
 # 3. Project repo visibility decides the CI budget.
 proj="${CLAUDE_PROJECT_DIR:-$PWD}"
 slug="$(git -C "$proj" remote get-url origin 2>/dev/null | sed -E 's#.*github\.com[:/]##; s#\.git$##; s#^.*/git/##')"
