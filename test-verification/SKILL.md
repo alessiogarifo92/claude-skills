@@ -1,7 +1,7 @@
 ---
 name: test-verification
 description: Use when deciding what to run to verify a code change - choosing the narrowest meaningful set of tests, lint, type checks, or manual smoke checks for backend, frontend, mobile app, database, or API changes - and before claiming any change is done, fixed, or passing
-version: 1.11.0
+version: 1.12.0
 ---
 
 # Test Verification
@@ -100,6 +100,15 @@ When the change lives in the image itself (base image, `Dockerfile`, start scrip
 
 Then exercise the image like production: start it with the host's start command and env, read its startup log, hit the health URL, and walk the main flow with Playwright on desktop and phone. A guard that must refuse something (a version check, a feature flag) is proven both ways: build the same image on the old base and show it fails to start. In the PR comment, list every difference between the local image and production, so a reviewer knows what CI or the deploy still has to prove.
 - **Why:** on tisane-match #27 (PHP2Shell fix: `php:8.4.27-cli` plus a start-up guard) the host had only PHP 8.3, so the suite could not run there. All four obstacles above blocked the build in turn; once worked around, the real image proved the fix (8.4.27 starts, 8.4.26 refuses) while GitHub Actions was blocked by billing.
+
+### A third-party host the session cannot reach
+A remote session's network policy can refuse a host the project depends on (`CONNECT tunnel failed, response 403`; `curl -sS "$HTTPS_PROXY/__agentproxy/status"` lists it under `recentRelayFailures`). A question about that host (CORS headers, response shape, which fields a model fills, whether an endpoint exists) is still answerable before building on it: ask it from a GitHub runner, which has open egress.
+1. Commit a temporary workflow on the ticket branch, triggered by `push` to that branch only, that runs the probe with `curl -D -` (send an `Origin` header and an `OPTIONS` preflight for CORS) and prints the headers and the body fields that matter. Push it, then read the job log (`get_job_logs` with the job id).
+2. Remove the workflow in a later commit on the same branch before the PR merges. Never add it to the default branch.
+3. Record what the log proved where the decision lives (the ticket, the architecture's "unverified" list, a code comment next to the call), with the date.
+4. The runner's answer is not a browser's: CORS seen with `curl` still needs one real-browser check, which belongs in the manual handoff.
+- Prefer this to a web search, which answers a different question, and to a scraping service, which hides the response headers.
+- **Why:** on fiets-vandaag #2 the session's proxy refused both PDOK and Open-Meteo, and the ticket's open question was whether their CORS allowed a direct browser call. A two-commit probe workflow showed `Access-Control-Allow-Origin: *` on both, and which forecast model returned every variable, before any code depended on it.
 
 ## Mobile + browser: verify both interfaces when a project ships both
 When a project ships both a browser/web frontend and a mobile app (native or Expo/React Native) against the same backend, a ticket touching shared behavior (API, auth, shared business logic, shared UI components) is verified on **both** interfaces before handoff — not just whichever one the change happened to be written in. The two clients often reach the backend through different paths (web via same-origin fetch, mobile via an explicit base URL), so a change can pass on one and silently regress the other.
