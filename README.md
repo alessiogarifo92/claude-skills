@@ -78,7 +78,7 @@ Policy: **opus** where judgment is expensive and no test catches the error (arch
 | `sql-performance` | 1.0.1 | sonnet | high |
 | `subagent-driven-development` | 1.2.0 | opus | medium |
 | `test-driven-development` | 1.0.1 | sonnet | medium |
-| `test-verification` | 1.12.0 | sonnet | medium |
+| `test-verification` | 1.13.0 | sonnet | medium |
 | `ticket-interrogation` | 1.4.2 | opus | high |
 | `vue-frontend` | 1.0.2 | sonnet | high |
 | `worktree-manager` | 1.7.0 | haiku | low |
