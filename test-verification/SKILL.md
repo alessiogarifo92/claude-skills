@@ -1,7 +1,7 @@
 ---
 name: test-verification
 description: Use when deciding what to run to verify a code change - choosing the narrowest meaningful set of tests, lint, type checks, or manual smoke checks for backend, frontend, mobile app, database, or API changes - and before claiming any change is done, fixed, or passing
-version: 1.10.0
+version: 1.11.0
 ---
 
 # Test Verification
@@ -90,6 +90,16 @@ Every push (topic branch included) is preceded by the full local run of the same
 4. Tell the user once that Actions is out of minutes and when the quota resets (start of the billing month), or that raising the spending limit is their call — never change billing yourself.
 5. Merge to the default branch stays behind the manual user gate exactly as before; local evidence substitutes for CI, never for the user's check.
 - **Why:** Daily-smile started as a private repo, where the free Actions quota is limited; the user asked that an exhausted quota never become either a blocker or an excuse to push untested — everything is still checked and tested before every push, just without spending GitHub minutes.
+
+### Running the production Docker image in a cloud session
+When the change lives in the image itself (base image, `Dockerfile`, start script) or the project's runtime is not installed on the host (another PHP/Python/Node version), the closest end-to-end check is to build and start the real image, the way the host would. Four obstacles show up every time in a remote container. Each has a fix, and none of them is a reason to fall back to "CI will tell me":
+1. **No daemon.** `docker` is installed but `/var/run/docker.sock` is missing. The session runs as root, so starting the existing binary is not an install: `nohup dockerd > <scratchpad>/dockerd.log 2>&1 &`, then wait for `docker info` to answer.
+2. **Docker Hub `429 Too Many Requests`** on pulls (anonymous pulls share an IP). Pull the same official image from Google's mirror and tag it under the name the `Dockerfile` uses: `docker pull mirror.gcr.io/library/<img>:<tag> && docker tag mirror.gcr.io/library/<img>:<tag> <img>:<tag>`. Then build with `--pull=false`.
+3. **The build does not trust the agent proxy.** Symptoms: `curl error 60 … self-signed certificate`, `apt` `Ign:`, `Could not authenticate against github.com`. Build with `--network host --build-arg http_proxy="$HTTP_PROXY" --build-arg https_proxy="$HTTPS_PROXY"`. Use a copy of the `Dockerfile` in the scratchpad that adds, after each `FROM`, `COPY .proxy-ca.crt /proxy-ca.crt` and `ENV SSL_CERT_FILE=/proxy-ca.crt COMPOSER_CAFILE=/proxy-ca.crt NODE_EXTRA_CA_CERTS=/proxy-ca.crt CURL_CA_BUNDLE=/proxy-ca.crt`, with `/root/.ccr/ca-bundle.crt` copied into the build context only for the build. Never commit any of it, and never edit the repo's `Dockerfile` for it.
+4. **Hosts the network policy blocks** (Debian mirrors, GitHub archive downloads for Composer, third-party image CDNs). Prepare what you can on the host, for example `vendor/` installed there and copied in. Drop only the layer that cannot be built, in the scratch copy, and say exactly which one (e.g. "no `pdo_pgsql`, so SQLite only"). Tests that need a missing extension are reported by name and count as **not covered**, never as passing.
+
+Then exercise the image like production: start it with the host's start command and env, read its startup log, hit the health URL, and walk the main flow with Playwright on desktop and phone. A guard that must refuse something (a version check, a feature flag) is proven both ways: build the same image on the old base and show it fails to start. In the PR comment, list every difference between the local image and production, so a reviewer knows what CI or the deploy still has to prove.
+- **Why:** on tisane-match #27 (PHP2Shell fix: `php:8.4.27-cli` plus a start-up guard) the host had only PHP 8.3, so the suite could not run there. All four obstacles above blocked the build in turn; once worked around, the real image proved the fix (8.4.27 starts, 8.4.26 refuses) while GitHub Actions was blocked by billing.
 
 ## Mobile + browser: verify both interfaces when a project ships both
 When a project ships both a browser/web frontend and a mobile app (native or Expo/React Native) against the same backend, a ticket touching shared behavior (API, auth, shared business logic, shared UI components) is verified on **both** interfaces before handoff — not just whichever one the change happened to be written in. The two clients often reach the backend through different paths (web via same-origin fetch, mobile via an explicit base URL), so a change can pass on one and silently regress the other.
