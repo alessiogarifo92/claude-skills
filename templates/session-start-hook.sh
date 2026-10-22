@@ -2,8 +2,12 @@
 # SessionStart hook: keeps the shared skills repo current and tells the session what it is running on.
 # Copy to <project>/.claude/session-start-hook.sh and register it in <project>/.claude/settings.json:
 #   {"hooks": {"SessionStart": [{"hooks": [{"type": "command",
-#     "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/session-start-hook.sh\""}]}]}}
-# On a local machine the same entry can live once in ~/.claude/settings.json for every project.
+#     "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/session-start-hook.sh\""}]}],
+#    "PreToolUse": [{"matcher": "Bash", "hooks": [{"type": "command",
+#     "command": "for f in \"$HOME/.claude/hooks/careful-guard.sh\" /home/user/claude-skills/scripts/careful-guard.sh \"$HOME/claude-skills/scripts/careful-guard.sh\" \"$HOME/.claude-skills-repo/scripts/careful-guard.sh\"; do [ -f \"$f\" ] && exec bash \"$f\"; done; exit 0"}]}]}}
+# The PreToolUse entry is careful-guard (destructive commands ask for confirmation): in the project's settings it is
+# active from the first session in any container, cloud or local, with no user-level step.
+# On a local machine the same entries can live once in ~/.claude/settings.json for every project.
 #
 # Whatever this prints reaches the session as context, so it states facts the session must act on:
 # which skills commit is installed, whether it is behind origin/main, and whether the project repo
@@ -54,10 +58,11 @@ if [ -n "$dir" ]; then
   echo "claude-skills: $(git -C "$dir" log -1 --format='%h %cs') in $dir, $status."
 fi
 
-# 2b. The main session's destructive-command guard is registered by hand on a local machine (install.sh never
-#     touches settings.json; the cloud setup script registers it). Say so every session until it is.
-if [ -n "$dir" ] && ! grep -q 'careful-guard.sh' "$HOME/.claude/settings.json" 2>/dev/null; then
-  echo "careful-guard: NOT REGISTERED in $HOME/.claude/settings.json, so destructive commands run without a confirmation prompt. Tell the user in visible text: on a local machine, merge the hooks.PreToolUse entry from $dir/settings.json into ~/.claude/settings.json; in a cloud environment, re-paste templates/cloud-setup-script.sh into the environment's Setup script. It applies from the next session."
+# 2b. careful-guard (destructive commands ask) must be registered where the session loads it: the project's
+#     .claude/settings.json (preferred: committed, active from the first session anywhere) or ~/.claude/settings.json.
+proj_settings="${CLAUDE_PROJECT_DIR:-$PWD}/.claude/settings.json"
+if [ -n "$dir" ] && ! grep -q 'careful-guard.sh' "$HOME/.claude/settings.json" "$proj_settings" 2>/dev/null; then
+  echo "careful-guard: NOT REGISTERED (neither $proj_settings nor ~/.claude/settings.json), so destructive commands run without a confirmation prompt. Add the PreToolUse entry from the header of $dir/templates/session-start-hook.sh to $proj_settings and commit it on the working branch as the first change (like the SessionStart entry: added, not asked); tell the user in visible text. It applies from the next session."
 fi
 
 # 2c. Prompt suggestions stay on globally (user setting, never per project): turn them back on if missing or off.

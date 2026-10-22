@@ -17,7 +17,7 @@ own="$HOME/.claude-skills-repo"
 # The hook runs whichever copy exists, preferring an attached one; session-start-hook.sh itself picks the
 # same clone (same search order), fast-forwards it and re-runs install.sh.
 cmd='for f in /home/user/claude-skills/templates/session-start-hook.sh "$HOME/claude-skills/templates/session-start-hook.sh" "$HOME/.claude-skills-repo/templates/session-start-hook.sh"; do [ -f "$f" ] && exec bash "$f"; done; echo "claude-skills: NOT INSTALLED (no clone found). Attach it (add_repo) and run scripts/install.sh before any work, and say so in visible text."'
-guard='f="$HOME/.claude/hooks/careful-guard.sh"; [ -f "$f" ] && exec bash "$f"; exit 0'
+guard='for f in "$HOME/.claude/hooks/careful-guard.sh" /home/user/claude-skills/scripts/careful-guard.sh "$HOME/claude-skills/scripts/careful-guard.sh" "$HOME/.claude-skills-repo/scripts/careful-guard.sh"; do [ -f "$f" ] && exec bash "$f"; done; exit 0'   # same string as the project entry: Claude Code runs an identical handler once
 s="$HOME/.claude/settings.json"
 [ -s "$s" ] || echo '{}' > "$s"
 # Replace any earlier session-start-hook / careful-guard entry with this one, keep every other hook: jq, else python3.

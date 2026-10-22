@@ -46,6 +46,32 @@ check "hook warns when careful-guard is not registered" grep -q "^careful-guard:
 mkdir -p "$HH/.claude" && echo '{"hooks":{"PreToolUse":[{"matcher":"Bash","hooks":[{"command":"bash ~/.claude/hooks/careful-guard.sh"}]}]}}' > "$HH/.claude/settings.json"
 check "hook is silent about careful-guard once registered" bash -c "! grep -q 'careful-guard' <<<\"\$(HOME='$HH' SKILLS_REPO_DIR='$C' CLAUDE_PROJECT_DIR='$TMP/noproject' HOOK_TIMEOUT=2 DESIGN_SKILLS_DIR='$TMP/design' bash '$ROOT/templates/session-start-hook.sh' 2>/dev/null)\""
 rm -f "$HH/.claude/settings.json"
+P="$TMP/proj"; mkdir -p "$P/.claude" && cp "$ROOT/.claude/settings.json" "$P/.claude/settings.json"
+check "hook is silent about careful-guard when the project settings register it" bash -c "! grep -q 'careful-guard' <<<\"\$(HOME='$HH' SKILLS_REPO_DIR='$C' CLAUDE_PROJECT_DIR='$P' HOOK_TIMEOUT=2 DESIGN_SKILLS_DIR='$TMP/design' bash '$ROOT/templates/session-start-hook.sh' 2>/dev/null)\""
+
+# --- careful-guard entry: one command string everywhere (Claude Code runs an identical handler once) ---
+guard_cmds() { python3 - "$ROOT" <<'PY2'
+import json, re, sys
+root = sys.argv[1]
+out = []
+for p in (".claude/settings.json", "settings.json"):
+    c = json.load(open(f"{root}/{p}"))
+    out += [h["command"] for e in c["hooks"]["PreToolUse"] for h in e["hooks"] if "careful-guard.sh" in h["command"]]
+hdr = open(f"{root}/templates/session-start-hook.sh").read()
+m = re.search(r'#\s+"command": ("for f in .*?exit 0")\}', hdr)
+out.append(json.loads(m.group(1)))
+setup = open(f"{root}/templates/cloud-setup-script.sh").read()
+out.append(re.search(r"^guard='(.*)'", setup, re.M).group(1))
+print(len(out), len(set(out)))
+for x in set(out): print(x)
+PY2
+}
+check "careful-guard command identical in project settings, settings.json, hook header and cloud setup" bash -c "guard_out=\"\$(cd /; $(declare -f guard_cmds); ROOT='$ROOT' guard_cmds)\"; head -1 <<<\"\$guard_out\" | grep -qx '4 1'"
+gcmd="$(python3 -c "import json; print(json.load(open('$ROOT/.claude/settings.json'))['hooks']['PreToolUse'][0]['hooks'][0]['command'])")"
+GH="$TMP/guardhome"; mkdir -p "$GH/.claude/hooks"
+check "guard command finds nothing and passes silently" bash -c "test -z \"\$(printf '{\"tool_input\":{\"command\":\"git reset --hard\"}}' | HOME='$GH' bash -c '${gcmd//\'/\'\\\'\'}')\" || [ -f /home/user/claude-skills/scripts/careful-guard.sh ]"
+ln -s "$ROOT/scripts/careful-guard.sh" "$GH/.claude/hooks/careful-guard.sh"
+check "guard command runs the installed guard (ask on reset --hard)" bash -c "printf '{\"tool_input\":{\"command\":\"git reset --hard\"}}' | HOME='$GH' bash -c '${gcmd//\'/\'\\\'\'}' | grep -q '\"ask\"'"
 gitc -C "$C" commit -q --allow-empty -m local-work
 gitc -C "$O" commit -q --allow-empty -m three
 out="$(hook)"
