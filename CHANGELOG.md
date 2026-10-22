@@ -14,6 +14,10 @@ modifica alla skill.
 
 ## 2026-10-22
 
+- test-verification 1.12.0: "A third-party host the session cannot reach" — quando il proxy della sessione rifiuta un host esterno, la domanda (CORS, forma della risposta, campi di un modello) si risolve da un runner GitHub con un workflow temporaneo sul branch del ticket, letto dal log del job e rimosso prima del merge; il risultato va registrato dove vive la decisione, e il CORS visto con `curl` resta da confermare in un browser vero. Nato da fiets-vandaag #2 (PDOK e Open-Meteo).
+
+## 2026-10-22
+
 - test-verification 1.11.0: "Running the production Docker image in a cloud session" — come costruire e avviare l'immagine reale in un container remoto (avviare `dockerd`, immagini da `mirror.gcr.io` contro il 429 di Docker Hub, certificato del proxy e `--network host` in una copia del Dockerfile nello scratchpad, host bloccati dichiarati come non coperti), provarla come in produzione e dimostrare un blocco in entrambi i sensi. Nato da tisane-match #27 (PHP2Shell).
 
 ## 2026-10-22
