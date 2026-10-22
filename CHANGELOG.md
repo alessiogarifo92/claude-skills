@@ -16,6 +16,10 @@ modifica alla skill.
 
 - test-verification 1.11.0: "Running the production Docker image in a cloud session" — come costruire e avviare l'immagine reale in un container remoto (avviare `dockerd`, immagini da `mirror.gcr.io` contro il 429 di Docker Hub, certificato del proxy e `--network host` in una copia del Dockerfile nello scratchpad, host bloccati dichiarati come non coperti), provarla come in produzione e dimostrare un blocco in entrambi i sensi. Nato da tisane-match #27 (PHP2Shell).
 
+## 2026-10-22
+
+- careful-guard registrato a livello di progetto: `.claude/settings.json` di questa repo e l'intestazione di `templates/session-start-hook.sh` (che ogni progetto copia con la voce SessionStart) hanno la voce `PreToolUse`. Le impostazioni di progetto arrivano col repo, quindi la conferma è attiva dalla prima sessione in qualsiasi container, senza script da re-incollare né file da unire a mano. Motivo: in cloud `~/.claude/settings.json` di una sessione ripresa resta quello del vecchio setup, e una registrazione fatta dall'hook di avvio vale solo dalla sessione dopo (verificato con una sessione headless). Un solo comando, identico ovunque (progetto, `settings.json`, setup cloud): Claude Code esegue una volta un handler identico. L'hook di avvio considera registrata anche la voce di progetto e, se manca, chiede di aggiungerla e committarla come la voce SessionStart. Test: comando identico nei 4 punti (con prova di mutazione), guardia trovata ed eseguita, silenzio senza guardia; verificato end-to-end con una sessione headless che legge solo le impostazioni di progetto.
+
 ## 2026-10-19
 
 - templates/session-start-hook.sh: se `careful-guard` non è registrato in `~/.claude/settings.json`, lo dice a ogni sessione, con il passo da fare (in locale unire `hooks.PreToolUse` da `settings.json`; nel cloud re-incollare lo script di setup), così il passo manuale non si dimentica. Test in `scripts_test.sh`.
