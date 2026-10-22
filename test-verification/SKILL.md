@@ -1,7 +1,7 @@
 ---
 name: test-verification
 description: Use when deciding what to run to verify a code change - choosing the narrowest meaningful set of tests, lint, type checks, or manual smoke checks for backend, frontend, mobile app, database, or API changes - and before claiming any change is done, fixed, or passing
-version: 1.12.0
+version: 1.13.0
 ---
 
 # Test Verification
@@ -137,6 +137,10 @@ Any site that can be installed as a PWA (it has a web manifest and a service wor
   - Service worker updates: a new deploy must reach installed users — a versioned cache plus an update path (prompt or reload), checked by deploying twice.
   - Layout: `viewport-fit=cover` with `env(safe-area-inset-*)` for the notch and home indicator in standalone mode; run `mobile-native` from the design pass.
 - **Verify on both — and know what Playwright cannot see:** Chromium with an Android device profile for the manifest, service worker and offline (`context.setOffline`) — Playwright's service-worker support is Chromium-only; WebKit with an iPhone profile for layout and the iOS install hint (WebKit needs `playwright install webkit` plus system packages: the install gate applies). Playwright cannot install the app, cannot emulate `display-mode: standalone`, and cannot show a real push notification: check the push subscription is created and saved and unit-test the service worker's push handler, but installability, standalone mode and push delivery always go to the real-device list. That list is in every handoff: install on an Android phone and on an iPhone, open from the icon, log in, go offline, receive a push if the app uses push. If no real iPhone check happened, it goes under "Not verified, and why" — never folded into "verified".
+- **Playwright traps that fail silently on a PWA:**
+  - Lighthouse 12+ has no PWA category, so "Lighthouse PWA installability" cannot be run as written. The same check is Chrome's own list: `newCDPSession(page)` then `Page.getInstallabilityErrors` must return `[]` (Chromium only); assert it in an E2E test and say so in the handoff.
+  - Once a service worker controls the page, `page.route` mocks stop seeing requests that pass through it. Put the mocks on `page.context().route` (Chromium routes service-worker requests there); a page-level route added later in one test still takes precedence for that test.
+  - `context.setOffline(true)` does not stop route mocks: they keep answering. For an offline test, also route the mocked host to `route.abort('internetdisconnected')`, and `unroute` that handler before going back online.
 - **Why:** the user wants every installable site to work on Android and Apple alike without having to ask for it each time; the iOS differences (no install prompt, separate storage, push only once installed) are exactly what a Chrome-only check misses.
 
 ## Manual handoff — telling the user what to test

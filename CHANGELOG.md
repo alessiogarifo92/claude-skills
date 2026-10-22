@@ -14,6 +14,7 @@ modifica alla skill.
 
 ## 2026-10-22
 
+- test-verification 1.13.0: "Installable web apps (PWA)" — new "Playwright traps that fail silently on a PWA" item. Lighthouse 12+ has no PWA category, so installability is checked through CDP `Page.getInstallabilityErrors` (must return `[]`). Once a service worker is active, the mocks go on `context.route` instead of `page.route`. `setOffline(true)` does not stop the mocks: offline also needs a `route.abort`. From fiets-vandaag #3.
 - test-verification 1.12.0: "A third-party host the session cannot reach" — quando il proxy della sessione rifiuta un host esterno, la domanda (CORS, forma della risposta, campi di un modello) si risolve da un runner GitHub con un workflow temporaneo sul branch del ticket, letto dal log del job e rimosso prima del merge; il risultato va registrato dove vive la decisione, e il CORS visto con `curl` resta da confermare in un browser vero. Nato da fiets-vandaag #2 (PDOK e Open-Meteo).
 
 ## 2026-10-22
