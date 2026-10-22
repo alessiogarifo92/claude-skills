@@ -12,6 +12,10 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-10-22
+
+- test-verification 1.11.0: "Running the production Docker image in a cloud session" — come costruire e avviare l'immagine reale in un container remoto (avviare `dockerd`, immagini da `mirror.gcr.io` contro il 429 di Docker Hub, certificato del proxy e `--network host` in una copia del Dockerfile nello scratchpad, host bloccati dichiarati come non coperti), provarla come in produzione e dimostrare un blocco in entrambi i sensi. Nato da tisane-match #27 (PHP2Shell).
+
 ## 2026-10-19
 
 - templates/session-start-hook.sh: se `careful-guard` non è registrato in `~/.claude/settings.json`, lo dice a ogni sessione, con il passo da fare (in locale unire `hooks.PreToolUse` da `settings.json`; nel cloud re-incollare lo script di setup), così il passo manuale non si dimentica. Test in `scripts_test.sh`.
