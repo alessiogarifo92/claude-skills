@@ -1,7 +1,7 @@
 ---
 name: security-review
 description: Use when reviewing any change that touches authentication, authorization, user input, file uploads, webhooks, SQL, secrets, or other trust boundaries, for realistic exploit paths and abuse scenarios
-version: 1.1.0
+version: 1.2.0
 model: opus
 effort: high
 ---
@@ -58,6 +58,7 @@ Identify:
 - Default-deny is preferred for access control.
 - Sensitive actions should be auditable.
 - Background jobs should re-check authorization when needed.
+- "We never log IPs/locations" covers the platform's automatic logs too, not just your own `console.log`: read one real log event before signing off. Cloudflare Workers Logs invocation logs (`observability.enabled`) record every request's `cf-connecting-ip`, `x-real-ip` and `cf.latitude/longitude`; turn them off with `observability.logs.invocation_logs: false` and keep the app's own logs. **Why:** fiets-vandaag #5 promised no IPs or coordinates in logs while invocation logs held both.
 
 ## What to return
 For each finding:

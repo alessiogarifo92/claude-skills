@@ -12,6 +12,10 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-10-23
+
+- security-review 1.2.0: "Backend-specific checks" — a no-IP/no-location logging promise must be checked against the platform's automatic logs too; Cloudflare Workers Logs invocation logs record client IP and city coordinates, `observability.logs.invocation_logs: false` turns them off. From fiets-vandaag #5.
+
 ## 2026-10-22
 
 - test-verification 1.13.0: "Installable web apps (PWA)" — new "Playwright traps that fail silently on a PWA" item. Lighthouse 12+ has no PWA category, so installability is checked through CDP `Page.getInstallabilityErrors` (must return `[]`). Once a service worker is active, the mocks go on `context.route` instead of `page.route`. `setOffline(true)` does not stop the mocks: offline also needs a `route.abort`. From fiets-vandaag #3.
