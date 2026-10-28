@@ -7,6 +7,9 @@
 # Best effort: never fails the container. Safe to re-run: re-pasting a newer version replaces the old hook entry.
 # It also registers scripts/careful-guard.sh (PreToolUse, Bash): destructive commands ask for confirmation even in auto mode,
 # and sets promptSuggestionEnabled: true (prompt suggestions stay on in every cloud session).
+# Usage limits: autoContinueAtUsageLimit only waits in an interactive local terminal, so a cloud session hitting a
+# claude.ai limit just stops. env CLAUDE_CODE_RETRY_WATCHDOG=1 makes the request wait out the limit and go on after
+# the reset (re-checked every _USAGE_LIMIT_RECHECK_MS, here 5 min); existing env keys are kept.
 t() { timeout 60 "$@"; }
 mkdir -p "$HOME/.claude/skills" "$HOME/.claude/agents"   # agents/ must exist at session start to be detected
 
@@ -26,7 +29,8 @@ if ! { command -v jq >/dev/null 2>&1 && jq --arg c "$cmd" --arg g "$guard" '
                            + [{"hooks": [{"type": "command", "command": $c}]}])
     | .hooks.PreToolUse = ([.hooks.PreToolUse[]? | select(([.hooks[]?.command] | map(contains("careful-guard.sh")) | any) | not)]
                            + [{"matcher": "Bash", "hooks": [{"type": "command", "command": $g}]}])
-    | .promptSuggestionEnabled = true' "$s" > "$s.tmp" && mv "$s.tmp" "$s"; }; then
+    | .promptSuggestionEnabled = true | .autoContinueAtUsageLimit = true
+    | .env = ((.env // {}) + {"CLAUDE_CODE_RETRY_WATCHDOG": "1", "CLAUDE_CODE_RETRY_WATCHDOG_USAGE_LIMIT_RECHECK_MS": "300000"})' "$s" > "$s.tmp" && mv "$s.tmp" "$s"; }; then
   rm -f "$s.tmp"
   python3 - "$s" "$cmd" "$guard" <<'PY' 2>/dev/null || echo "claude-skills setup: could not register the SessionStart and careful-guard hooks (no jq, no python3): sessions will not auto-update the skills" >&2
 import json, sys
@@ -38,6 +42,8 @@ def keep(event, marker):
 hooks["SessionStart"] = keep("SessionStart", "session-start-hook.sh") + [{"hooks": [{"type": "command", "command": cmd}]}]
 hooks["PreToolUse"] = keep("PreToolUse", "careful-guard.sh") + [{"matcher": "Bash", "hooks": [{"type": "command", "command": guard}]}]
 cfg["promptSuggestionEnabled"] = True
+cfg["autoContinueAtUsageLimit"] = True
+cfg.setdefault("env", {}).update({"CLAUDE_CODE_RETRY_WATCHDOG": "1", "CLAUDE_CODE_RETRY_WATCHDOG_USAGE_LIMIT_RECHECK_MS": "300000"})
 json.dump(cfg, open(path, "w"), indent=2)
 PY
 fi

@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
 # SessionStart hook: keeps the shared skills repo current and tells the session what it is running on.
 # Copy to <project>/.claude/session-start-hook.sh and register it in <project>/.claude/settings.json:
-#   {"hooks": {"SessionStart": [{"hooks": [{"type": "command",
+#   {"env": {"CLAUDE_CODE_RETRY_WATCHDOG": "1", "CLAUDE_CODE_RETRY_WATCHDOG_USAGE_LIMIT_RECHECK_MS": "300000"},
+#    "hooks": {"SessionStart": [{"hooks": [{"type": "command",
 #     "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/session-start-hook.sh\""}]}],
 #    "PreToolUse": [{"matcher": "Bash", "hooks": [{"type": "command",
 #     "command": "for f in \"$HOME/.claude/hooks/careful-guard.sh\" /home/user/claude-skills/scripts/careful-guard.sh \"$HOME/claude-skills/scripts/careful-guard.sh\" \"$HOME/.claude-skills-repo/scripts/careful-guard.sh\"; do [ -f \"$f\" ] && exec bash \"$f\"; done; exit 0"}]}]}}
 # The PreToolUse entry is careful-guard (destructive commands ask for confirmation): in the project's settings it is
 # active from the first session in any container, cloud or local, with no user-level step.
+# The env entry makes a session that hits a claude.ai usage limit wait for the reset and continue on its own
+# (cloud, background and -p sessions included, where autoContinueAtUsageLimit does not apply). Never put
+# autoContinueAtUsageLimit itself in project settings: from a project file it turns the feature off.
 # On a local machine the same entries can live once in ~/.claude/settings.json for every project.
 #
 # Whatever this prints reaches the session as context, so it states facts the session must act on:
