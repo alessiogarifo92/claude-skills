@@ -118,9 +118,9 @@ if command -v jq >/dev/null 2>&1; then
 fi
 mkdir -p "$TMP/nojq"; printf '#!/bin/sh\nexit 127\n' > "$TMP/nojq/jq"; chmod +x "$TMP/nojq/jq"
 setup_home "$TMP/cs2"; run_setup "$TMP/cs2" "$TMP/nojq:$PATH"; assert_settings "$TMP/cs2" "python fallback (jq broken)"
-check "project settings and hook header carry the usage-limit watchdog env" python3 -c "
-import json; assert json.load(open('$ROOT/.claude/settings.json'))['env']['CLAUDE_CODE_RETRY_WATCHDOG']=='1'
-assert 'CLAUDE_CODE_RETRY_WATCHDOG' in open('$ROOT/templates/session-start-hook.sh').read()"
+check "usage-limit config stays global: no env/autoContinue in project settings or the hook template" python3 -c "
+import json; c=json.load(open('$ROOT/.claude/settings.json')); assert 'env' not in c and 'autoContinueAtUsageLimit' not in c
+assert 'CLAUDE_CODE_RETRY_WATCHDOG' not in open('$ROOT/templates/session-start-hook.sh').read()"
 check "setup creates ~/.claude/agents before the session starts" test -d "$TMP/cs2/.claude/agents"
 
 exit $FAIL
