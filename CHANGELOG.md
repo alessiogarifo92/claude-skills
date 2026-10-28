@@ -12,6 +12,10 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-10-28
+
+- Auto-continue al limite d'uso: `autoContinueAtUsageLimit` (già in `settings.json`) vale solo nel terminale interattivo locale e solo da impostazioni utente/managed, quindi una sessione cloud (web o app mobile) che raggiunge il limite si fermava e al reset non ripartiva. Aggiunto `env` `CLAUDE_CODE_RETRY_WATCHDOG=1` + `CLAUDE_CODE_RETRY_WATCHDOG_USAGE_LIMIT_RECHECK_MS=300000` (la richiesta aspetta il reset e il turno prosegue) solo a livello globale: `settings.json` (da unire in `~/.claude/settings.json`) e `templates/cloud-setup-script.sh`, che imposta anche `autoContinueAtUsageLimit: true` e conserva le altre chiavi `env`; nell'ambiente cloud va messo anche tra le variabili d'ambiente. Mai nei singoli progetti (scelta dell'utente; `autoContinueAtUsageLimit` in un file di progetto spegnerebbe la funzione). autonomous-workflow 1.10.0: la voce "Usage limit" rimanda a questa configurazione; l'heartbeat `send_later` resta come ripiego. Test: env impostato su entrambi i percorsi (jq e python) del setup, con prova di mutazione, e assente dalle impostazioni di progetto.
+
 ## 2026-10-23
 
 - security-review 1.2.0: "Backend-specific checks" — a no-IP/no-location logging promise must be checked against the platform's automatic logs too; Cloudflare Workers Logs invocation logs record client IP and city coordinates, `observability.logs.invocation_logs: false` turns them off. From fiets-vandaag #5.

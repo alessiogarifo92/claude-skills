@@ -49,7 +49,7 @@ Policy: **opus** where judgment is expensive and no test catches the error (arch
 |---|---|---|---|
 | `api-design` | 1.0.2 | sonnet | high |
 | `architecture-review` | 1.1.1 | opus | high |
-| `autonomous-workflow` | 1.9.0 | opus | high |
+| `autonomous-workflow` | 1.10.0 | opus | high |
 | `brainstorming` | 1.2.1 | opus | high |
 | `brand-strategist` | 1.1.2 | opus | medium |
 | `cross-verification` | 1.1.5 | opus | high |
@@ -74,7 +74,7 @@ Policy: **opus** where judgment is expensive and no test catches the error (arch
 | `receiving-code-review` | 1.1.0 | opus | medium |
 | `refactoring-strategy` | 1.0.1 | sonnet | high |
 | `requesting-code-review` | 1.2.2 | opus | high |
-| `security-review` | 1.1.0 | opus | high |
+| `security-review` | 1.2.0 | opus | high |
 | `sql-performance` | 1.0.1 | sonnet | high |
 | `subagent-driven-development` | 1.2.0 | opus | medium |
 | `test-driven-development` | 1.0.1 | sonnet | medium |

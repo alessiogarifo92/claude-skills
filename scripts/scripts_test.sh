@@ -87,7 +87,7 @@ check "user-level entry still prints" bash -c "test -n \"\$(HOME='$HH' SKILLS_RE
 setup_home() { # setup_home <dir>: a HOME with its own clone in place (no network) and a settings.json to merge into
   mkdir -p "$1/.claude-skills-repo/.git" "$1/.claude"
   cat > "$1/.claude/settings.json" <<'JSON'
-{"theme": "dark", "hooks": {"SessionStart": [
+{"theme": "dark", "env": {"KEEP": "me"}, "hooks": {"SessionStart": [
   {"hooks": [{"type": "command", "command": "echo unrelated"}]},
   {"hooks": [{"type": "command", "command": "bash /old/templates/session-start-hook.sh"}]}],
  "PreToolUse": [{"matcher": "Bash", "hooks": [{"type": "command", "command": "bash /old/careful-guard.sh"}]},
@@ -106,6 +106,9 @@ s=[x for x in cmds if 'session-start-hook.sh' in x]; assert len(s)==1 and '/old/
   check "$2: exactly one careful-guard entry, on Bash, the new one" python3 -c "
 import json; c=json.load(open('$s')); e=[e for e in c['hooks']['PreToolUse'] if any('careful-guard.sh' in h['command'] for h in e['hooks'])]
 assert len(e)==1 and e[0]['matcher']=='Bash' and '/old/' not in e[0]['hooks'][0]['command']"
+  check "$2: usage-limit watchdog env set, other env kept, auto-continue on" python3 -c "
+import json; c=json.load(open('$s')); e=c['env']
+assert e['CLAUDE_CODE_RETRY_WATCHDOG']=='1' and e['KEEP']=='me' and c['autoContinueAtUsageLimit'] is True"
   check "$2: unrelated PreToolUse hook kept" python3 -c "
 import json; c=json.load(open('$s')); assert any(h['command']=='echo other-pre' for e in c['hooks']['PreToolUse'] for h in e['hooks'])"
 }
@@ -115,6 +118,9 @@ if command -v jq >/dev/null 2>&1; then
 fi
 mkdir -p "$TMP/nojq"; printf '#!/bin/sh\nexit 127\n' > "$TMP/nojq/jq"; chmod +x "$TMP/nojq/jq"
 setup_home "$TMP/cs2"; run_setup "$TMP/cs2" "$TMP/nojq:$PATH"; assert_settings "$TMP/cs2" "python fallback (jq broken)"
+check "usage-limit config stays global: no env/autoContinue in project settings or the hook template" python3 -c "
+import json; c=json.load(open('$ROOT/.claude/settings.json')); assert 'env' not in c and 'autoContinueAtUsageLimit' not in c
+assert 'CLAUDE_CODE_RETRY_WATCHDOG' not in open('$ROOT/templates/session-start-hook.sh').read()"
 check "setup creates ~/.claude/agents before the session starts" test -d "$TMP/cs2/.claude/agents"
 
 exit $FAIL
