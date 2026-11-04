@@ -42,6 +42,7 @@
   "agentPushNotifEnabled": true,
   "promptSuggestionEnabled": true,
   "env": {
+    "CLAUDE_CODE_AUTO_COMPACT_WINDOW": "200000",
     "CLAUDE_CODE_RETRY_WATCHDOG": "1",
     "CLAUDE_CODE_RETRY_WATCHDOG_USAGE_LIMIT_RECHECK_MS": "300000"
   }

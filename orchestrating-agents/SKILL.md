@@ -1,7 +1,7 @@
 ---
 name: orchestrating-agents
 description: Use when dispatching any subagent or coordinating multi-phase work (research → plan → implement → verify → deploy) — covers picking the model for the task, writing the dispatch brief, and verifying each agent's report before the next phase.
-version: 2.5.0
+version: 2.6.0
 model: opus
 effort: high
 ---
@@ -50,7 +50,7 @@ Every request re-reads the whole context, so cost grows with **context size × n
 
 - **Child sessions take the model policy too.** A session opened with `create_session` inherits the caller's model unless `model` is passed: a bounded ticket (a level stage, a mechanic with a spec, a PR to green) gets `model: "claude-sonnet-5-5"` (or the current sonnet id); opus only for a session that owns decisions (the manager, design, architecture). State the model when announcing the session.
 - **Parallel sessions: 2-3, not 5.** Each one starts cold (bootstrap, CLAUDE.md, skills listing, repo reads) and they all draw on the same weekly limit. Open the next wave when one closes, and only for tickets whose blockers are merged — a session that waits for a sibling's PR to be aligned is paying to wait.
-- **Short contexts.** Past ~150K tokens in a session that still has many tool calls ahead, write the state (done, open, next step) on the ticket and `/compact`, or hand the next step to a fresh session. The 1M window auto-compacts only near 800K: by then every call costs 5× what it did at the start.
+- **Short contexts, compacted automatically.** The model cannot run `/compact` (it is a user command), so compaction is configuration: `CLAUDE_CODE_AUTO_COMPACT_WINDOW=200000` makes every session and subagent auto-compact near 160K tokens instead of near 800K on the 1M window, where every call costs 5× what it did at the start. The SessionStart hook writes it into `~/.claude/settings.json` (settings `env` reloads live, so it applies to the running session); `settings.json` and `templates/cloud-setup-script.sh` carry it too. Keep the state (done, open, next step) on the ticket so a compaction loses nothing, and hand a long tail of work to a fresh session rather than dragging a big context. Never ask the user to type `/compact`.
 - **Agents that loop on a UI or a simulation** (playtest agents, browser drivers): one bounded job per agent (one level pack, one flow), a hard cap on actions, and read a screenshot only when the screen has settled — every image read stays in that agent's context for every later call. Answer what a deterministic tool can answer (a solver, a script, a test) with the tool, and keep LLM agents for what needs a player's eye.
 - **Check-ins.** A `send_later` / scheduled check-in re-reads the whole manager context each time it fires. Space them by how fast the awaited thing changes (CI ~15-30 min, a child ticket 1-2 h), and arm none while parked on a user gate — child sessions report back with `send_message` anyway.
 - **Why:** on mix-splash (29 Oct-4 Nov 2026) one manager on opus opened 20+ opus child sessions in waves of 4-5; two playtest sessions alone cost ~$120 of the ~$330 total at list price (580M cache-read tokens from sonnet playtest agents driving the game by screenshot), each request carried 200-340K tokens of context, and the weekly limit reached its warning in six days.
