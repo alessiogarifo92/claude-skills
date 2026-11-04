@@ -1,7 +1,7 @@
 ---
 name: orchestrating-agents
 description: Use when dispatching any subagent or coordinating multi-phase work (research → plan → implement → verify → deploy) — covers picking the model for the task, writing the dispatch brief, and verifying each agent's report before the next phase.
-version: 2.4.0
+version: 2.5.0
 model: opus
 effort: high
 ---
@@ -43,6 +43,17 @@ Three tiers, plus effort. The `model:` and `effort:` in each agent's frontmatter
 - **main session (no delegation)** — design decisions, ambiguity resolution, anything destructive or user-facing, all git state changes.
 
 Escalate a sonnet agent to opus (via the `model` parameter) when its task turns out to be a judgment call rather than bounded work — e.g. a `quick-debugger` bug that crosses subsystems, or a failing second attempt. Drop to haiku only for a truly trivial job. Per-skill and per-agent recommendations: `README.md`. Announce model + effort at launch per the global CLAUDE.md rule.
+
+## Token budget
+
+Every request re-reads the whole context, so cost grows with **context size × number of calls**, not with the size of the task. One long session that plays, polls or loops costs far more than the same work split into short ones.
+
+- **Child sessions take the model policy too.** A session opened with `create_session` inherits the caller's model unless `model` is passed: a bounded ticket (a level stage, a mechanic with a spec, a PR to green) gets `model: "claude-sonnet-5-5"` (or the current sonnet id); opus only for a session that owns decisions (the manager, design, architecture). State the model when announcing the session.
+- **Parallel sessions: 2-3, not 5.** Each one starts cold (bootstrap, CLAUDE.md, skills listing, repo reads) and they all draw on the same weekly limit. Open the next wave when one closes, and only for tickets whose blockers are merged — a session that waits for a sibling's PR to be aligned is paying to wait.
+- **Short contexts.** Past ~150K tokens in a session that still has many tool calls ahead, write the state (done, open, next step) on the ticket and `/compact`, or hand the next step to a fresh session. The 1M window auto-compacts only near 800K: by then every call costs 5× what it did at the start.
+- **Agents that loop on a UI or a simulation** (playtest agents, browser drivers): one bounded job per agent (one level pack, one flow), a hard cap on actions, and read a screenshot only when the screen has settled — every image read stays in that agent's context for every later call. Answer what a deterministic tool can answer (a solver, a script, a test) with the tool, and keep LLM agents for what needs a player's eye.
+- **Check-ins.** A `send_later` / scheduled check-in re-reads the whole manager context each time it fires. Space them by how fast the awaited thing changes (CI ~15-30 min, a child ticket 1-2 h), and arm none while parked on a user gate — child sessions report back with `send_message` anyway.
+- **Why:** on mix-splash (29 Oct-4 Nov 2026) one manager on opus opened 20+ opus child sessions in waves of 4-5; two playtest sessions alone cost ~$120 of the ~$330 total at list price (580M cache-read tokens from sonnet playtest agents driving the game by screenshot), each request carried 200-340K tokens of context, and the weekly limit reached its warning in six days.
 
 ## Dispatch brief — what the agent receives
 
