@@ -78,6 +78,22 @@ if [ "$(jq -r '.promptSuggestionEnabled' "$s" 2>/dev/null)" != "true" ]; then
   fi
 fi
 
+# 2d. Token and usage-limit env, user level (never per project): auto-compact at a 200K window (~160K tokens) instead
+#     of near 800K on the 1M window, since the model cannot run /compact itself; and the usage-limit watchdog, so a
+#     cloud session waits out a limit and goes on. Settings env is reloaded live, so this applies to the running
+#     session within seconds. A value already set (settings or environment) is kept.
+want='{"CLAUDE_CODE_AUTO_COMPACT_WINDOW":"200000","CLAUDE_CODE_RETRY_WATCHDOG":"1","CLAUDE_CODE_RETRY_WATCHDOG_USAGE_LIMIT_RECHECK_MS":"300000"}'
+missing="$(jq -r --argjson w "$want" '[$w | keys[] as $k | select(($ENV[$k] // "") == "") | $k] - ((.env // {}) | keys) | join(" ")' "$s" 2>/dev/null || echo '?')"
+if [ "$missing" = "?" ]; then
+  echo "session env: could not read $s (no jq or invalid JSON): auto-compact stays near 800K tokens. Tell the user in visible text."
+elif [ -n "$missing" ]; then
+  if jq --argjson w "$want" --arg m "$missing" '.env = ((.env // {}) + ($w | with_entries(select(.key as $k | $m | split(" ") | index($k)))))' "$s" > "$s.tmp" 2>/dev/null && mv "$s.tmp" "$s"; then
+    echo "session env: set $missing in $s (auto-compact near 160K tokens, usage-limit watchdog); active in this session within seconds."
+  else
+    rm -f "$s.tmp"; echo "session env: could not write $missing to $s. Tell the user in visible text."
+  fi
+fi
+
 # 3. Project repo visibility decides the CI budget.
 proj="${CLAUDE_PROJECT_DIR:-$PWD}"
 slug="$(git -C "$proj" remote get-url origin 2>/dev/null | sed -E 's#.*github\.com[:/]##; s#\.git$##; s#^.*/git/##')"

@@ -49,7 +49,7 @@ Policy: **opus** where judgment is expensive and no test catches the error (arch
 |---|---|---|---|
 | `api-design` | 1.0.2 | sonnet | high |
 | `architecture-review` | 1.1.1 | opus | high |
-| `autonomous-workflow` | 1.11.0 | opus | high |
+| `autonomous-workflow` | 1.12.0 | opus | high |
 | `brainstorming` | 1.2.1 | opus | high |
 | `brand-strategist` | 1.1.2 | opus | medium |
 | `cross-verification` | 1.1.5 | opus | high |
@@ -65,7 +65,7 @@ Policy: **opus** where judgment is expensive and no test catches the error (arch
 | `laravel-architecture` | 1.3.1 | sonnet | high |
 | `market-analyst` | 1.0.3 | sonnet | medium |
 | `multi-agent-brainstorm` | 1.3.1 | opus | high |
-| `orchestrating-agents` | 2.5.0 | opus | high |
+| `orchestrating-agents` | 2.6.0 | opus | high |
 | `principal-engineering-core` | 1.2.0 | opus | high |
 | `product-marketing-strategist` | 1.1.1 | opus | medium |
 | `product-ownership` | 1.26.0 | sonnet | medium |
