@@ -42,6 +42,7 @@ Playwright and the manual handoff prove the feature works end to end on a real s
 - Prefer regression tests for bug fixes.
 - Do not run the entire suite unless the change size justifies it.
 - State clearly what remains unverified.
+- **Never skip a planned check to save tokens.** Every check the ticket, its spec or the project's protocol calls for (unit, e2e, browser, design pass, playtest agents, device check) runs before the work is reported done. Cost is managed by *sizing* the check — the narrowest test set, tools before LLM agents, fewer agents, one pack each, screenshots only when the screen has settled — never by dropping it. A check that genuinely cannot run (missing hardware, a hard usage limit) is a blocker raised *before* asking for the merge OK, with the ticket left open, and the user decides; it is never a footnote in the handoff. "State what remains unverified" covers what was impossible to verify, not what was cheaper to skip. (**Why:** on mix-splash #174 a child session skipped the P09/P16 playtest agents "to save tokens" and the gap surfaced only after the merge.)
 
 ## By change type
 - backend logic: focused tests around changed behavior
