@@ -1,7 +1,7 @@
 ---
 name: direct-execution
 description: Use when a task is linear and single-focus (one bug, one feature, one file, dependent steps) and you are tempted to orchestrate it — split it into a task list, dispatch subagents per step, or enter a planning workflow — instead of just doing it.
-version: 1.4.0
+version: 1.4.1
 ---
 
 # Direct Execution
@@ -38,7 +38,7 @@ Steps that depend on each other (fix → test → verify) are ONE task, not thre
 When a single piece of work is well-scoped but you want it off the main context, use one specialized agent for the whole piece — never one agent per step:
 
 - `quick-debugger` (sonnet) — localized bug, clear symptom
-- `implementer` (sonnet) — one decided feature/change + its tests
+- `implementer` (opus) — one decided feature/change + its tests
 - `refactor-optimizer` (sonnet) — behavior-preserving cleanup of tested code
 - `test-runner` (haiku) — run a suite, report outcome only
 - `researcher` (sonnet) — external facts/docs; `Explore` (haiku) — locate things in the codebase

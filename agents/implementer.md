@@ -1,7 +1,7 @@
 ---
 name: implementer
 description: Implements one clearly scoped feature or code change with tests — reads existing patterns, writes the code and its tests, runs them, and reports. Use when the spec is already decided and fits one focused unit of work; not for tasks needing design discussion, multiple features at once, or schema/architecture decisions.
-model: sonnet
+model: opus
 tools: Bash, Read, Grep, Glob, Edit, Write, mcp__Context7__*, Skill
 effort: high
 skills:

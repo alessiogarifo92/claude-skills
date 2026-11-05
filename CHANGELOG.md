@@ -12,6 +12,10 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-11-05
+
+- Modelli per tipo di lavoro (richiesta dell'utente): opus anche per **scrivere nuovo codice di prodotto** (`implementer` passa a `model: opus`; sessioni figlie che implementano una meccanica, UI, regole di `src/core` o un bug non banale), al massimo 2 sessioni opus di codice in parallelo; sonnet per il lavoro che uno strumento verifica o che non scrive codice di prodotto (bug localizzato con riproduzione, refactor sotto test, stage di livelli accettato dal solver, PR da riportare in verde, playtest, ricerca, docs, verifica); haiku invariato. orchestrating-agents 2.7.0 (Model policy, tabella delle fasi, Token budget), autonomous-workflow 1.13.0, subagent-driven-development 1.2.1, direct-execution 1.4.1, CLAUDE.md globale e README. Motivo: la qualità del design dentro il codice non la prende un test; il costo resta contenuto perché a mix-splash il lavoro più caro (playtest) era già su sonnet, e la leva vera sono contesto e parallelismo.
+
 ## 2026-11-04
 
 - Compattazione automatica: il modello non può lanciare `/compact`, quindi la soglia è configurazione. `CLAUDE_CODE_AUTO_COMPACT_WINDOW=200000` (compatta verso 160K invece che verso 800K sulla finestra da 1M) in `settings.json`, in `templates/cloud-setup-script.sh` e nel SessionStart hook (passo 2d), che lo scrive in `~/.claude/settings.json` insieme al watchdog del limite d'uso quando mancano; l'`env` delle impostazioni si ricarica a caldo (verificato), quindi vale già nella sessione in corso; un valore già impostato resta. orchestrating-agents 2.6.0 e autonomous-workflow 1.12.0: mai chiedere all'utente di digitare `/compact`. Test: hook imposta, conserva, è idempotente e rispetta l'ambiente (con prova di mutazione).
