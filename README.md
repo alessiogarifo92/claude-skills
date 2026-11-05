@@ -42,21 +42,21 @@ Private skills, agents and global rules for Claude Code. Goal: run a project fro
 
 ## Models and effort
 
-Policy: **opus** where judgment is expensive and no test catches the error (architecture, review, security, critique, positioning); **sonnet** for bounded code, research and verification work; **haiku** for mechanical run/locate/git work. The main session decides and owns git. Escalate a sonnet agent to opus when its task turns out to be a judgment call or a second attempt failed. For skills, `Run on: opus` is **enforced** by `model: opus` + `effort` in the frontmatter (Claude Code applies it for the rest of the current turn, then the session model resumes). `sonnet`/`haiku`/`main` rows are deliberately **not** enforced: a downward override would stick for the whole rest of a long autonomous turn, so they only say which agent should do the work or which model to select. For agents, an agent's `model:`/`effort:` frontmatter is applied (the docs say the available effort levels depend on the model and do not say what happens for an unsupported one, so treat `effort` as best effort, notably on the haiku agents), and a dispatch can override the model but not the effort. The table is generated from the files (`python3 scripts/validate.py --write-readme`); the `Run on` line in each skill is the source for skills, frontmatter for agents.
+Policy: **opus** where judgment is expensive and no test catches the error (architecture, review, security, critique, positioning); **opus** also for new product code (`implementer`); **sonnet** for tool-verified code (localized bug, refactor under tests, solver-checked content), playtest, research and verification work; **haiku** for mechanical run/locate/git work. The main session decides and owns git. Escalate a sonnet agent to opus when its task turns out to be a judgment call or a second attempt failed. For skills, `Run on: opus` is **enforced** by `model: opus` + `effort` in the frontmatter (Claude Code applies it for the rest of the current turn, then the session model resumes). `sonnet`/`haiku`/`main` rows are deliberately **not** enforced: a downward override would stick for the whole rest of a long autonomous turn, so they only say which agent should do the work or which model to select. For agents, an agent's `model:`/`effort:` frontmatter is applied (the docs say the available effort levels depend on the model and do not say what happens for an unsupported one, so treat `effort` as best effort, notably on the haiku agents), and a dispatch can override the model but not the effort. The table is generated from the files (`python3 scripts/validate.py --write-readme`); the `Run on` line in each skill is the source for skills, frontmatter for agents.
 
 <!-- matrix:begin -->
 | Skill | Version | Run on | Effort |
 |---|---|---|---|
 | `api-design` | 1.0.2 | sonnet | high |
 | `architecture-review` | 1.1.1 | opus | high |
-| `autonomous-workflow` | 1.12.0 | opus | high |
+| `autonomous-workflow` | 1.13.0 | opus | high |
 | `brainstorming` | 1.2.1 | opus | high |
 | `brand-strategist` | 1.1.2 | opus | medium |
 | `cross-verification` | 1.1.5 | opus | high |
 | `database-design` | 1.2.0 | opus | high |
 | `debugging-workflow` | 1.0.3 | sonnet | high |
 | `deploy-readiness` | 1.5.0 | opus | high |
-| `direct-execution` | 1.4.0 | main | medium |
+| `direct-execution` | 1.4.1 | main | medium |
 | `docs-and-specs` | 1.0.2 | sonnet | medium |
 | `executing-plans` | 1.0.1 | sonnet | medium |
 | `finishing-a-development-branch` | 1.2.0 | sonnet | low |
@@ -65,7 +65,7 @@ Policy: **opus** where judgment is expensive and no test catches the error (arch
 | `laravel-architecture` | 1.3.1 | sonnet | high |
 | `market-analyst` | 1.0.3 | sonnet | medium |
 | `multi-agent-brainstorm` | 1.3.1 | opus | high |
-| `orchestrating-agents` | 2.6.0 | opus | high |
+| `orchestrating-agents` | 2.7.0 | opus | high |
 | `principal-engineering-core` | 1.2.0 | opus | high |
 | `product-marketing-strategist` | 1.1.1 | opus | medium |
 | `product-ownership` | 1.26.0 | sonnet | medium |
@@ -76,7 +76,7 @@ Policy: **opus** where judgment is expensive and no test catches the error (arch
 | `requesting-code-review` | 1.2.2 | opus | high |
 | `security-review` | 1.2.0 | opus | high |
 | `sql-performance` | 1.0.1 | sonnet | high |
-| `subagent-driven-development` | 1.2.0 | opus | medium |
+| `subagent-driven-development` | 1.2.1 | opus | medium |
 | `test-driven-development` | 1.0.1 | sonnet | medium |
 | `test-verification` | 1.13.0 | sonnet | medium |
 | `ticket-interrogation` | 1.4.2 | opus | high |
@@ -91,7 +91,7 @@ Policy: **opus** where judgment is expensive and no test catches the error (arch
 | `architect` | opus | high | `principal-engineering-core`, `architecture-review` | Read-only design agent |
 | `critic` | opus | high | — | Adversarial critic |
 | `github-ops` | haiku | low | — | Runs mechanical git/GitHub operations |
-| `implementer` | sonnet | high | `test-driven-development`, `test-verification` | Implements one clearly scoped feature or code change with tests |
+| `implementer` | opus | high | `test-driven-development`, `test-verification` | Implements one clearly scoped feature or code change with tests |
 | `marketing-strategist` | opus | medium | `product-marketing-strategist`, `brand-strategist` | Drafts and critiques positioning, landing/home copy, launch plans, release notes and SEO titles/meta for a pro |
 | `quick-debugger` | sonnet | high | `debugging-workflow` | Finds and fixes a localized bug with a clear symptom |
 | `refactor-optimizer` | sonnet | medium | `refactoring-strategy` | Simplifies working code without changing behavior |
