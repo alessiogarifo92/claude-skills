@@ -37,6 +37,10 @@ deny='["Booking.com", "claude.ai Booking.com", "eDreams", "claude.ai eDreams", "
  "Cloudflare Developer Platform", "claude.ai Cloudflare Developer Platform", "Booking_com", "claude.ai Booking_com",
  "Google_Compute_Engine", "claude.ai Google_Compute_Engine",
  "Cloudflare_Developer_Platform", "claude.ai Cloudflare_Developer_Platform"]'
+# Sessions opened with create_session get claude.ai connectors named by their account ID (a UUID), not by name:
+# list those IDs here, in the environment's own copy only (they identify the user's account; never commit them).
+deny_extra='[]'
+deny="$(jq -nc --argjson a "$deny" --argjson b "$deny_extra" '$a + $b' 2>/dev/null || echo "$deny")"
 s="$HOME/.claude/settings.json"
 [ -s "$s" ] || echo '{}' > "$s"
 # Replace any earlier session-start-hook / careful-guard entry with this one, keep every other hook: jq, else python3.

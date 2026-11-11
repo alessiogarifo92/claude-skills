@@ -173,6 +173,7 @@ assert 'CLAUDE_CODE_RETRY_WATCHDOG' not in open('$ROOT/templates/session-start-h
 check "setup script's inline deny list equals templates/lean-context.json" python3 -c "
 import json,re; l=[d['serverName'] for d in json.load(open('$ROOT/templates/lean-context.json'))['deniedMcpServers']]
 m=re.search(r\"^deny='(.*?)'$\", open('$ROOT/templates/cloud-setup-script.sh').read(), re.M|re.S); assert json.loads(m.group(1))==l"
+check "setup script commits no account connector IDs (deny_extra stays empty)" grep -qx "deny_extra='\[\]'" "$ROOT/templates/cloud-setup-script.sh"
 check "setup script fits the environment editor (lines <= 200 bytes, <= 100 lines)" python3 -c "
 L=open('$ROOT/templates/cloud-setup-script.sh','rb').read().split(b'\\n'); assert len(L)<=100 and max(map(len,L))<=200"
 check "setup creates ~/.claude/agents before the session starts" test -d "$TMP/cs2/.claude/agents"
