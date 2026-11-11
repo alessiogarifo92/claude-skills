@@ -42,8 +42,65 @@
   "agentPushNotifEnabled": true,
   "promptSuggestionEnabled": true,
   "env": {
-    "CLAUDE_CODE_AUTO_COMPACT_WINDOW": "200000",
+    "CLAUDE_CODE_AUTO_COMPACT_WINDOW": "400000",
     "CLAUDE_CODE_RETRY_WATCHDOG": "1",
     "CLAUDE_CODE_RETRY_WATCHDOG_USAGE_LIMIT_RECHECK_MS": "300000"
-  }
+  },
+  "syncClaudeAiPlugins": false,
+  "deniedMcpServers": [
+    {
+      "serverName": "Booking.com"
+    },
+    {
+      "serverName": "claude.ai Booking.com"
+    },
+    {
+      "serverName": "eDreams"
+    },
+    {
+      "serverName": "claude.ai eDreams"
+    },
+    {
+      "serverName": "Gmail"
+    },
+    {
+      "serverName": "claude.ai Gmail"
+    },
+    {
+      "serverName": "Google Compute Engine"
+    },
+    {
+      "serverName": "claude.ai Google Compute Engine"
+    },
+    {
+      "serverName": "Postman"
+    },
+    {
+      "serverName": "claude.ai Postman"
+    },
+    {
+      "serverName": "Cloudflare Developer Platform"
+    },
+    {
+      "serverName": "claude.ai Cloudflare Developer Platform"
+    },
+    {
+      "serverName": "Booking_com"
+    },
+    {
+      "serverName": "claude.ai Booking_com"
+    },
+    {
+      "serverName": "Google_Compute_Engine"
+    },
+    {
+      "serverName": "claude.ai Google_Compute_Engine"
+    },
+    {
+      "serverName": "Cloudflare_Developer_Platform"
+    },
+    {
+      "serverName": "claude.ai Cloudflare_Developer_Platform"
+    }
+  ]
 }

@@ -50,6 +50,7 @@ P="$TMP/proj"; mkdir -p "$P/.claude" && cp "$ROOT/.claude/settings.json" "$P/.cl
 check "hook is silent about careful-guard when the project settings register it" bash -c "! grep -q 'careful-guard' <<<\"\$(HOME='$HH' SKILLS_REPO_DIR='$C' CLAUDE_PROJECT_DIR='$P' HOOK_TIMEOUT=2 DESIGN_SKILLS_DIR='$TMP/design' bash '$ROOT/templates/session-start-hook.sh' 2>/dev/null)\""
 
 # session env (2d): auto-compact window + usage-limit watchdog written at user level, existing values kept, idempotent
+cp "$ROOT/templates/lean-context.json" "$C/templates/lean-context.json"  # the working copy, committed or not
 EH="$TMP/envhome"; mkdir -p "$EH/.claude"; echo '{"env":{"KEEP":"me","CLAUDE_CODE_RETRY_WATCHDOG":"0"}}' > "$EH/.claude/settings.json"
 envhook() { env -u CLAUDE_CODE_AUTO_COMPACT_WINDOW -u CLAUDE_CODE_RETRY_WATCHDOG -u CLAUDE_CODE_RETRY_WATCHDOG_USAGE_LIMIT_RECHECK_MS \
   HOME="$EH" SKILLS_REPO_DIR="$C" CLAUDE_PROJECT_DIR="$TMP/noproject" HOOK_TIMEOUT=2 DESIGN_SKILLS_DIR="$TMP/design" \
@@ -58,9 +59,34 @@ out="$(envhook)"
 check "hook reports the session env it set" grep -q "^session env: set .*CLAUDE_CODE_AUTO_COMPACT_WINDOW" <<<"$out"
 check "hook sets the auto-compact window, keeps existing env values" python3 -c "
 import json; e=json.load(open('$EH/.claude/settings.json'))['env']
-assert e['CLAUDE_CODE_AUTO_COMPACT_WINDOW']=='200000' and e['KEEP']=='me' and e['CLAUDE_CODE_RETRY_WATCHDOG']=='0'
+assert e['CLAUDE_CODE_AUTO_COMPACT_WINDOW']=='400000' and e['KEEP']=='me' and e['CLAUDE_CODE_RETRY_WATCHDOG']=='0'
 assert e['CLAUDE_CODE_RETRY_WATCHDOG_USAGE_LIMIT_RECHECK_MS']=='300000'"
 check "hook is silent about session env once set" bash -c "! grep -q 'session env' <<<\"\$(HOME='$EH' SKILLS_REPO_DIR='$C' CLAUDE_PROJECT_DIR='$TMP/noproject' HOOK_TIMEOUT=2 DESIGN_SKILLS_DIR='$TMP/design' bash '$ROOT/templates/session-start-hook.sh' 2>/dev/null)\""
+check "hook turns off claude.ai plugin sync and denies the lean-context servers" python3 -c "
+import json; c=json.load(open('$EH/.claude/settings.json')); l=json.load(open('$ROOT/templates/lean-context.json'))
+assert c['syncClaudeAiPlugins'] is False
+assert {d['serverName'] for d in l['deniedMcpServers']} <= {d['serverName'] for d in c['deniedMcpServers']}"
+echo '{"env":{"CLAUDE_CODE_AUTO_COMPACT_WINDOW":"200000"},"deniedMcpServers":[{"serverName":"Mine"},{"serverName":"Gmail"}]}' > "$EH/.claude/settings.json"
+out="$(envhook)"
+check "hook upgrades the stale 200K window it wrote earlier" python3 -c "
+import json; assert json.load(open('$EH/.claude/settings.json'))['env']['CLAUDE_CODE_AUTO_COMPACT_WINDOW']=='400000'"
+echo '{"env":{"CLAUDE_CODE_AUTO_COMPACT_WINDOW":"200000"}}' > "$EH/.claude/settings.json"
+CLAUDE_CODE_AUTO_COMPACT_WINDOW=200000 HOME="$EH" SKILLS_REPO_DIR="$C" CLAUDE_PROJECT_DIR="$TMP/noproject" HOOK_TIMEOUT=2 DESIGN_SKILLS_DIR="$TMP/design" bash "$ROOT/templates/session-start-hook.sh" >/dev/null 2>&1
+check "hook upgrades the stale window even when settings already exported it to the session env" python3 -c "
+import json; assert json.load(open('$EH/.claude/settings.json'))['env']['CLAUDE_CODE_AUTO_COMPACT_WINDOW']=='400000'"
+CLAUDE_CODE_AUTO_COMPACT_WINDOW=500000 HOME="$EH" SKILLS_REPO_DIR="$C" CLAUDE_PROJECT_DIR="$TMP/noproject" HOOK_TIMEOUT=2 DESIGN_SKILLS_DIR="$TMP/design" bash "$ROOT/templates/session-start-hook.sh" >/dev/null 2>&1
+check "hook leaves settings alone when the environment sets its own window" python3 -c "
+import json; assert json.load(open('$EH/.claude/settings.json'))['env']['CLAUDE_CODE_AUTO_COMPACT_WINDOW']=='400000'"
+echo '{"env":{"CLAUDE_CODE_AUTO_COMPACT_WINDOW":"200000"},"deniedMcpServers":[{"serverName":"Mine"},{"serverName":"Gmail"}]}' > "$EH/.claude/settings.json"; envhook >/dev/null
+check "hook keeps a hand-denied server and adds no duplicate" python3 -c "
+import json; n=[d['serverName'] for d in json.load(open('$EH/.claude/settings.json'))['deniedMcpServers']]
+assert 'Mine' in n and n.count('Gmail')==1"
+echo '{"env":{"CLAUDE_CODE_AUTO_COMPACT_WINDOW":"300000"}}' > "$EH/.claude/settings.json"; envhook >/dev/null
+check "hook keeps a window the user chose by hand" python3 -c "
+import json; assert json.load(open('$EH/.claude/settings.json'))['env']['CLAUDE_CODE_AUTO_COMPACT_WINDOW']=='300000'"
+check "repo settings.json carries the lean-context deny list" python3 -c "
+import json; c=json.load(open('$ROOT/settings.json')); l=json.load(open('$ROOT/templates/lean-context.json'))
+assert c['deniedMcpServers']==l['deniedMcpServers'] and c['syncClaudeAiPlugins'] is False"
 echo '{}' > "$EH/.claude/settings.json"
 check "hook keeps a value the environment already sets" bash -c "CLAUDE_CODE_AUTO_COMPACT_WINDOW=150000 HOME='$EH' SKILLS_REPO_DIR='$C' CLAUDE_PROJECT_DIR='$TMP/noproject' HOOK_TIMEOUT=2 DESIGN_SKILLS_DIR='$TMP/design' bash '$ROOT/templates/session-start-hook.sh' >/dev/null 2>&1; python3 -c \"import json; assert 'CLAUDE_CODE_AUTO_COMPACT_WINDOW' not in json.load(open('$EH/.claude/settings.json')).get('env', {})\""
 
@@ -76,7 +102,9 @@ hdr = open(f"{root}/templates/session-start-hook.sh").read()
 m = re.search(r'#\s+"command": ("for f in .*?exit 0")\}', hdr)
 out.append(json.loads(m.group(1)))
 setup = open(f"{root}/templates/cloud-setup-script.sh").read()
-out.append(re.search(r"^guard='(.*)'", setup, re.M).group(1))
+import subprocess  # the setup script builds guard over several lines: evaluate them as bash does
+lines = "\n".join(l for l in setup.splitlines() if l.startswith("guard="))
+out.append(subprocess.run(["bash", "-c", lines + '\nprintf %s "$guard"'], capture_output=True, text=True).stdout)
 print(len(out), len(set(out)))
 for x in set(out): print(x)
 PY2
@@ -102,7 +130,7 @@ check "user-level entry still prints" bash -c "test -n \"\$(HOME='$HH' SKILLS_RE
 setup_home() { # setup_home <dir>: a HOME with its own clone in place (no network) and a settings.json to merge into
   mkdir -p "$1/.claude-skills-repo/.git" "$1/.claude"
   cat > "$1/.claude/settings.json" <<'JSON'
-{"theme": "dark", "env": {"KEEP": "me"}, "hooks": {"SessionStart": [
+{"theme": "dark", "env": {"KEEP": "me"}, "deniedMcpServers": [{"serverName": "Mine"}, {"serverName": "Gmail"}], "hooks": {"SessionStart": [
   {"hooks": [{"type": "command", "command": "echo unrelated"}]},
   {"hooks": [{"type": "command", "command": "bash /old/templates/session-start-hook.sh"}]}],
  "PreToolUse": [{"matcher": "Bash", "hooks": [{"type": "command", "command": "bash /old/careful-guard.sh"}]},
@@ -124,7 +152,12 @@ assert len(e)==1 and e[0]['matcher']=='Bash' and '/old/' not in e[0]['hooks'][0]
   check "$2: usage-limit watchdog env set, other env kept, auto-continue on" python3 -c "
 import json; c=json.load(open('$s')); e=c['env']
 assert e['CLAUDE_CODE_RETRY_WATCHDOG']=='1' and e['KEEP']=='me' and c['autoContinueAtUsageLimit'] is True
-assert e['CLAUDE_CODE_AUTO_COMPACT_WINDOW']=='200000'"
+assert e['CLAUDE_CODE_AUTO_COMPACT_WINDOW']=='400000'"
+  check "$2: plugin sync off, lean-context servers denied once, hand-denied server kept" python3 -c "
+import json; c=json.load(open('$s')); l=json.load(open('$ROOT/templates/lean-context.json'))
+n=[d['serverName'] for d in c['deniedMcpServers']]
+assert c['syncClaudeAiPlugins'] is False and 'Mine' in n and n.count('Gmail')==1
+assert {d['serverName'] for d in l['deniedMcpServers']} <= set(n)"
   check "$2: unrelated PreToolUse hook kept" python3 -c "
 import json; c=json.load(open('$s')); assert any(h['command']=='echo other-pre' for e in c['hooks']['PreToolUse'] for h in e['hooks'])"
 }
@@ -137,6 +170,11 @@ setup_home "$TMP/cs2"; run_setup "$TMP/cs2" "$TMP/nojq:$PATH"; assert_settings "
 check "usage-limit config stays global: no env/autoContinue in project settings or the hook template" python3 -c "
 import json; c=json.load(open('$ROOT/.claude/settings.json')); assert 'env' not in c and 'autoContinueAtUsageLimit' not in c
 assert 'CLAUDE_CODE_RETRY_WATCHDOG' not in open('$ROOT/templates/session-start-hook.sh').read().split('set -u')[0]"
+check "setup script's inline deny list equals templates/lean-context.json" python3 -c "
+import json,re; l=[d['serverName'] for d in json.load(open('$ROOT/templates/lean-context.json'))['deniedMcpServers']]
+m=re.search(r\"^deny='(.*?)'$\", open('$ROOT/templates/cloud-setup-script.sh').read(), re.M|re.S); assert json.loads(m.group(1))==l"
+check "setup script fits the environment editor (lines <= 200 bytes, <= 100 lines)" python3 -c "
+L=open('$ROOT/templates/cloud-setup-script.sh','rb').read().split(b'\\n'); assert len(L)<=100 and max(map(len,L))<=200"
 check "setup creates ~/.claude/agents before the session starts" test -d "$TMP/cs2/.claude/agents"
 
 exit $FAIL

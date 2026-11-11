@@ -78,19 +78,51 @@ if [ "$(jq -r '.promptSuggestionEnabled' "$s" 2>/dev/null)" != "true" ]; then
   fi
 fi
 
-# 2d. Token and usage-limit env, user level (never per project): auto-compact at a 200K window (~160K tokens) instead
-#     of near 800K on the 1M window, since the model cannot run /compact itself; and the usage-limit watchdog, so a
-#     cloud session waits out a limit and goes on. Settings env is reloaded live, so this applies to the running
-#     session within seconds. A value already set (settings or environment) is kept.
-want='{"CLAUDE_CODE_AUTO_COMPACT_WINDOW":"200000","CLAUDE_CODE_RETRY_WATCHDOG":"1","CLAUDE_CODE_RETRY_WATCHDOG_USAGE_LIMIT_RECHECK_MS":"300000"}'
-missing="$(jq -r --argjson w "$want" '[$w | keys[] as $k | select(($ENV[$k] // "") == "") | $k] - ((.env // {}) | keys) | join(" ")' "$s" 2>/dev/null || echo '?')"
+# 2d. Token and usage-limit env, user level (never per project). Auto-compact at a 400K window (compacts around
+#     360K tokens, not near the 1M window's ceiling), since the model cannot run /compact itself. 200K was too tight:
+#     the fixed prefix (system prompt, tool names, skill list, CLAUDE.md) plus the post-compaction summary refilled it
+#     in a few turns, and Claude Code stopped with "Your context window is full" (blocking limit / autocompact
+#     thrashing) instead of compacting again. Plus the usage-limit watchdog, so a cloud session waits out a limit.
+#     Settings env is reloaded live, so this applies to the running session within seconds. A value set in the environment
+#     by something other than these settings is kept; in settings, a value is kept unless it is one this hook wrote earlier (stale_env).
+want='{"CLAUDE_CODE_AUTO_COMPACT_WINDOW":"400000","CLAUDE_CODE_RETRY_WATCHDOG":"1","CLAUDE_CODE_RETRY_WATCHDOG_USAGE_LIMIT_RECHECK_MS":"300000"}'
+stale_env='{"CLAUDE_CODE_AUTO_COMPACT_WINDOW":["200000"]}'
+missing="$(jq -r --argjson w "$want" --argjson st "$stale_env" '(.env // {}) as $e
+  | [$w | keys[] as $k | select(($ENV[$k] // "") == "" or $ENV[$k] == ($e[$k] // null)) | select(($e | has($k) | not) or ((($st[$k] // []) | index($e[$k])) != null)) | $k]
+  | join(" ")' "$s" 2>/dev/null || echo '?')"
 if [ "$missing" = "?" ]; then
-  echo "session env: could not read $s (no jq or invalid JSON): auto-compact stays near 800K tokens. Tell the user in visible text."
+  echo "session env: could not read $s (no jq or invalid JSON): auto-compact window not set. Tell the user in visible text."
 elif [ -n "$missing" ]; then
   if jq --argjson w "$want" --arg m "$missing" '.env = ((.env // {}) + ($w | with_entries(select(.key as $k | $m | split(" ") | index($k)))))' "$s" > "$s.tmp" 2>/dev/null && mv "$s.tmp" "$s"; then
-    echo "session env: set $missing in $s (auto-compact near 160K tokens, usage-limit watchdog); active in this session within seconds."
+    echo "session env: set $missing in $s (auto-compact window 400K, usage-limit watchdog); active in this session within seconds."
   else
     rm -f "$s.tmp"; echo "session env: could not write $missing to $s. Tell the user in visible text."
+  fi
+fi
+
+# 2e. Lean context, user level: every MCP server and plugin a session loads puts its tool names and skill list in
+#     every request. syncClaudeAiPlugins=false stops the claude.ai org plugins (data, engineering, cowork-plugin-
+#     management: ~40 skills and ~16 MCP servers that mostly cannot even connect from a cloud container) from
+#     loading; deniedMcpServers blocks the claude.ai connectors no project here uses. The list lives in
+#     templates/lean-context.json of the clone found in step 1; entries are only ever added, so a server the user denied by hand stays denied.
+#     Both apply from the next session (servers and plugins are loaded at startup).
+lean="${dir:+$dir/templates/lean-context.json}"
+if [ -n "$lean" ] && [ -f "$lean" ]; then
+  if out_lean="$(jq --slurpfile l "$lean" '
+      ($l[0].deniedMcpServers | map(.serverName)) as $want
+      | ([.deniedMcpServers[]?.serverName]) as $have
+      | ($want - $have) as $add
+      | {changed: (($add | length) > 0 or .syncClaudeAiPlugins != false), add: $add,
+         cfg: (.syncClaudeAiPlugins = false | .deniedMcpServers = ((.deniedMcpServers // []) + ($add | map({serverName: .}))))}' "$s" 2>/dev/null)"; then
+    if [ "$(jq -r .changed <<<"$out_lean")" = "true" ]; then
+      if jq '.cfg' <<<"$out_lean" > "$s.tmp" && mv "$s.tmp" "$s"; then
+        echo "lean context: set syncClaudeAiPlugins=false and denied $(jq -r '.add | length' <<<"$out_lean") unused MCP server name(s) in $s; applies from the next session."
+      else
+        rm -f "$s.tmp"; echo "lean context: could not write $s. Tell the user in visible text."
+      fi
+    fi
+  else
+    echo "lean context: could not read $s or $lean (no jq or invalid JSON). Tell the user in visible text."
   fi
 fi
 
