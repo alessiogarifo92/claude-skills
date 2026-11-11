@@ -70,6 +70,14 @@ echo '{"env":{"CLAUDE_CODE_AUTO_COMPACT_WINDOW":"200000"},"deniedMcpServers":[{"
 out="$(envhook)"
 check "hook upgrades the stale 200K window it wrote earlier" python3 -c "
 import json; assert json.load(open('$EH/.claude/settings.json'))['env']['CLAUDE_CODE_AUTO_COMPACT_WINDOW']=='400000'"
+echo '{"env":{"CLAUDE_CODE_AUTO_COMPACT_WINDOW":"200000"}}' > "$EH/.claude/settings.json"
+CLAUDE_CODE_AUTO_COMPACT_WINDOW=200000 HOME="$EH" SKILLS_REPO_DIR="$C" CLAUDE_PROJECT_DIR="$TMP/noproject" HOOK_TIMEOUT=2 DESIGN_SKILLS_DIR="$TMP/design" bash "$ROOT/templates/session-start-hook.sh" >/dev/null 2>&1
+check "hook upgrades the stale window even when settings already exported it to the session env" python3 -c "
+import json; assert json.load(open('$EH/.claude/settings.json'))['env']['CLAUDE_CODE_AUTO_COMPACT_WINDOW']=='400000'"
+CLAUDE_CODE_AUTO_COMPACT_WINDOW=500000 HOME="$EH" SKILLS_REPO_DIR="$C" CLAUDE_PROJECT_DIR="$TMP/noproject" HOOK_TIMEOUT=2 DESIGN_SKILLS_DIR="$TMP/design" bash "$ROOT/templates/session-start-hook.sh" >/dev/null 2>&1
+check "hook leaves settings alone when the environment sets its own window" python3 -c "
+import json; assert json.load(open('$EH/.claude/settings.json'))['env']['CLAUDE_CODE_AUTO_COMPACT_WINDOW']=='400000'"
+echo '{"env":{"CLAUDE_CODE_AUTO_COMPACT_WINDOW":"200000"},"deniedMcpServers":[{"serverName":"Mine"},{"serverName":"Gmail"}]}' > "$EH/.claude/settings.json"; envhook >/dev/null
 check "hook keeps a hand-denied server and adds no duplicate" python3 -c "
 import json; n=[d['serverName'] for d in json.load(open('$EH/.claude/settings.json'))['deniedMcpServers']]
 assert 'Mine' in n and n.count('Gmail')==1"

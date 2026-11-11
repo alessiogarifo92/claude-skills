@@ -83,12 +83,12 @@ fi
 #     the fixed prefix (system prompt, tool names, skill list, CLAUDE.md) plus the post-compaction summary refilled it
 #     in a few turns, and Claude Code stopped with "Your context window is full" (blocking limit / autocompact
 #     thrashing) instead of compacting again. Plus the usage-limit watchdog, so a cloud session waits out a limit.
-#     Settings env is reloaded live, so this applies to the running session within seconds. A value already set in
-#     the environment is kept; in settings, a value is kept unless it is one this hook wrote earlier (stale_env).
+#     Settings env is reloaded live, so this applies to the running session within seconds. A value set in the environment
+#     by something other than these settings is kept; in settings, a value is kept unless it is one this hook wrote earlier (stale_env).
 want='{"CLAUDE_CODE_AUTO_COMPACT_WINDOW":"400000","CLAUDE_CODE_RETRY_WATCHDOG":"1","CLAUDE_CODE_RETRY_WATCHDOG_USAGE_LIMIT_RECHECK_MS":"300000"}'
 stale_env='{"CLAUDE_CODE_AUTO_COMPACT_WINDOW":["200000"]}'
 missing="$(jq -r --argjson w "$want" --argjson st "$stale_env" '(.env // {}) as $e
-  | [$w | keys[] as $k | select(($ENV[$k] // "") == "") | select(($e | has($k) | not) or ((($st[$k] // []) | index($e[$k])) != null)) | $k]
+  | [$w | keys[] as $k | select(($ENV[$k] // "") == "" or $ENV[$k] == ($e[$k] // null)) | select(($e | has($k) | not) or ((($st[$k] // []) | index($e[$k])) != null)) | $k]
   | join(" ")' "$s" 2>/dev/null || echo '?')"
 if [ "$missing" = "?" ]; then
   echo "session env: could not read $s (no jq or invalid JSON): auto-compact window not set. Tell the user in visible text."
