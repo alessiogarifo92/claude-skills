@@ -50,6 +50,7 @@ P="$TMP/proj"; mkdir -p "$P/.claude" && cp "$ROOT/.claude/settings.json" "$P/.cl
 check "hook is silent about careful-guard when the project settings register it" bash -c "! grep -q 'careful-guard' <<<\"\$(HOME='$HH' SKILLS_REPO_DIR='$C' CLAUDE_PROJECT_DIR='$P' HOOK_TIMEOUT=2 DESIGN_SKILLS_DIR='$TMP/design' bash '$ROOT/templates/session-start-hook.sh' 2>/dev/null)\""
 
 # session env (2d): auto-compact window + usage-limit watchdog written at user level, existing values kept, idempotent
+cp "$ROOT/templates/lean-context.json" "$C/templates/lean-context.json"  # the working copy, committed or not
 EH="$TMP/envhome"; mkdir -p "$EH/.claude"; echo '{"env":{"KEEP":"me","CLAUDE_CODE_RETRY_WATCHDOG":"0"}}' > "$EH/.claude/settings.json"
 envhook() { env -u CLAUDE_CODE_AUTO_COMPACT_WINDOW -u CLAUDE_CODE_RETRY_WATCHDOG -u CLAUDE_CODE_RETRY_WATCHDOG_USAGE_LIMIT_RECHECK_MS \
   HOME="$EH" SKILLS_REPO_DIR="$C" CLAUDE_PROJECT_DIR="$TMP/noproject" HOOK_TIMEOUT=2 DESIGN_SKILLS_DIR="$TMP/design" \
@@ -58,9 +59,26 @@ out="$(envhook)"
 check "hook reports the session env it set" grep -q "^session env: set .*CLAUDE_CODE_AUTO_COMPACT_WINDOW" <<<"$out"
 check "hook sets the auto-compact window, keeps existing env values" python3 -c "
 import json; e=json.load(open('$EH/.claude/settings.json'))['env']
-assert e['CLAUDE_CODE_AUTO_COMPACT_WINDOW']=='200000' and e['KEEP']=='me' and e['CLAUDE_CODE_RETRY_WATCHDOG']=='0'
+assert e['CLAUDE_CODE_AUTO_COMPACT_WINDOW']=='400000' and e['KEEP']=='me' and e['CLAUDE_CODE_RETRY_WATCHDOG']=='0'
 assert e['CLAUDE_CODE_RETRY_WATCHDOG_USAGE_LIMIT_RECHECK_MS']=='300000'"
 check "hook is silent about session env once set" bash -c "! grep -q 'session env' <<<\"\$(HOME='$EH' SKILLS_REPO_DIR='$C' CLAUDE_PROJECT_DIR='$TMP/noproject' HOOK_TIMEOUT=2 DESIGN_SKILLS_DIR='$TMP/design' bash '$ROOT/templates/session-start-hook.sh' 2>/dev/null)\""
+check "hook turns off claude.ai plugin sync and denies the lean-context servers" python3 -c "
+import json; c=json.load(open('$EH/.claude/settings.json')); l=json.load(open('$ROOT/templates/lean-context.json'))
+assert c['syncClaudeAiPlugins'] is False
+assert {d['serverName'] for d in l['deniedMcpServers']} <= {d['serverName'] for d in c['deniedMcpServers']}"
+echo '{"env":{"CLAUDE_CODE_AUTO_COMPACT_WINDOW":"200000"},"deniedMcpServers":[{"serverName":"Mine"},{"serverName":"Gmail"}]}' > "$EH/.claude/settings.json"
+out="$(envhook)"
+check "hook upgrades the stale 200K window it wrote earlier" python3 -c "
+import json; assert json.load(open('$EH/.claude/settings.json'))['env']['CLAUDE_CODE_AUTO_COMPACT_WINDOW']=='400000'"
+check "hook keeps a hand-denied server and adds no duplicate" python3 -c "
+import json; n=[d['serverName'] for d in json.load(open('$EH/.claude/settings.json'))['deniedMcpServers']]
+assert 'Mine' in n and n.count('Gmail')==1"
+echo '{"env":{"CLAUDE_CODE_AUTO_COMPACT_WINDOW":"300000"}}' > "$EH/.claude/settings.json"; envhook >/dev/null
+check "hook keeps a window the user chose by hand" python3 -c "
+import json; assert json.load(open('$EH/.claude/settings.json'))['env']['CLAUDE_CODE_AUTO_COMPACT_WINDOW']=='300000'"
+check "repo settings.json carries the lean-context deny list" python3 -c "
+import json; c=json.load(open('$ROOT/settings.json')); l=json.load(open('$ROOT/templates/lean-context.json'))
+assert c['deniedMcpServers']==l['deniedMcpServers'] and c['syncClaudeAiPlugins'] is False"
 echo '{}' > "$EH/.claude/settings.json"
 check "hook keeps a value the environment already sets" bash -c "CLAUDE_CODE_AUTO_COMPACT_WINDOW=150000 HOME='$EH' SKILLS_REPO_DIR='$C' CLAUDE_PROJECT_DIR='$TMP/noproject' HOOK_TIMEOUT=2 DESIGN_SKILLS_DIR='$TMP/design' bash '$ROOT/templates/session-start-hook.sh' >/dev/null 2>&1; python3 -c \"import json; assert 'CLAUDE_CODE_AUTO_COMPACT_WINDOW' not in json.load(open('$EH/.claude/settings.json')).get('env', {})\""
 
@@ -124,7 +142,7 @@ assert len(e)==1 and e[0]['matcher']=='Bash' and '/old/' not in e[0]['hooks'][0]
   check "$2: usage-limit watchdog env set, other env kept, auto-continue on" python3 -c "
 import json; c=json.load(open('$s')); e=c['env']
 assert e['CLAUDE_CODE_RETRY_WATCHDOG']=='1' and e['KEEP']=='me' and c['autoContinueAtUsageLimit'] is True
-assert e['CLAUDE_CODE_AUTO_COMPACT_WINDOW']=='200000'"
+assert e['CLAUDE_CODE_AUTO_COMPACT_WINDOW']=='400000'"
   check "$2: unrelated PreToolUse hook kept" python3 -c "
 import json; c=json.load(open('$s')); assert any(h['command']=='echo other-pre' for e in c['hooks']['PreToolUse'] for h in e['hooks'])"
 }
