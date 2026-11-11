@@ -83,6 +83,24 @@
     },
     {
       "serverName": "claude.ai Cloudflare Developer Platform"
+    },
+    {
+      "serverName": "Booking_com"
+    },
+    {
+      "serverName": "claude.ai Booking_com"
+    },
+    {
+      "serverName": "Google_Compute_Engine"
+    },
+    {
+      "serverName": "claude.ai Google_Compute_Engine"
+    },
+    {
+      "serverName": "Cloudflare_Developer_Platform"
+    },
+    {
+      "serverName": "claude.ai Cloudflare_Developer_Platform"
     }
   ]
 }

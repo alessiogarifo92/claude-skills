@@ -1,11 +1,59 @@
 {
-  "_comment": "Read by templates/session-start-hook.sh (step 2e) and merged into ~/.claude/settings.json: claude.ai connectors no project uses, blocked so their tool names stay out of every session's context. Each connector is listed under its plain name (cloud sessions) and its 'claude.ai <name>' form (local CLI). To use one again, remove it here and from ~/.claude/settings.json deniedMcpServers. Kept on purpose: github, Context7, Firecrawl, Figma, Claude_Docs, Supabase, Sentry, Notion.",
+  "_comment": "Read by templates/session-start-hook.sh (step 2e) and merged into ~/.claude/settings.json: claude.ai connectors no project uses, blocked so their tool names stay out of every session's context. Each connector is listed under its plain name (cloud sessions) and its 'claude.ai <name>' form (local CLI). To use one again, remove it here and from ~/.claude/settings.json deniedMcpServers. Kept on purpose: github, Context7, Firecrawl, Figma, Claude_Docs, Supabase, Sentry, Notion. Names with spaces or dots are listed also as the tool prefix spells them (underscores): in a 2026-11-11 session the plain one-word names (Gmail, Postman, eDreams) disconnected, the others did not.",
   "deniedMcpServers": [
-    {"serverName": "Booking.com"}, {"serverName": "claude.ai Booking.com"},
-    {"serverName": "eDreams"}, {"serverName": "claude.ai eDreams"},
-    {"serverName": "Gmail"}, {"serverName": "claude.ai Gmail"},
-    {"serverName": "Google Compute Engine"}, {"serverName": "claude.ai Google Compute Engine"},
-    {"serverName": "Postman"}, {"serverName": "claude.ai Postman"},
-    {"serverName": "Cloudflare Developer Platform"}, {"serverName": "claude.ai Cloudflare Developer Platform"}
+    {
+      "serverName": "Booking.com"
+    },
+    {
+      "serverName": "claude.ai Booking.com"
+    },
+    {
+      "serverName": "eDreams"
+    },
+    {
+      "serverName": "claude.ai eDreams"
+    },
+    {
+      "serverName": "Gmail"
+    },
+    {
+      "serverName": "claude.ai Gmail"
+    },
+    {
+      "serverName": "Google Compute Engine"
+    },
+    {
+      "serverName": "claude.ai Google Compute Engine"
+    },
+    {
+      "serverName": "Postman"
+    },
+    {
+      "serverName": "claude.ai Postman"
+    },
+    {
+      "serverName": "Cloudflare Developer Platform"
+    },
+    {
+      "serverName": "claude.ai Cloudflare Developer Platform"
+    },
+    {
+      "serverName": "Booking_com"
+    },
+    {
+      "serverName": "claude.ai Booking_com"
+    },
+    {
+      "serverName": "Google_Compute_Engine"
+    },
+    {
+      "serverName": "claude.ai Google_Compute_Engine"
+    },
+    {
+      "serverName": "Cloudflare_Developer_Platform"
+    },
+    {
+      "serverName": "claude.ai Cloudflare_Developer_Platform"
+    }
   ]
 }

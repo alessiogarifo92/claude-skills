@@ -102,7 +102,9 @@ hdr = open(f"{root}/templates/session-start-hook.sh").read()
 m = re.search(r'#\s+"command": ("for f in .*?exit 0")\}', hdr)
 out.append(json.loads(m.group(1)))
 setup = open(f"{root}/templates/cloud-setup-script.sh").read()
-out.append(re.search(r"^guard='(.*)'", setup, re.M).group(1))
+import subprocess  # the setup script builds guard over several lines: evaluate them as bash does
+lines = "\n".join(l for l in setup.splitlines() if l.startswith("guard="))
+out.append(subprocess.run(["bash", "-c", lines + '\nprintf %s "$guard"'], capture_output=True, text=True).stdout)
 print(len(out), len(set(out)))
 for x in set(out): print(x)
 PY2
@@ -128,7 +130,7 @@ check "user-level entry still prints" bash -c "test -n \"\$(HOME='$HH' SKILLS_RE
 setup_home() { # setup_home <dir>: a HOME with its own clone in place (no network) and a settings.json to merge into
   mkdir -p "$1/.claude-skills-repo/.git" "$1/.claude"
   cat > "$1/.claude/settings.json" <<'JSON'
-{"theme": "dark", "env": {"KEEP": "me"}, "hooks": {"SessionStart": [
+{"theme": "dark", "env": {"KEEP": "me"}, "deniedMcpServers": [{"serverName": "Mine"}, {"serverName": "Gmail"}], "hooks": {"SessionStart": [
   {"hooks": [{"type": "command", "command": "echo unrelated"}]},
   {"hooks": [{"type": "command", "command": "bash /old/templates/session-start-hook.sh"}]}],
  "PreToolUse": [{"matcher": "Bash", "hooks": [{"type": "command", "command": "bash /old/careful-guard.sh"}]},
@@ -151,6 +153,11 @@ assert len(e)==1 and e[0]['matcher']=='Bash' and '/old/' not in e[0]['hooks'][0]
 import json; c=json.load(open('$s')); e=c['env']
 assert e['CLAUDE_CODE_RETRY_WATCHDOG']=='1' and e['KEEP']=='me' and c['autoContinueAtUsageLimit'] is True
 assert e['CLAUDE_CODE_AUTO_COMPACT_WINDOW']=='400000'"
+  check "$2: plugin sync off, lean-context servers denied once, hand-denied server kept" python3 -c "
+import json; c=json.load(open('$s')); l=json.load(open('$ROOT/templates/lean-context.json'))
+n=[d['serverName'] for d in c['deniedMcpServers']]
+assert c['syncClaudeAiPlugins'] is False and 'Mine' in n and n.count('Gmail')==1
+assert {d['serverName'] for d in l['deniedMcpServers']} <= set(n)"
   check "$2: unrelated PreToolUse hook kept" python3 -c "
 import json; c=json.load(open('$s')); assert any(h['command']=='echo other-pre' for e in c['hooks']['PreToolUse'] for h in e['hooks'])"
 }
@@ -163,6 +170,11 @@ setup_home "$TMP/cs2"; run_setup "$TMP/cs2" "$TMP/nojq:$PATH"; assert_settings "
 check "usage-limit config stays global: no env/autoContinue in project settings or the hook template" python3 -c "
 import json; c=json.load(open('$ROOT/.claude/settings.json')); assert 'env' not in c and 'autoContinueAtUsageLimit' not in c
 assert 'CLAUDE_CODE_RETRY_WATCHDOG' not in open('$ROOT/templates/session-start-hook.sh').read().split('set -u')[0]"
+check "setup script's inline deny list equals templates/lean-context.json" python3 -c "
+import json,re; l=[d['serverName'] for d in json.load(open('$ROOT/templates/lean-context.json'))['deniedMcpServers']]
+m=re.search(r\"^deny='(.*?)'$\", open('$ROOT/templates/cloud-setup-script.sh').read(), re.M|re.S); assert json.loads(m.group(1))==l"
+check "setup script fits the environment editor (lines <= 200 bytes, <= 100 lines)" python3 -c "
+L=open('$ROOT/templates/cloud-setup-script.sh','rb').read().split(b'\\n'); assert len(L)<=100 and max(map(len,L))<=200"
 check "setup creates ~/.claude/agents before the session starts" test -d "$TMP/cs2/.claude/agents"
 
 exit $FAIL
