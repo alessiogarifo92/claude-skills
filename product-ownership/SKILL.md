@@ -179,6 +179,7 @@ If a PR gets superseded (e.g. you push a direct commit instead of merging its br
 Once a branch's work has landed on the default branch, delete **both** copies — local and remote. Only the default branch persists long-term. This is standing cleanup, not something to wait to be asked for each time; do it as part of finishing that piece of work, right after confirming the change actually landed.
 
 - Remote: `git push origin --delete <branch>` (or `gh pr merge --delete-branch` at merge time)
+- **Remote delete refused** (a remote session's proxy blocks it, or you lack the permission): don't retry and don't say only "delete it from the PR page". Hand the user one line per branch with its name and the direct link `https://github.com/<owner>/<repo>/branches/all?query=<branch>`, where the trash icon sits on that branch's row. Do it for every merged branch you find left over, not only the one just merged. (**Why:** mix-splash, Nov 2026: "delete it from the PR page" made the user hunt for each branch; they asked for the ready link instead.)
 - Local: `git branch -d <branch>`; if it's checked out in a worktree, remove the worktree first (`git worktree remove`, unlocking it if needed) before deleting the branch
 
 **Red flag:** if you notice `git branch -a` listing branches other than the default one whose work is already on it, that's stale cleanup you should do now, not just note for later.
