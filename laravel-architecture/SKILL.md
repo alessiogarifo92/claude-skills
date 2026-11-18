@@ -1,12 +1,12 @@
 ---
 name: laravel-architecture
 description: Use when writing or reviewing Laravel code - controllers, Form Requests, policies/gates, actions or services, jobs, events, Eloquent models, or API resources
-version: 1.3.1
+version: 1.3.2
 ---
 
 # Laravel Architecture
 
-**Run on:** sonnet · effort high — writing and reviewing code.
+**Run on:** main · effort high — writing and reviewing code: new product code on opus (`implementer` or an opus session), reviews and bounded fixes on sonnet.
 
 Design Laravel code for clarity, correctness, security, and maintainability.
 

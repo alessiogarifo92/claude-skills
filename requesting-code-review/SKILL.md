@@ -1,14 +1,12 @@
 ---
 name: requesting-code-review
 description: Use before merging or completing any non-trivial feature or fix, to decide whether a review pass is warranted and request one, rather than moving straight from tests passing to merge (a change touching a trust boundary also gets `security-review`)
-version: 1.2.2
-model: opus
-effort: high
+version: 1.3.0
 ---
 
 # Requesting Code Review
 
-**Run on:** opus · effort high — orchestrates the review panel; panelists are opus.
+**Run on:** main · effort medium — picking the review level and dispatching keeps the session's model; the panelists (`reviewer`, `security-auditor`, `architect`, `critic`) are opus.
 
 Tests passing is necessary, not sufficient. Before merge, explicitly decide whether this change warrants a review pass — this is the trigger discipline, not the review mechanism itself.
 

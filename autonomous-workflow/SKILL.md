@@ -1,14 +1,12 @@
 ---
 name: autonomous-workflow
 description: Use when the user hands over an end-to-end goal (an app idea, a whole feature set, "take it from here", "vai in autonomia") or asks you to run the workflow unattended — conducts every stage from idea through marketing and deploy by routing to the right skill, agent, model and cross-verification level, and says exactly where it may proceed alone and where it must stop
-version: 1.13.1
-model: opus
-effort: high
+version: 1.14.0
 ---
 
 # Autonomous Workflow
 
-**Run on:** opus · effort high — the conductor is the main session; each stage names its own model.
+**Run on:** main · effort high — the conductor coordinates, so it keeps the session's model (sonnet where possible, `orchestrating-agents` "The orchestrator's own model"); each stage names its own model, and the judgment skills it calls (`brainstorming`, `architecture-review`, `cross-verification`, …) raise the turn to opus themselves.
 
 The conductor. It does not replace any skill's judgment: it sequences them, keeps the state, decides what can run in parallel, and enforces which gates are hard. Nothing important is skipped because nobody was asked, and nothing is asked that could be decided alone.
 
