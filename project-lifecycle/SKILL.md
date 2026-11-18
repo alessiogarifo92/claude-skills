@@ -1,14 +1,12 @@
 ---
 name: project-lifecycle
 description: Use when starting a new application or project from scratch, or evaluating one end to end, or adding a new platform (iOS, Android, an installable PWA) to an app that already ships — from initial idea through tool/stack and cost decisions, architecture, breaking the work into tickets, implementation, and deploy — with the user steering each phase (when unattended, `autonomous-workflow` conducts it) — not for a single scoped ticket already in flight
-version: 1.15.0
-model: opus
-effort: high
+version: 1.16.0
 ---
 
 # Project Lifecycle
 
-**Run on:** opus · effort high — phase gates and decisions.
+**Run on:** main · effort high — phase gates and sequencing keep the session's model; each phase's decision skill (`brainstorming`, `architecture-review`, `database-design`, `writing-plans`, `deploy-readiness`) raises the turn to opus itself.
 
 Owns the whole-project arc that sits above a single ticket: an idea becomes a validated stack, a sound architecture, a set of tickets, and eventually a deployed app. `product-ownership` owns each ticket's lifecycle once it exists; this skill decides what tickets should exist and in what order.
 

@@ -1,12 +1,12 @@
 ---
 name: go-backend
 description: Use when writing or reviewing Go service code - goroutine lifecycle, context propagation and cancellation, channel ownership, error handling, or interface boundaries
-version: 1.0.1
+version: 1.0.2
 ---
 
 # Go Backend
 
-**Run on:** sonnet · effort high — writing and reviewing code.
+**Run on:** main · effort high — writing and reviewing code: new product code on opus (`implementer` or an opus session), reviews and bounded fixes on sonnet.
 
 Review and design Go code for correctness, concurrency safety, and simplicity.
 

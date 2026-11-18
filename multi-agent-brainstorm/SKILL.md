@@ -1,14 +1,12 @@
 ---
 name: multi-agent-brainstorm
 description: Use when a new idea or design question needs input from multiple distinct specialties at once — UI/UX, architecture, cost/tooling, code feasibility — before a direction is picked (an open-ended idea with many lenses, not a two-way choice with a clear criterion — that is `cross-verification`), to gather independent parallel analysis rather than one agent covering every lens sequentially
-version: 1.3.1
-model: opus
-effort: high
+version: 1.4.0
 ---
 
 # Multi-Agent Brainstorm
 
-**Run on:** opus · effort high — orchestrator; lenses per its own table.
+**Run on:** main · effort high — the orchestrator dispatches lenses and relays; the judgment is in the lens agents and the opus `critic`, so it keeps the session's model.
 
 Gathers independent, parallel analysis from distinct specialties on the same question — it does not decide. The decision stays with the user in the main session, exactly as `orchestrating-agents` phase 1 requires; this skill only enriches phase 2 (data gathering) with multiple simultaneous lenses instead of one pass.
 

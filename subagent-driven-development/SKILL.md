@@ -1,14 +1,12 @@
 ---
 name: subagent-driven-development
 description: Use when executing a written plan whose steps are genuinely independent, dispatching one subagent per independent task in the current session instead of running them sequentially
-version: 1.2.1
-model: opus
-effort: medium
+version: 1.3.0
 ---
 
 # Subagent-Driven Development
 
-**Run on:** opus · effort medium — orchestrator; `implementer` agents run on opus (new product code), at most 2 in parallel.
+**Run on:** main · effort medium — the orchestrator dispatches and verifies, so it keeps the session's model (sonnet where possible); `implementer` agents run on opus (new product code), at most 2 in parallel.
 
 Once `writing-plans` has flagged which steps of a plan are genuinely independent, dispatch them in parallel within the current session instead of running them one by one — then verify every report before treating that phase as done.
 

@@ -1,12 +1,12 @@
 ---
 name: python-backend
 description: Use when writing or reviewing Python backend code - services, scripts, or API handlers - for typing, error handling, async correctness, resource or subprocess safety, or input validation
-version: 1.0.1
+version: 1.0.2
 ---
 
 # Python Backend
 
-**Run on:** sonnet · effort high — writing and reviewing code.
+**Run on:** main · effort high — writing and reviewing code: new product code on opus (`implementer` or an opus session), reviews and bounded fixes on sonnet.
 
 Review and design Python code for clarity, reliability, and safety.
 
