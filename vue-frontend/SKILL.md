@@ -1,12 +1,12 @@
 ---
 name: vue-frontend
 description: Use when writing or reviewing Vue components - composables, state ownership, props/emits design, accessibility, or loading/empty/error UI states
-version: 1.0.3
+version: 1.0.4
 ---
 
 # Vue Frontend
 
-**Run on:** main · effort high — writing and reviewing code: new product code on opus (`implementer` or an opus session), reviews and bounded fixes on sonnet.
+**Run on:** main · effort high — writing and reviewing code: all code, new or fix, on opus (`implementer` or an opus session); a sonnet session reviews only and never types code.
 
 Design Vue code for maintainability, predictable state, and good UX.
 

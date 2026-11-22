@@ -65,6 +65,12 @@ if [ -n "$dir" ] && ! grep -q 'careful-guard.sh' "$HOME/.claude/settings.json" "
   echo "careful-guard: NOT REGISTERED (neither $proj_settings nor ~/.claude/settings.json), so destructive commands run without a confirmation prompt. Add the PreToolUse entry from the header of $dir/templates/session-start-hook.sh to $proj_settings and commit it on the working branch as the first change (like the SessionStart entry: added, not asked); tell the user in visible text. It applies from the next session."
 fi
 
+# 2b'. model-guard (child sessions that may write code are opened on opus) is a user-level hook: an orchestrator opens
+#      children from any project, so it is registered by the cloud setup script (or ~/.claude/settings.json locally).
+if [ -n "$dir" ] && ! grep -q 'model-guard.sh' "$HOME/.claude/settings.json" "$proj_settings" 2>/dev/null; then
+  echo "model-guard: NOT REGISTERED, so create_session is not checked for the Code-writing rule (code tickets on opus). Before opening any child session pass model explicitly by that rule yourself, and tell the user in visible text to re-paste $dir/templates/cloud-setup-script.sh into the environment's Setup script (claude.ai -> environment settings); locally, merge the create_session PreToolUse entry of $dir/settings.json into ~/.claude/settings.json."
+fi
+
 # 2c. Prompt suggestions stay on globally (user setting, never per project): turn them back on if missing or off.
 s="$HOME/.claude/settings.json"
 if [ "$(jq -r '.promptSuggestionEnabled' "$s" 2>/dev/null)" != "true" ]; then

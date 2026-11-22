@@ -6,6 +6,7 @@
 # so every session updates and installs the skills before the first turn, with or without claude-skills attached.
 # Best effort: never fails the container. Safe to re-run: re-pasting a newer version replaces the old hook entry.
 # It also registers scripts/careful-guard.sh (PreToolUse, Bash): destructive commands ask for confirmation even in auto mode,
+# and scripts/model-guard.sh (PreToolUse, create_session): a child session that may write code must be opened on opus,
 # and sets promptSuggestionEnabled: true (prompt suggestions stay on in every cloud session).
 # Usage limits: autoContinueAtUsageLimit only waits in an interactive local terminal, so a cloud session hitting a
 # claude.ai limit just stops. env CLAUDE_CODE_RETRY_WATCHDOG=1 makes the request wait out the limit and go on after
@@ -32,6 +33,9 @@ cmd="$cmd"' before any work, and say so in visible text."'
 guard='for f in "$HOME/.claude/hooks/careful-guard.sh" /home/user/claude-skills/scripts/careful-guard.sh'
 guard="$guard"' "$HOME/claude-skills/scripts/careful-guard.sh" "$HOME/.claude-skills-repo/scripts/careful-guard.sh";'
 guard="$guard"' do [ -f "$f" ] && exec bash "$f"; done; exit 0'
+mguard='for f in "$HOME/.claude/hooks/model-guard.sh" /home/user/claude-skills/scripts/model-guard.sh'
+mguard="$mguard"' "$HOME/claude-skills/scripts/model-guard.sh" "$HOME/.claude-skills-repo/scripts/model-guard.sh";'
+mguard="$mguard"' do [ -f "$f" ] && exec bash "$f"; done; exit 0'
 deny='["Booking.com", "claude.ai Booking.com", "eDreams", "claude.ai eDreams", "Gmail", "claude.ai Gmail",
  "Google Compute Engine", "claude.ai Google Compute Engine", "Postman", "claude.ai Postman",
  "Cloudflare Developer Platform", "claude.ai Cloudflare Developer Platform", "Booking_com", "claude.ai Booking_com",
@@ -44,26 +48,29 @@ deny="$(jq -nc --argjson a "$deny" --argjson b "$deny_extra" '$a + $b' 2>/dev/nu
 s="$HOME/.claude/settings.json"
 [ -s "$s" ] || echo '{}' > "$s"
 # Replace any earlier session-start-hook / careful-guard entry with this one, keep every other hook: jq, else python3.
-if ! { command -v jq >/dev/null 2>&1 && jq --arg c "$cmd" --arg g "$guard" --argjson d "$deny" '
+if ! { command -v jq >/dev/null 2>&1 && jq --arg c "$cmd" --arg g "$guard" --arg m "$mguard" --argjson d "$deny" '
     .hooks.SessionStart = ([.hooks.SessionStart[]? | select(([.hooks[]?.command] | map(contains("session-start-hook.sh")) | any) | not)]
                            + [{"hooks": [{"type": "command", "command": $c}]}])
-    | .hooks.PreToolUse = ([.hooks.PreToolUse[]? | select(([.hooks[]?.command] | map(contains("careful-guard.sh")) | any) | not)]
-                           + [{"matcher": "Bash", "hooks": [{"type": "command", "command": $g}]}])
+    | .hooks.PreToolUse = ([.hooks.PreToolUse[]? | select(([.hooks[]?.command] | map(contains("careful-guard.sh") or contains("model-guard.sh")) | any) | not)]
+                           + [{"matcher": "Bash", "hooks": [{"type": "command", "command": $g}]},
+                              {"matcher": "mcp__claude-code-remote__create_session", "hooks": [{"type": "command", "command": $m}]}])
     | .promptSuggestionEnabled = true | .autoContinueAtUsageLimit = true
     | .env = ((.env // {}) + {"CLAUDE_CODE_AUTO_COMPACT_WINDOW": "400000", "CLAUDE_CODE_RETRY_WATCHDOG": "1", "CLAUDE_CODE_RETRY_WATCHDOG_USAGE_LIMIT_RECHECK_MS": "300000"})
     | .syncClaudeAiPlugins = false
     | .deniedMcpServers = ((.deniedMcpServers // []) + ($d - [.deniedMcpServers[]?.serverName] | map({serverName: .})))' "$s" > "$s.tmp" && mv "$s.tmp" "$s"; }; then
   rm -f "$s.tmp"
-  err="claude-skills setup: could not register the SessionStart and careful-guard hooks (no jq, no python3)"
-  python3 - "$s" "$cmd" "$guard" "$deny" <<'PY' 2>/dev/null || echo "$err: sessions will not auto-update the skills" >&2
+  err="claude-skills setup: could not register the SessionStart, careful-guard and model-guard hooks (no jq, no python3)"
+  python3 - "$s" "$cmd" "$guard" "$deny" "$mguard" <<'PY' 2>/dev/null || echo "$err: sessions will not auto-update the skills" >&2
 import json, sys
-path, cmd, guard, deny = sys.argv[1], sys.argv[2], sys.argv[3], json.loads(sys.argv[4])
+path, cmd, guard, deny, mguard = sys.argv[1], sys.argv[2], sys.argv[3], json.loads(sys.argv[4]), sys.argv[5]
 cfg = json.load(open(path))
 hooks = cfg.setdefault("hooks", {})
 def keep(event, marker):
     return [e for e in hooks.get(event, []) if not any(marker in h.get("command", "") for h in e.get("hooks", []))]
 hooks["SessionStart"] = keep("SessionStart", "session-start-hook.sh") + [{"hooks": [{"type": "command", "command": cmd}]}]
-hooks["PreToolUse"] = keep("PreToolUse", "careful-guard.sh") + [{"matcher": "Bash", "hooks": [{"type": "command", "command": guard}]}]
+hooks["PreToolUse"] = [e for e in keep("PreToolUse", "careful-guard.sh") if not any("model-guard.sh" in h.get("command", "") for h in e.get("hooks", []))] \
+    + [{"matcher": "Bash", "hooks": [{"type": "command", "command": guard}]},
+       {"matcher": "mcp__claude-code-remote__create_session", "hooks": [{"type": "command", "command": mguard}]}]
 cfg["promptSuggestionEnabled"] = True
 cfg["autoContinueAtUsageLimit"] = True
 cfg.setdefault("env", {}).update({"CLAUDE_CODE_AUTO_COMPACT_WINDOW": "400000", "CLAUDE_CODE_RETRY_WATCHDOG": "1", "CLAUDE_CODE_RETRY_WATCHDOG_USAGE_LIMIT_RECHECK_MS": "300000"})

@@ -1,7 +1,7 @@
 ---
 name: refactor-optimizer
 description: Simplifies working code without changing behavior — removes duplication, reduces complexity, tightens naming, then proves behavior is unchanged by running the existing tests. Use on code that works but is messy and already has test coverage; not when behavior must change, tests are missing, or an API redesign is needed.
-model: sonnet
+model: opus
 tools: Bash, Read, Grep, Glob, Edit, Skill
 effort: medium
 skills:
