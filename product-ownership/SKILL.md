@@ -1,7 +1,7 @@
 ---
 name: product-ownership
 description: Use when publishing or creating a GitHub issue/ticket whose content is already settled (if its own design decisions are still open, `ticket-interrogation` runs first and hands back the title and body), researching external sources needed to write one, deciding whether something is a bug/research/implementation ticket, starting or finishing implementation work on a ticket, about to push or merge a completed change, or cleaning up branches after a PR merges or a commit supersedes it
-version: 1.26.0
+version: 1.26.1
 ---
 
 # Product Ownership
@@ -26,7 +26,7 @@ Own the lifecycle of a work item end to end: from a raw problem report to a grou
 | 6. Review | `requesting-code-review` (the discipline of asking before merging) runs the review panel for the diff (the `code-review` plugin if the user prefers it); add the `architecture-review` / `security-review` lens when the change touches structure or trust boundaries, the `market-analyst` lens for new external dependencies, and `receiving-code-review` when feedback comes back | level-gated per `cross-verification`: `reviewer` alone at L1, `reviewer` + the relevant lens at L2, full Mode C with `critic` at L3 |
 | 7. Closing | manual user gate (below) → `finishing-a-development-branch` (merge/PR/rebase options) → this skill: lesson capture (compound step), close issue, remove label, branch cleanup, skill version bumps | `deploy-readiness` when the merge deploys; `github-ops` for the mechanical follow-through once you've decided what to run: merge/push, `gh issue close`/label removal, local+remote branch and worktree cleanup |
 
-Every agent dispatch in any phase follows `orchestrating-agents`: the model matches the task (haiku mechanical, sonnet code/research/verification, opus for the judgment agents `architect`, `reviewer`, `security-auditor`, `critic`, `marketing-strategist`), the agent reports in the STATUS/CHANGES/EVIDENCE/FINDINGS/OPEN structure, and the orchestrator verifies the report before the next phase starts.
+Every agent dispatch in any phase follows `orchestrating-agents`: the model matches the task (haiku mechanical, sonnet research/verification/docs (never code: code-writing is opus), opus for the judgment agents `architect`, `reviewer`, `security-auditor`, `critic`, `marketing-strategist`), the agent reports in the STATUS/CHANGES/EVIDENCE/FINDINGS/OPEN structure, and the orchestrator verifies the report before the next phase starts.
 
 The table stays at phase level on purpose: domain skills are a category ("the relevant domain skill"), not an exhaustive list. Rationale and diagram live in the decision record `docs/reports/2026-07-17-ticket-4-workflow-skills-agents.md` (#4).
 

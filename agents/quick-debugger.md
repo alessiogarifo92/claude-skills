@@ -1,7 +1,7 @@
 ---
 name: quick-debugger
 description: Finds and fixes a localized bug with a clear symptom — locates the root cause, applies a minimal fix, runs the relevant tests, and reports what changed. Use for focused bug hunts with a known symptom and reproduction; not for vague symptoms ("it's slow"), cross-system issues, or anything needing a design decision.
-model: sonnet
+model: opus
 tools: Bash, Read, Grep, Glob, Edit, Skill
 effort: high
 skills:

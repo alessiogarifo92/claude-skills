@@ -12,6 +12,11 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-11-22
+
+- orchestrating-agents 2.10.0 — regola "Code-writing rule" (richiesta dell'utente, dopo che le sessioni figlie #99 e #236 di mix-splash scrivevano codice su sonnet): **qualsiasi sessione o agent che scrive codice (feature, meccanica, bug fix, refactor, fix CI che tocca codice) gira su opus**, senza eccezioni per dimensione o per test verdi. Sonnet solo per lavoro senza codice (coordinazione, ricerca, verifica, playtest, docs, contenuti solo-dati, PR portata a verde senza modifiche al codice). Una sessione non può cambiare il proprio modello: la scelta si fa al dispatch (ticket che tocca codice → `create_session` con opus; ticket ambiguo → opus) e una sessione sonnet che scopre di dover scrivere codice delega a `implementer` (opus) o si ferma. `quick-debugger` e `refactor-optimizer` passano a `model: opus`.
+- Allineati `CLAUDE.md`, `README.md`, `direct-execution` 1.4.2, `product-ownership` 1.26.1, `test-driven-development` 1.0.3, `autonomous-workflow` 1.14.1 e le skill stack (`laravel-architecture`, `vue-frontend`, `go-backend`, `python-backend`) che ancora ammettevano "bounded fix su sonnet".
+
 ## 2026-11-18
 
 - Orchestratore su sonnet dove possibile (richiesta dell'utente, dopo che la sessione orchestratrice del 17/11 aveva proposto da sola "fai il prossimo con sonnet"): orchestrating-agents 2.9.0, nuova sezione "The orchestrator's own model" — la sessione che coordina (dispatch, verifica dei report, git e ticket, check-in, sessioni figlie) gira su sonnet; opus solo quando scrive lei stessa codice di prodotto o conduce una fase di decisione con l'utente. Il modello non può cambiarsi da solo: manager aperto con `create_session` → sonnet; in sessione interattiva proporre `/model sonnet` in una riga al cambio di fase (e `/model opus` per tornare), verificando il modello reale con `get_session`. Token budget: il manager passa da opus a sonnet. CLAUDE.md globale e README allineati.
