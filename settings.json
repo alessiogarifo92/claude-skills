@@ -15,6 +15,15 @@
             "command": "for f in \"$HOME/.claude/hooks/careful-guard.sh\" /home/user/claude-skills/scripts/careful-guard.sh \"$HOME/claude-skills/scripts/careful-guard.sh\" \"$HOME/.claude-skills-repo/scripts/careful-guard.sh\"; do [ -f \"$f\" ] && exec bash \"$f\"; done; exit 0"
           }
         ]
+      },
+      {
+        "matcher": "mcp__claude-code-remote__create_session",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "for f in \"$HOME/.claude/hooks/model-guard.sh\" /home/user/claude-skills/scripts/model-guard.sh \"$HOME/claude-skills/scripts/model-guard.sh\" \"$HOME/.claude-skills-repo/scripts/model-guard.sh\"; do [ -f \"$f\" ] && exec bash \"$f\"; done; exit 0"
+          }
+        ]
       }
     ]
   },

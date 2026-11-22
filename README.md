@@ -22,7 +22,8 @@ Private skills, agents and global rules for Claude Code. Goal: run a project fro
 - `templates/session-start-hook.sh` — SessionStart hook every project commits; `templates/cloud-setup-script.sh` — cloud environment setup script registering it at user level.
 - `scripts/agent-guard.sh` — PreToolUse hook every agent but `github-ops` carries (linked to `~/.claude/hooks/` by `install.sh`): blocks git and GitHub writes, which belong to the main session. Agent and hook changes apply to sessions started after `install.sh`.
 - `scripts/careful-guard.sh` — PreToolUse hook (Bash) for the main session, registered in each project's committed `.claude/settings.json` (the entry is in the header of `templates/session-start-hook.sh`; this repo carries it), so it is active from the first session in any container with no user step; the same command string is also in `settings.json` and the cloud setup script, and Claude Code runs an identical handler once: force-push, `reset --hard`, recursive deletes outside build/cache/temp dirs, DB wipes and Docker volume removal answer `ask`, which forces a confirmation prompt even in auto mode. `CAREFUL_GUARD_OFF=1` turns it off.
-- Tests (CI runs them all, plus `shellcheck`): `worktree-manager/scripts/worktree_test.sh`, `scripts/agent-guard_test.sh`, `scripts/careful-guard_test.sh`, `scripts/scripts_test.sh` (install, SessionStart hook, cloud setup).
+- `scripts/model-guard.sh` — PreToolUse hook (`mcp__claude-code-remote__create_session`) for the main session, registered at user level by `templates/cloud-setup-script.sh` (locally: the entry in `settings.json`): **denies** opening a child session with no `model`, or with a non-opus model unless the prompt carries the line `SESSIONE SENZA CODICE` (`orchestrating-agents`, Code-writing rule). Fails open without python3; off switch `MODEL_GUARD_OFF=1`; extra code-capable models via `MODEL_GUARD_CODE_MODELS` (regex, default `opus`).
+- Tests (CI runs them all, plus `shellcheck`): `worktree-manager/scripts/worktree_test.sh`, `scripts/agent-guard_test.sh`, `scripts/careful-guard_test.sh`, `scripts/model-guard_test.sh`, `scripts/scripts_test.sh` (install, SessionStart hook, cloud setup).
 - `scripts/validate.py` — consistency check (CI runs it); `scripts/install.sh` — link into `~/.claude`; `scripts/install-design-skills.sh` — link the external design skills (`impeccable`, a subset of Emil Kowalski's) at pinned commits.
 - `CHANGELOG.md` — one line per skill change, same commit as the change.
 
@@ -65,7 +66,7 @@ Policy: **opus** where judgment is expensive and no test catches the error (arch
 | `laravel-architecture` | 1.3.3 | main | high |
 | `market-analyst` | 1.0.3 | sonnet | medium |
 | `multi-agent-brainstorm` | 1.4.0 | main | high |
-| `orchestrating-agents` | 2.10.0 | main | high |
+| `orchestrating-agents` | 2.11.0 | main | high |
 | `principal-engineering-core` | 1.2.0 | opus | high |
 | `product-marketing-strategist` | 1.1.1 | opus | medium |
 | `product-ownership` | 1.26.1 | sonnet | medium |

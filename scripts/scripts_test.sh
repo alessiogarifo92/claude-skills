@@ -21,6 +21,7 @@ check "install links agents" test -L "$H/agents/reviewer.md"
 check "install links CLAUDE.md" test "$(readlink "$H/CLAUDE.md")" = "$ROOT/CLAUDE.md"
 check "install links the agent guard hook" test "$(readlink "$H/hooks/agent-guard.sh")" = "$ROOT/scripts/agent-guard.sh"
 check "install links the careful guard hook" test "$(readlink "$H/hooks/careful-guard.sh")" = "$ROOT/scripts/careful-guard.sh"
+check "install links the model guard hook" test "$(readlink "$H/hooks/model-guard.sh")" = "$ROOT/scripts/model-guard.sh"
 check "install never overwrites a real file" grep -qx mine "$H/skills/api-design"
 check "install reports the skipped file" grep -q "SKIP $H/skills/api-design" "$TMP/i1.out"
 CLAUDE_HOME="$H" bash "$ROOT/scripts/install.sh" > "$TMP/i2.out"
@@ -43,6 +44,7 @@ check "hook fast-forwards a clean clone" test "$(git -C "$C" rev-parse HEAD)" = 
 check "hook reports up to date" grep -q "up to date with origin/main" <<<"$out"
 check "hook prints the entry skills line" grep -q "^skills entry:" <<<"$out"
 check "hook warns when careful-guard is not registered" grep -q "^careful-guard: NOT REGISTERED" <<<"$out"
+check "hook warns when model-guard is not registered" grep -q "^model-guard: NOT REGISTERED" <<<"$out"
 mkdir -p "$HH/.claude" && echo '{"hooks":{"PreToolUse":[{"matcher":"Bash","hooks":[{"command":"bash ~/.claude/hooks/careful-guard.sh"}]}]}}' > "$HH/.claude/settings.json"
 check "hook is silent about careful-guard once registered" bash -c "! grep -q 'careful-guard' <<<\"\$(HOME='$HH' SKILLS_REPO_DIR='$C' CLAUDE_PROJECT_DIR='$TMP/noproject' HOOK_TIMEOUT=2 DESIGN_SKILLS_DIR='$TMP/design' bash '$ROOT/templates/session-start-hook.sh' 2>/dev/null)\""
 rm -f "$HH/.claude/settings.json"
@@ -134,6 +136,7 @@ setup_home() { # setup_home <dir>: a HOME with its own clone in place (no networ
   {"hooks": [{"type": "command", "command": "echo unrelated"}]},
   {"hooks": [{"type": "command", "command": "bash /old/templates/session-start-hook.sh"}]}],
  "PreToolUse": [{"matcher": "Bash", "hooks": [{"type": "command", "command": "bash /old/careful-guard.sh"}]},
+  {"matcher": "mcp__claude-code-remote__create_session", "hooks": [{"type": "command", "command": "bash /old/model-guard.sh"}]},
   {"matcher": "Edit", "hooks": [{"type": "command", "command": "echo other-pre"}]}]}}
 JSON
 }
@@ -149,6 +152,11 @@ s=[x for x in cmds if 'session-start-hook.sh' in x]; assert len(s)==1 and '/old/
   check "$2: exactly one careful-guard entry, on Bash, the new one" python3 -c "
 import json; c=json.load(open('$s')); e=[e for e in c['hooks']['PreToolUse'] if any('careful-guard.sh' in h['command'] for h in e['hooks'])]
 assert len(e)==1 and e[0]['matcher']=='Bash' and '/old/' not in e[0]['hooks'][0]['command']"
+  check "$2: exactly one model-guard entry, on create_session, the new one, and the other PreToolUse hook kept" python3 -c "
+import json; c=json.load(open('$s')); p=c['hooks']['PreToolUse']; e=[e for e in p if any('model-guard.sh' in h['command'] for h in e['hooks'])]
+assert len(e)==1 and e[0]['matcher']=='mcp__claude-code-remote__create_session' and '/old/' not in e[0]['hooks'][0]['command']
+assert any(h['command']=='echo other-pre' for x in p for h in x['hooks'])"
+  check "$2: registered model-guard command runs the guard (deny sonnet without the code-free line)" bash -c "c=\"\$(python3 -c \"import json; c=json.load(open('$s')); print([h['command'] for e in c['hooks']['PreToolUse'] for h in e['hooks'] if 'model-guard.sh' in h['command']][0])\")\"; mkdir -p '$1/.claude/hooks'; ln -sf '$ROOT/scripts/model-guard.sh' '$1/.claude/hooks/model-guard.sh'; printf '{\"tool_name\":\"mcp__claude-code-remote__create_session\",\"tool_input\":{\"model\":\"claude-sonnet-5-5\",\"prompt\":\"x\"}}' | HOME='$1' bash -c \"\$c\" | grep -q deny"
   check "$2: usage-limit watchdog env set, other env kept, auto-continue on" python3 -c "
 import json; c=json.load(open('$s')); e=c['env']
 assert e['CLAUDE_CODE_RETRY_WATCHDOG']=='1' and e['KEEP']=='me' and c['autoContinueAtUsageLimit'] is True
