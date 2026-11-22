@@ -32,7 +32,7 @@ def deny(reason):
         "permissionDecision": "deny", "permissionDecisionReason": "model-guard: " + reason}}))
     sys.exit(0)
 if not model:
-    deny("pass `model` explicitly: without it the child inherits this session’s model. "
+    deny("pass `model` explicitly: without it the child inherits the model of this session. "
          "claude-opus-5-5 if the ticket will edit any source or test code (feature, mechanic, fix, refactor, "
          "a stage that touches scripts/src; when unsure, opus); claude-sonnet-5-5 only for code-free work, with the "
          "line \"SESSIONE SENZA CODICE\" in the prompt (orchestrating-agents, Code-writing rule).")
