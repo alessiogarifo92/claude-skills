@@ -1,0 +1,121 @@
+# Release workflow: GitHub itself creates the tag vX.Y.Z and its release, with GITHUB_TOKEN.
+# A remote Claude session cannot: its proxy refuses `git push` of a tag and `POST repos/{o}/{r}/git/refs` (403),
+# but it can start this workflow (GitHub MCP `actions_run_trigger`, workflow `release.yml`, ref `main`,
+# inputs {"version": "1.2.3", "dry_run": true}); `product-ownership`, "Without `gh`", has the whole path.
+#
+# Copy to <project>/.github/workflows/release.yml and adapt the lines marked ADAPT: the CI workflow whose green run
+# the commit needs, where the version lives (package.json here), the build of the files to attach.
+# Run it twice: dry_run on (the default) shows in the run summary the tag, commit, title and notes it would create;
+# then dry_run off, only after the user's explicit OK on that summary.
+#
+# A tag created with GITHUB_TOKEN starts no other workflow (GitHub's rule: only workflow_dispatch and
+# repository_dispatch runs are created), so an `on: push: tags: ['v*']` build never fires for it: build the files
+# to attach in this same job, between the two steps. A project whose build workflow already publishes its
+# artifacts on a tag adds the `version`/`dry_run` inputs to that workflow instead (Release checks before the
+# build, Publish after it, `permissions` on its job), as mix-splash did in .github/workflows/android.yml.
+#
+# If Publish fails after the tag was pushed, the next run stops at "already exists": delete that tag first.
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release, X.Y.Z without v (the tag is vX.Y.Z): must match package.json and have a non-empty CHANGELOG.md section'
+        required: true
+        type: string
+      dry_run:
+        description: 'Run the checks and show what would be created, without creating the tag or the release'
+        required: false
+        type: boolean
+        default: true
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # the tag and the release
+      actions: read # the checks read the CI runs of the commit
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Release checks
+        # Before anything is built or created: a failed check stops the run here, with nothing created.
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          CI_WORKFLOW: ci.yml # ADAPT: the workflow file whose green run on this commit a release requires
+        run: |
+          set -euo pipefail
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error title=Release check::Version \"$VERSION\" must be X.Y.Z, without v (the tag adds it) and without a suffix."
+            exit 1
+          fi
+          errors=()
+          [[ "$GITHUB_REF" == "refs/heads/$DEFAULT_BRANCH" ]] ||
+            errors+=("A release runs on the default branch ($DEFAULT_BRANCH) only; this run is on $GITHUB_REF.")
+          pkg=$(jq -r .version package.json) # ADAPT: where the project keeps its version
+          [[ "$pkg" == "$VERSION" ]] || errors+=("package.json is at $pkg, not $VERSION: bump it on $DEFAULT_BRANCH first.")
+          # The "## 1.2.3 ..." or "## [1.2.3] ..." section, up to the next "## ": 1.2.1 never reads the 1.2.10 notes.
+          if ! notes=$(awk -v v="$VERSION" '$1 == "##" { if (f) exit; if ($2 == v || $2 == "[" v "]") f = found = 1; next }
+                f { print } END { exit !found }' CHANGELOG.md); then
+            errors+=("CHANGELOG.md has no \"## $VERSION\" section.")
+          elif [[ -z "${notes//[[:space:]]/}" ]]; then
+            errors+=("The \"## $VERSION\" section of CHANGELOG.md is empty.")
+          else
+            printf '%s\n' "$notes" > "$RUNNER_TEMP/release-notes.md"
+          fi
+          [[ -z "$(git ls-remote --tags origin "refs/tags/v$VERSION")" ]] || errors+=("Tag v$VERSION already exists.")
+          run=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/$CI_WORKFLOW/runs?head_sha=$GITHUB_SHA&per_page=1" \
+            --jq '.workflow_runs[0] // empty | "\(.status) \(.conclusion) \(.html_url)"')
+          read -r status conclusion url <<< "$run"
+          if [[ -z "$status" ]]; then errors+=("No CI run ($CI_WORKFLOW) found for commit $GITHUB_SHA.")
+          elif [[ "$status" != completed ]]; then errors+=("CI on this commit is still $status: run again when it is green ($url).")
+          elif [[ "$conclusion" != success ]]; then errors+=("CI on this commit ended with $conclusion, not success ($url).")
+          fi
+          for e in "${errors[@]}"; do echo "::error title=Release check::$e"; done
+          [[ ${#errors[@]} -eq 0 ]] || exit 1
+          echo "Release checks passed for v$VERSION on $GITHUB_SHA."
+
+      # ADAPT: build the files to attach here, in this job, and list them in ASSETS below.
+
+      - name: Publish tag and release (on a dry run, show them instead)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+          # Publishes only when dry_run is explicitly false.
+          DRY_RUN: ${{ inputs.dry_run }}
+          ASSETS: '' # ADAPT: space-separated files built above, e.g. dist/app.zip
+        run: |
+          set -euo pipefail
+          TAG="v$VERSION"
+          TITLE="$TAG" # ADAPT: release title
+          read -ra files <<< "$ASSETS"
+          if [[ "$DRY_RUN" != false ]]; then
+            # Also in the log: a remote session reads the run with get_job_logs, which has no step summary.
+            {
+              echo '### Dry run: nothing was created'
+              echo
+              echo 'With `dry_run` off, this run would create:'
+              echo
+              echo "- annotated tag \`$TAG\` on commit \`$GITHUB_SHA\`"
+              echo "- release **$TITLE**, marked latest, assets: ${files[*]:-none}"
+              echo
+              echo '#### Release notes'
+              echo
+              cat "$RUNNER_TEMP/release-notes.md"
+            } | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          # An annotated tag on the commit that was checked and built, pushed with GITHUB_TOKEN (checkout keeps it).
+          # `gh release create --target "$GITHUB_SHA"` without the tag would also work, but makes a lightweight tag.
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git tag -a "$TAG" -m "$TITLE" "$GITHUB_SHA"
+          git push origin "refs/tags/$TAG"
+          gh release create "$TAG" "${files[@]}" --verify-tag --latest --title "$TITLE" --notes-file "$RUNNER_TEMP/release-notes.md"

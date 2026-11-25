@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Tests for install.sh, templates/session-start-hook.sh and templates/cloud-setup-script.sh,
+# Tests for install.sh, templates/session-start-hook.sh, templates/cloud-setup-script.sh and templates/release-workflow.yml,
 # each run against a throwaway HOME — never touches the real ~/.claude. Run: bash scripts/scripts_test.sh
 set -u
 ROOT="$(cd "$(dirname "$0")/.." && pwd -P)"
@@ -185,5 +185,92 @@ check "setup script commits no account connector IDs (deny_extra stays empty)" g
 check "setup script fits the environment editor (lines <= 200 bytes, <= 100 lines)" python3 -c "
 L=open('$ROOT/templates/cloud-setup-script.sh','rb').read().split(b'\\n'); assert len(L)<=100 and max(map(len,L))<=200"
 check "setup creates ~/.claude/agents before the session starts" test -d "$TMP/cs2/.claude/agents"
+
+# --- release-workflow.yml: structure, then its two run scripts against a fake project with git/gh stubs ---
+RW="$ROOT/templates/release-workflow.yml"; RWD="$TMP/rw"; mkdir -p "$RWD/bin" "$RWD/proj" "$RWD/tmp"
+rw_yaml() { python3 -c "
+import yaml; w=yaml.safe_load(open('$RW')); on=w.get('on', w.get(True)); steps=w['jobs']['release']['steps']
+checks=[s for s in steps if s.get('name')=='Release checks'][0]
+publish=[s for s in steps if str(s.get('name','')).startswith('Publish')][0]
+$1"; }
+check "release workflow: valid YAML, workflow_dispatch only" rw_yaml "assert list(on)==['workflow_dispatch']"
+check "release workflow: version required string, dry_run boolean defaulting to true" rw_yaml "
+i=on['workflow_dispatch']['inputs']; assert i['version']['required'] is True and i['version']['type']=='string'
+assert i['dry_run']['type']=='boolean' and i['dry_run']['default'] is True"
+check "release workflow: permissions contents write + actions read" rw_yaml "
+assert w['jobs']['release']['permissions']=={'contents':'write','actions':'read'}"
+check "release workflow: no \${{ }} inside any run script (inputs only via env)" rw_yaml "
+assert all('\${{' not in s['run'] for s in steps if 'run' in s)"
+check "release workflow: checks run unconditionally, before the publish step" rw_yaml "
+assert 'if' not in checks and steps.index(checks) < steps.index(publish)"
+rw_yaml "open('$RWD/checks.sh','w').write(checks['run']); open('$RWD/publish.sh','w').write(publish['run'])" 2>/dev/null
+cat > "$RWD/bin/git" <<'SH'
+#!/bin/sh
+echo "git $*" >> "$CALLS"
+if [ "$1" = ls-remote ] && [ -n "${FAKE_TAGS:-}" ]; then printf '%s\n' "$FAKE_TAGS"; fi
+exit 0
+SH
+cat > "$RWD/bin/gh" <<'SH'
+#!/bin/sh
+echo "gh $*" >> "$CALLS"
+if [ "$1" = api ]; then  # apply the step's own --jq to a fake runs list, as gh does
+  while [ $# -gt 0 ]; do if [ "$1" = --jq ]; then printf '%s' "$FAKE_RUNS" | jq -r "$2"; exit; fi; shift; done
+fi
+exit 0
+SH
+chmod +x "$RWD/bin/git" "$RWD/bin/gh"
+echo '{"name": "p", "version": "1.2.3"}' > "$RWD/proj/package.json"
+cat > "$RWD/proj/CHANGELOG.md" <<'MD'
+# Changelog
+
+## 1.2.10 — later
+
+- notes of ten
+
+## [1.2.4] - 2026-11-20
+
+## 1.2.3 — first
+
+### Added
+
+- notes of three
+MD
+GREEN='{"workflow_runs":[{"status":"completed","conclusion":"success","html_url":"https://x/run/1"}]}'
+rw() { # rw <checks|publish> [VAR=value...]: run a step script in the fake project; output in $RWD/out, calls in $RWD/calls
+  local s="$1"; shift; : > "$RWD/calls"
+  (cd "$RWD/proj" && env PATH="$RWD/bin:$PATH" CALLS="$RWD/calls" RUNNER_TEMP="$RWD/tmp" GITHUB_STEP_SUMMARY="$RWD/summary" \
+    GITHUB_REF=refs/heads/main DEFAULT_BRANCH=main GITHUB_SHA=abc123 GITHUB_REPOSITORY=o/r CI_WORKFLOW=ci.yml \
+    VERSION=1.2.3 FAKE_TAGS='' FAKE_RUNS="$GREEN" ASSETS='' DRY_RUN=true "$@" bash "$RWD/$s.sh") > "$RWD/out" 2>&1; }
+rw_fails() { # rw_fails <message regex> [VAR=value...]: the checks exit non-zero and say why
+  local m="$1"; shift; ! rw checks "$@" && grep -Eq "::error.*$m" "$RWD/out"; }
+rw_all_failures() { rw_fails 'package.json' VERSION=1.2.5 GITHUB_REF=refs/heads/topic && test "$(grep -c '::error' "$RWD/out")" -eq 3; }
+rw_created_nothing() { ! grep -Eq '^git (tag|push)|^gh release' "$RWD/calls"; }
+rw_published() {
+  rw publish DRY_RUN=false ASSETS='a.zip b.zip' && grep -Eq '^git tag -a v1\.2\.3 -m .* abc123$' "$RWD/calls" &&
+    grep -qx 'git push origin refs/tags/v1.2.3' "$RWD/calls" &&
+    grep -Eq "^gh release create v1\.2\.3 a\.zip b\.zip --verify-tag .*--notes-file $RWD/tmp/release-notes\.md" "$RWD/calls"; }
+check "release checks pass on a clean release" rw checks
+check "release checks read the CI runs of this commit from the configured workflow" grep -q 'actions/workflows/ci.yml/runs?head_sha=abc123' "$RWD/calls"
+check "release notes are the exact section (1.2.3 never reads 1.2.10)" bash -c "grep -q 'notes of three' '$RWD/tmp/release-notes.md' && ! grep -q 'notes of ten' '$RWD/tmp/release-notes.md'"
+check "release checks refuse a version with v" rw_fails 'X\.Y\.Z' VERSION=v1.2.3
+check "release checks refuse a suffix" rw_fails 'X\.Y\.Z' VERSION=1.2.3-rc.1
+check "release checks refuse an empty version" rw_fails 'X\.Y\.Z' VERSION=
+check "release checks refuse a version other than package.json" rw_fails 'package.json is at 1.2.3' VERSION=1.2.10
+check "release checks refuse a version with no CHANGELOG section" rw_fails 'no "## 1.2.5" section' VERSION=1.2.5
+check "release checks never take 1.2.10 for the 1.2.1 section" rw_fails 'no "## 1.2.1" section' VERSION=1.2.1
+check "release checks refuse an empty CHANGELOG section (Keep a Changelog heading)" rw_fails 'is empty' VERSION=1.2.4
+check "release checks refuse an existing tag" rw_fails 'v1.2.3 already exists' FAKE_TAGS="$(printf 'abc\trefs/tags/v1.2.3')"
+check "release checks refuse a run off the default branch" rw_fails 'default branch' GITHUB_REF=refs/heads/topic
+check "release checks refuse a commit with no CI run" rw_fails 'No CI run' FAKE_RUNS='{"workflow_runs":[]}'
+check "release checks refuse CI still running" rw_fails 'still in_progress' FAKE_RUNS='{"workflow_runs":[{"status":"in_progress","conclusion":null,"html_url":"u"}]}'
+check "release checks refuse red CI" rw_fails 'ended with failure' FAKE_RUNS='{"workflow_runs":[{"status":"completed","conclusion":"failure","html_url":"u"}]}'
+check "release checks report every failure, not only the first" rw_all_failures
+rw checks; : > "$RWD/summary"
+check "dry run exits 0" rw publish
+check "dry run creates nothing" rw_created_nothing
+check "dry run summary shows tag, commit and notes" bash -c "grep -q 'v1.2.3' '$RWD/summary' && grep -q 'abc123' '$RWD/summary' && grep -q 'notes of three' '$RWD/summary'"
+check "dry run prints the same to the job log (get_job_logs has no step summary)" bash -c "grep -q 'tag \`v1.2.3\` on commit \`abc123\`' '$RWD/out' && grep -q 'notes of three' '$RWD/out'"
+check "anything but dry_run=false is a dry run" bash -c "$(declare -f rw rw_created_nothing); RWD='$RWD' GREEN='$GREEN'; rw publish DRY_RUN='' && rw_created_nothing"
+check "dry_run=false pushes an annotated tag on the built commit, then the release on it" rw_published
 
 exit $FAIL
