@@ -58,7 +58,7 @@ Policy: **opus** where judgment is expensive and no test catches the error (arch
 | `database-design` | 1.2.0 | opus | high |
 | `debugging-workflow` | 1.0.3 | sonnet | high |
 | `deploy-readiness` | 1.6.0 | opus | high |
-| `device-health` | 1.0.0 | main | low |
+| `device-health` | 1.1.0 | main | low |
 | `direct-execution` | 1.4.2 | main | medium |
 | `docs-and-specs` | 1.0.2 | sonnet | medium |
 | `executing-plans` | 1.0.1 | sonnet | medium |
