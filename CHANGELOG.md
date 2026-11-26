@@ -12,6 +12,10 @@ Regole di bump:
 Il bump di versione e la riga di changelog vanno nello stesso commit della
 modifica alla skill.
 
+## 2026-11-26
+
+- Nuova skill device-health 1.0.0 - controllo e ottimizzazione dei dispositivi personali dell'utente: tablet Samsung SM-X230 e TV Xiaomi via adb (ricerca della porta con `adb mdns services`, diagnostica di sola lettura, ottimizzazioni reversibili, app inutilizzate disattivate con `pm disable-user` solo dopo il sì dell'utente) e PC Windows (controlli in PowerShell). Nata dalla sessione di ottimizzazione del tablet del 26/11.
+
 ## 2026-11-25
 
 - product-ownership 1.27.0 — tabella "Without `gh`", nuova riga **tag / release**: da una sessione remota il proxy rifiuta con 403 il `git push` di un tag e `POST .../git/refs`; il tag e la release li crea GitHub con il workflow di release del progetto (`workflow_dispatch`, `version` X.Y.Z senza `v`, `dry_run` acceso di default) lanciato con `actions_run_trigger`: prima la prova a secco, poi `dry_run: false` solo dopo il sì esplicito dell'utente. Ripiego: i passi UI con il tag `vX.Y.Z` **con la `v`**, mai un'altra via attorno al 403. Motivo: mix-splash 0.6.0 (24/11), release pubblicata a mano col tag `0.6.0`, la build su `v*` non è partita e la release è uscita senza APK.
