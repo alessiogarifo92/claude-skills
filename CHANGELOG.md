@@ -14,6 +14,7 @@ modifica alla skill.
 
 ## 2026-11-26
 
+- device-health 1.1.0 - uso da Claude Code sul cellulare (Termux/PRoot): scelta in base all'host, associazione e ricerca della porta senza mdns, Galaxy S23 tra i dispositivi, niente `adb tcpip 5555`, note su diskstats e carico del tablet.
 - Nuova skill device-health 1.0.0 - controllo e ottimizzazione dei dispositivi personali dell'utente: tablet Samsung SM-X230 e TV Xiaomi via adb (ricerca della porta con `adb mdns services`, diagnostica di sola lettura, ottimizzazioni reversibili, app inutilizzate disattivate con `pm disable-user` solo dopo il sì dell'utente) e PC Windows (controlli in PowerShell). Nata dalla sessione di ottimizzazione del tablet del 26/11.
 
 ## 2026-11-25
